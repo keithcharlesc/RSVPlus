@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Alert } from "react-bootstrap";
+import { Container, Button, Alert } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useHistory } from "react-router-dom";
 
@@ -21,16 +21,25 @@ export default function Dashboard() {
 
   return (
     <>
-      <h2 className="text-center mb-4">Profile</h2>
-      {error && <Alert variant="danger">{error}</Alert>}
-      <strong>Email:</strong> {currentUser.email}
-      <Link to="/update-profile" className="btn btn-primary w-100 mt-3">
-        Update Profile
-      </Link>
-      <div className="w-100 text-center mt-2">
-        <Button variant="link" onClick={handleLogout}>
-          Log Out
-        </Button>
+      <div class="p-3 mb-2 bg-dark text-white">
+        <Container
+          className="d-flex align-items-center justify-content-center"
+          style={{ minHeight: "100vh" }}
+        >
+          <div className="w-100" style={{ maxWidth: "400px" }}>
+            <h2 className="text-center mb-4">Profile</h2>
+            {error && <Alert variant="danger">{error}</Alert>}
+            <strong>Email:</strong> {currentUser.email}
+            <Link to="/update-profile" className="btn btn-primary w-100 mt-3">
+              Update Profile
+            </Link>
+            <div className="w-100 text-center mt-2">
+              <Button variant="link" onClick={handleLogout}>
+                Log Out
+              </Button>
+            </div>
+          </div>
+        </Container>
       </div>
     </>
   );
