@@ -3,11 +3,10 @@ import { Container, Form, Button, Alert } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useHistory } from "react-router-dom";
 
-export default function Signup() {
+export default function Login() {
   const emailRef = useRef();
   const passwordRef = useRef();
-  const passwordConfirmRef = useRef();
-  const { signUp } = useAuth();
+  const { login } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const history = useHistory();
@@ -16,20 +15,14 @@ export default function Signup() {
     //Prevent form from refreshing
     event.preventDefault();
 
-    //Exit out of the function if there's an error
-    if (passwordRef.current.value !== passwordConfirmRef.current.value) {
-      return setError("Passwords do not match");
-    }
-
     try {
       setError("");
-      //Prevent user from submitting multiple sign ups
       setLoading(true);
-      await signUp(emailRef.current.value, passwordRef.current.value);
+      await login(emailRef.current.value, passwordRef.current.value);
       //Upon success, bring to dashboard page
       history.push("/");
     } catch {
-      setError("Failed to sign up for an account.");
+      setError("Failed to log in.");
     }
 
     setLoading(false);
@@ -43,7 +36,9 @@ export default function Signup() {
           style={{ minHeight: "100vh" }}
         >
           <div className="w-100" style={{ maxWidth: "400px" }}>
-            <h2 className="text-center mb-4">Sign Up</h2>
+            <h1 className="text-center mb-5">
+              Welcome to <em className="text-danger">RSVP!</em>
+            </h1>
             {error && <Alert variant="danger">{error}</Alert>}
             <Form onSubmit={handleSubmit}>
               <Form.Group id="email">
@@ -53,30 +48,18 @@ export default function Signup() {
               <br></br>
               <Form.Group id="password">
                 <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  ref={passwordRef}
-                  placeholder="Minimum 6 characters long."
-                  required
-                />
-              </Form.Group>
-              <br></br>
-              <Form.Group id="password-confirm">
-                <Form.Label>Confirm Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  ref={passwordConfirmRef}
-                  placeholder="Minimum 6 characters long."
-                  required
-                />
+                <Form.Control type="password" ref={passwordRef} required />
               </Form.Group>
               <br></br>
               <Button disabled={loading} className="w-100" type="submit">
-                Sign Up
+                Log In
               </Button>
             </Form>
+            <div className="w-100 text-center mt-3">
+              <Link to="/forgot-password">Forgot Password?</Link>
+            </div>
             <div className="w-100 text-center mt-2">
-              Already have an account? <Link to="/login">Log In</Link>
+              Need an account? <Link to="/signup">Sign Up</Link>
             </div>
           </div>
         </Container>
