@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Container, Form, Button, Alert } from "react-bootstrap";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { Link, useHistory } from "react-router-dom";
 
 export default function Signup() {
@@ -37,7 +37,7 @@ export default function Signup() {
 
   return (
     <>
-      <div class="p-3 mb-2 bg-dark text-white">
+      <div className="p-3 mb-2 bg-dark text-white">
         <Container
           className="d-flex align-items-center justify-content-center"
           style={{ minHeight: "100vh" }}

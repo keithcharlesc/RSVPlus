@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Container, Form, Button, Alert } from "react-bootstrap";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { Link } from "react-router-dom";
 
 export default function ForgotPassword() {
@@ -29,7 +29,7 @@ export default function ForgotPassword() {
 
   return (
     <>
-      <div class="p-3 mb-2 bg-dark text-white">
+      <div className="p-3 mb-2 bg-dark text-white">
         <Container
           className="d-flex align-items-center justify-content-center"
           style={{ minHeight: "100vh" }}

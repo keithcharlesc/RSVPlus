@@ -1,9 +1,10 @@
 import React, { useRef, useState } from "react";
 import { Container, Form, Button, Alert } from "react-bootstrap";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext.js";
 import { Link, useHistory } from "react-router-dom";
+import NavigationBar from "./NavigationBar";
 
-export default function UpdateProfile() {
+export default function Profile() {
   const emailRef = useRef();
   const passwordRef = useRef();
   const passwordConfirmRef = useRef();
@@ -46,7 +47,8 @@ export default function UpdateProfile() {
 
   return (
     <>
-      <div class="p-3 mb-2 bg-dark text-white">
+      <NavigationBar />
+      <div className="p-3 mb-2 bg-dark text-white">
         <Container
           className="d-flex align-items-center justify-content-center"
           style={{ minHeight: "100vh" }}
