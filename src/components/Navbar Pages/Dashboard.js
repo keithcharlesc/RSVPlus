@@ -1,24 +1,10 @@
-import React, { useState } from "react";
-import { Container, Button, Alert } from "react-bootstrap";
+import React from "react";
+import { Container, Card } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthContext";
-import { Link, useHistory } from "react-router-dom";
 import NavigationBar from "./NavigationBar";
 
 export default function Dashboard() {
-  const [error, setError] = useState("");
-  const { currentUser, logout } = useAuth();
-  const history = useHistory();
-
-  async function handleLogout() {
-    setError("");
-
-    try {
-      await logout();
-      history.pushState("/login");
-    } catch {
-      setError("Failed to log out.");
-    }
-  }
+  const { currentUser } = useAuth();
 
   return (
     <>
@@ -30,18 +16,42 @@ export default function Dashboard() {
         >
           <div className="w-100" style={{ maxWidth: "400px" }}>
             <h2 className="text-center mb-4">Welcome</h2>
-            {error && <Alert variant="danger">{error}</Alert>}
             <p className="d-flex align-items-center justify-content-center">
               {currentUser.email}
             </p>
-            <Link to="/profile" className="btn btn-primary w-100 mt-3">
-              Update Profile
-            </Link>
-            <div className="w-100 text-center mt-2">
-              <Button variant="link" onClick={handleLogout}>
-                Log Out
-              </Button>
-            </div>
+            <Card>
+              <Card.Body className="text-dark h6">
+                <small>
+                  <p>Hi, thanks for visiting our website!</p>
+                  <p>Currently:</p>
+                  <ul>
+                    <li>
+                      The Channels/Calendar/Contact Us Pages have yet to be
+                      build.
+                    </li>
+                  </ul>
+                  <p>Existing features:</p>
+                  <ul>
+                    <li className="mb-1">
+                      <strong>Navigation Bar</strong> that directs you to the
+                      different pages (Clicking on icon directs to home page)
+                    </li>
+                    <li className="mb-1">
+                      You can click on the <strong>profile tab</strong> in the
+                      navbar to update your email and password!
+                    </li>
+                    <li className="mb-1">
+                      You can see the{" "}
+                      <strong>
+                        existing logged in email in the top right corner
+                      </strong>{" "}
+                      and a <strong>logout button</strong> to sign you out!
+                    </li>
+                    <li>Sign up, Login, Forget/Reset Password features!</li>
+                  </ul>
+                </small>
+              </Card.Body>
+            </Card>
           </div>
         </Container>
       </div>
