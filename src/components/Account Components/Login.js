@@ -37,7 +37,7 @@ export default function Login() {
         >
           <div className="w-100" style={{ maxWidth: "400px" }}>
             <h1 className="text-center mb-5">
-              Welcome to <em className="text-danger">RSVP!</em>
+              Welcome to <em className="text-danger">RSVP+</em>
             </h1>
             {error && <Alert variant="danger">{error}</Alert>}
             <Form onSubmit={handleSubmit}>
