@@ -1,12 +1,12 @@
-RSVP Web App
+RSVPlus Web App
 
 ## Project Idea
 
-RSVP is a Web App for finding the most optimal time slot when it comes to organizing events or meetups with friends. The current issue is that organizing meetups by manually asking around or through telegram polls could be a inefficient and chaotic experience for many.
+RSVPlus is a Web App for finding the most optimal time slot when it comes to organizing events or meetups with friends. The current issue is that organizing meetups by manually asking around or through telegram polls could be a inefficient and chaotic experience for many.
 
-RSVP aims to solve these issues with its own unique features. Users will have their own local calendar in which they can import their google calendar to. There will be channels in which host can create when organizing a meetup/event and users can join the channel.
+RSVPlus aims to solve these issues with its own unique features. Users will have their own local calendar in which they can import their google calendar to. There will be channels in which host can create when organizing a meetup/event and users can join the channel.
 
-Through a broadcast from the host which requests for users date availability (start date - end date), users will be prompted the option to sync their local calendar. Upon everyone's agreement, RSVP's algorithm will take everyone's calendar availability for the specified dates into consideration. After which, it determines the most optimal time slot and broadcast it to the group, should there not be a date, alternative suggestions will be provided.
+Through a broadcast from the host which requests for users date availability (start date - end date), users will be prompted the option to sync their local calendar. Upon everyone's agreement, RSVPlus' algorithm will take everyone's calendar availability for the specified dates into consideration. After which, it determines the most optimal time slot and broadcast it to the group, should there not be a date, alternative suggestions will be provided.
 
 ## Purpose
 
