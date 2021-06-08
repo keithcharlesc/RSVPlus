@@ -32,7 +32,6 @@ export default function NavigationBar() {
             <Nav.Link href="/">Home</Nav.Link>
             <Nav.Link href="/channels">Channels</Nav.Link>
             <Nav.Link href="/calendar">Calendar</Nav.Link>
-            <Nav.Link href="/profile">Profile</Nav.Link>
             <Nav.Link href="/contact-us">Contact Us</Nav.Link>
           </Nav>
           <Nav>

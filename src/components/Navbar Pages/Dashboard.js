@@ -19,6 +19,7 @@ export default function Dashboard() {
             <p className="d-flex align-items-center justify-content-center">
               {currentUser.displayName}
             </p>
+            {/*
             <Card>
               <Card.Body className="text-dark h6">
                 <small>
@@ -52,6 +53,7 @@ export default function Dashboard() {
                 </small>
               </Card.Body>
             </Card>
+            */}
           </div>
         </Container>
       </div>
