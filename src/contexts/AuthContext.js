@@ -1,5 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { auth } from "../firebase";
+import firebase from "../firebase";
+import { useHistory } from "react-router-dom";
 
 const AuthContext = React.createContext();
 
@@ -8,6 +10,7 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
+  const history = useHistory();
   const [currentUser, setCurrentUser] = useState();
   const [loading, setLoading] = useState(true);
 
@@ -18,9 +21,25 @@ export function AuthProvider({ children }) {
   }
 
   //Login function
-  function login(email, password) {
+  function login() {
     //***SELF-REMINDER: POSSIBLE TO CHANGE THIS TO A DIFF BACKEND IF NEEDED
-    return auth.signInWithEmailAndPassword(email, password);
+    var provider = new firebase.auth.GoogleAuthProvider();
+    auth
+      .signInWithPopup(provider)
+      .then((result) => {
+        setCurrentUser(result.user);
+        history.push("/");
+        console.log(result);
+        var credential = result.credential;
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        var token = credential.accessToken;
+        // The signed-in user info.
+        var user = result.user;
+        // ...
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   //Logout function

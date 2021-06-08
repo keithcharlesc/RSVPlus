@@ -36,7 +36,7 @@ export default function NavigationBar() {
             <Nav.Link href="/contact-us">Contact Us</Nav.Link>
           </Nav>
           <Nav>
-            <Navbar.Text>Signed in as: {currentUser.email}</Navbar.Text>
+            <Navbar.Text>Signed in as: {currentUser.displayName}</Navbar.Text>
           </Nav>
         </Navbar.Collapse>
         <Button

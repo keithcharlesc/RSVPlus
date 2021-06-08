@@ -17,7 +17,7 @@ export default function Dashboard() {
           <div className="w-100" style={{ maxWidth: "400px" }}>
             <h2 className="text-center mb-4">Welcome</h2>
             <p className="d-flex align-items-center justify-content-center">
-              {currentUser.email}
+              {currentUser.displayName}
             </p>
             <Card>
               <Card.Body className="text-dark h6">
