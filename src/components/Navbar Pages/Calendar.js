@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Container } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
+import "./Calendar.css";
 
 export default function Calendar() {
   var gapi = window.gapi;
@@ -13,7 +14,8 @@ export default function Calendar() {
   var SCOPES = "https://www.googleapis.com/auth/calendar.events";
 
   /* ---------------- ADDING EVENT -------------*/
-  const handleClick = () => {
+  const handleClick = (e) => {
+    e.preventDefault();
     gapi.load("client:auth2", () => {
       console.log("loaded client!");
 
@@ -28,18 +30,17 @@ export default function Calendar() {
 
       gapi.auth2.getAuthInstance().then(() => {
         var event = {
-          summary: "Awesome Event!",
-          location: "800 Howard St., San Francisco, CA 94103",
-          description: "Really great refreshments",
+          summary: data.name,
+          location: data.location,
+          description: data.description,
           start: {
-            dateTime: "2021-06-28T09:00:00-07:00",
+            dateTime: data.startDate + "T09:00:00+08:00",
             timeZone: "Asia/Singapore",
           },
           end: {
-            dateTime: "2021-06-28T17:00:00-07:00",
+            dateTime: data.endDate + "T17:00:00+08:00",
             timeZone: "Asia/Singapore",
           },
-          recurrence: ["RRULE:FREQ=DAILY;COUNT=2"],
           reminders: {
             useDefault: false,
             overrides: [
@@ -48,6 +49,8 @@ export default function Calendar() {
             ],
           },
         };
+
+        console.log(event.start.dateTime);
 
         var request = gapi.client.calendar.events.insert({
           calendarId: "primary",
@@ -92,7 +95,22 @@ export default function Calendar() {
       });
     });
   };
-  /* --------------------------------------------*/
+  /* ----------Handle Form Input to use in API---------*/
+  const [data, setData] = useState({
+    name: "",
+    description: "",
+    location: "",
+    startDate: "",
+    endDate: "",
+  });
+
+  function handleSubmitForm(e) {
+    const newData = { ...data };
+    newData[e.target.id] = e.target.value;
+    setData(newData);
+    console.log(newData);
+  }
+  /*---------------------------------------------------*/
   return (
     <div>
       <NavigationBar />
@@ -102,9 +120,67 @@ export default function Calendar() {
           className="d-flex align-items-center justify-content-center"
           style={{ minHeight: "100vh" }}
         >
-          <button style={{ width: 100, height: 50 }} onClick={handleClick}>
-            Add Event
-          </button>
+          <section class="create-event-section">
+            <form class="create-event-form" onSubmit={(e) => handleClick(e)}>
+              <h1 className="mb-3"> Create an Event </h1>
+              <div class="input-group">
+                <label for="name">Name</label>
+                <input
+                  onChange={(e) => handleSubmitForm(e)}
+                  id="name"
+                  value={data.name}
+                  placeholder=""
+                  type="text"
+                ></input>
+              </div>
+              <div class="input-group">
+                <label for="name">Description</label>
+                <input
+                  onChange={(e) => handleSubmitForm(e)}
+                  id="description"
+                  value={data.description}
+                  placeholder=""
+                  type="text"
+                ></input>
+              </div>
+              <div class="input-group">
+                <label for="name">Location</label>
+                <input
+                  onChange={(e) => handleSubmitForm(e)}
+                  id="location"
+                  value={data.location}
+                  placeholder=""
+                  type="text"
+                ></input>
+              </div>
+              <div class="input-group">
+                <label for="name">Start Date</label>
+                <input
+                  onChange={(e) => handleSubmitForm(e)}
+                  id="startDate"
+                  value={data.startDate}
+                  placeholder="YYYY-MM-DD"
+                  type="text"
+                ></input>
+              </div>
+              <div class="input-group">
+                <label for="name">End Date</label>
+                <input
+                  onChange={(e) => handleSubmitForm(e)}
+                  id="endDate"
+                  value={data.endDate}
+                  placeholder="YYYY-MM-DD"
+                  type="text"
+                ></input>
+              </div>
+              <button
+                style={{ width: 100, height: 50 }}
+                /*onClick={handleClick}*/
+              >
+                Add Event
+              </button>
+            </form>
+          </section>
           <button
             style={{ width: 100, height: 50 }}
             onClick={handleSecondClick}

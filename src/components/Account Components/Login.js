@@ -81,11 +81,11 @@ export default function Login() {
       calendarId: "primary",
       start: {
         dateTime: hoursFromNow(2),
-        timeZone: "America/Los_Angeles",
+        timeZone: "Asia/Singapore",
       },
       end: {
         dateTime: hoursFromNow(3),
-        timeZone: "America/Los_Angeles",
+        timeZone: "Asia/Singapore",
       },
       summary: "Have fun!!!",
       description: "Do some cool stuff",
