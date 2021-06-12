@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Container } from "react-bootstrap";
+import { Button, Card, Container } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
 import "./Calendar.css";
 
@@ -115,12 +115,12 @@ export default function Calendar() {
   }
   /*---------------------------------------------------*/
   return (
-    <div>
+    <>
       <NavigationBar />
       <div className="p-3 mb-2 bg-dark text-white">
-        <h1>Calendar</h1>
+        <h2 className="text-center mb-4">Calendar</h2>
 
-        {/* FETCH EVENT FORM */}
+        {/* FETCH EVENT FORM 
         <div className="events">
           {events &&
             events.map((event, index) => {
@@ -152,7 +152,7 @@ export default function Calendar() {
                           {event.start.date != null
                             ? event.start.date
                             : event.start.dateTime.slice(0, 10)}
-                          {/*console.log(event.start.date)*/}
+                          {//*console.log(event.start.date)
                         </Card.Text>
                         <Card.Text>
                           End date:{" "}
@@ -167,10 +167,10 @@ export default function Calendar() {
               );
             })}
         </div>
-        {/* END OF FETCH EVENT FORM */}
+       */}
 
         <Container
-          className="d-flex align-items-center justify-content-center"
+          className="d-flex  justify-content-center"
           style={{ minHeight: "100vh" }}
         >
           {/* CREATE EVENT FORM */}
@@ -231,6 +231,8 @@ export default function Calendar() {
                 ></input>
               </div>
               <button
+                className="mt-2"
+                variant="danger"
                 style={{ width: 100, height: 50 }}
                 /*onClick={handleClick}*/
               >
@@ -240,14 +242,16 @@ export default function Calendar() {
           </section>
           {/* END OF CREATE EVENT FORM */}
 
+          {/*}
           <button
             style={{ width: 100, height: 50 }}
             onClick={handleSecondClick}
           >
             Fetch Events
           </button>
+          */}
         </Container>
       </div>
-    </div>
+    </>
   );
 }
