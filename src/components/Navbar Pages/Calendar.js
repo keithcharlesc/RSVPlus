@@ -3,68 +3,71 @@ import { Button, Card, Container } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
 import "./Calendar.css";
 
-export default function Calendar() {
-  var gapi = window.gapi;
-  var CLIENT_ID =
-    "1011248109211-umpu5g48dj5p4hqlnhvuvl6f4c9qdhn3.apps.googleusercontent.com";
-  var API_KEY = "AIzaSyD3-pnAPnBMzBqL_dAZYYyVGretc42zUnA";
-  var DISCOVERY_DOCS = [
-    "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
-  ];
-  var SCOPES = "https://www.googleapis.com/auth/calendar.events";
+/*----- GAPI ------*/
+var gapi = window.gapi;
+var CLIENT_ID =
+  "1011248109211-umpu5g48dj5p4hqlnhvuvl6f4c9qdhn3.apps.googleusercontent.com";
+var API_KEY = "AIzaSyD3-pnAPnBMzBqL_dAZYYyVGretc42zUnA";
+var DISCOVERY_DOCS = [
+  "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
+];
+var SCOPES = "https://www.googleapis.com/auth/calendar.events";
 
+gapi.load("client:auth2", () => {
+  console.log("loaded client!");
+
+  gapi.client.init({
+    apiKey: API_KEY,
+    clientId: CLIENT_ID,
+    discoveryDocs: DISCOVERY_DOCS,
+    scope: SCOPES,
+  });
+
+  gapi.client.load("calendar", "v3", () => console.log("entry!"));
+});
+/*-----------------*/
+
+export default function Calendar() {
   /* ---------------- ADDING EVENT -------------*/
   const handleClick = (e) => {
     e.preventDefault();
-    gapi.load("client:auth2", () => {
-      console.log("loaded client!");
 
-      gapi.client.init({
-        apiKey: API_KEY,
-        clientId: CLIENT_ID,
-        discoveryDocs: DISCOVERY_DOCS,
-        scope: SCOPES,
+    gapi.auth2.getAuthInstance().then(() => {
+      var event = {
+        summary: data.name,
+        location: data.location,
+        description: data.description,
+        start: {
+          dateTime: data.startDate + "T09:00:00+08:00",
+          timeZone: "Asia/Singapore",
+        },
+        end: {
+          dateTime: data.endDate + "T17:00:00+08:00",
+          timeZone: "Asia/Singapore",
+        },
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: "email", minutes: 24 * 60 },
+            { method: "popup", minutes: 10 },
+          ],
+        },
+      };
+
+      //console.log(event.start.dateTime);
+
+      var request = gapi.client.calendar.events.insert({
+        calendarId: "primary",
+        resource: event,
       });
 
-      gapi.client.load("calendar", "v3", () => console.log("entry!"));
-
-      gapi.auth2.getAuthInstance().then(() => {
-        var event = {
-          summary: data.name,
-          location: data.location,
-          description: data.description,
-          start: {
-            dateTime: data.startDate + "T09:00:00+08:00",
-            timeZone: "Asia/Singapore",
-          },
-          end: {
-            dateTime: data.endDate + "T17:00:00+08:00",
-            timeZone: "Asia/Singapore",
-          },
-          reminders: {
-            useDefault: false,
-            overrides: [
-              { method: "email", minutes: 24 * 60 },
-              { method: "popup", minutes: 10 },
-            ],
-          },
-        };
-
-        //console.log(event.start.dateTime);
-
-        var request = gapi.client.calendar.events.insert({
-          calendarId: "primary",
-          resource: event,
-        });
-
-        request.execute((event) => {
-          console.log(event);
-          window.open(event.htmlLink);
-        });
+      request.execute((event) => {
+        console.log(event);
+        window.open(event.htmlLink);
       });
     });
   };
-  /* -------------- RETRIEVING EVENTS ------------*/
+  /* -------------- RETRIEVING EVENTS ------------
   const [events, setEvents] = useState(null);
 
   const handleSecondClick = () => {
@@ -98,6 +101,7 @@ export default function Calendar() {
       });
     });
   };
+  ------------*/
   /* ----------Handle Form Input to use in API---------*/
   const [data, setData] = useState({
     name: "",
