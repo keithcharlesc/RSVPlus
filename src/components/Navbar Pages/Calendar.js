@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container } from "react-bootstrap";
+import { Card, Container } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
 import "./Calendar.css";
 
@@ -50,7 +50,7 @@ export default function Calendar() {
           },
         };
 
-        console.log(event.start.dateTime);
+        //console.log(event.start.dateTime);
 
         var request = gapi.client.calendar.events.insert({
           calendarId: "primary",
@@ -65,6 +65,8 @@ export default function Calendar() {
     });
   };
   /* -------------- RETRIEVING EVENTS ------------*/
+  const [events, setEvents] = useState(null);
+
   const handleSecondClick = () => {
     gapi.load("client:auth2", () => {
       console.log("loaded client!");
@@ -91,6 +93,7 @@ export default function Calendar() {
           .then((response) => {
             const events = response.result.items;
             console.log("EVENTS: ", events);
+            setEvents(events);
           });
       });
     });
@@ -108,7 +111,7 @@ export default function Calendar() {
     const newData = { ...data };
     newData[e.target.id] = e.target.value;
     setData(newData);
-    console.log(newData);
+    //console.log(newData);
   }
   /*---------------------------------------------------*/
   return (
@@ -116,15 +119,69 @@ export default function Calendar() {
       <NavigationBar />
       <div className="p-3 mb-2 bg-dark text-white">
         <h1>Calendar</h1>
+
+        {/* FETCH EVENT FORM */}
+        <div className="events">
+          {events &&
+            events.map((event, index) => {
+              return (
+                <Card
+                  className="card text-dark bg-light mb-3"
+                  style={{ maxWidth: "18rem" }}
+                  key={index}
+                >
+                  <div className="event">
+                    <Card.Header>Event {index + 1}</Card.Header>
+                    <Card.Body>
+                      <Card.Title>
+                        {event.summary != null ? event.summary : "N/A"}
+                      </Card.Title>
+                      <div className="details">
+                        <Card.Text>
+                          Description:{" "}
+                          {event.description != null
+                            ? event.description
+                            : "N/A"}
+                        </Card.Text>
+                        <Card.Text>
+                          Location:{" "}
+                          {event.location != null ? event.location : "N/A"}
+                        </Card.Text>
+                        <Card.Text>
+                          Start Date:{" "}
+                          {event.start.date != null
+                            ? event.start.date
+                            : event.start.dateTime.slice(0, 10)}
+                          {/*console.log(event.start.date)*/}
+                        </Card.Text>
+                        <Card.Text>
+                          End date:{" "}
+                          {event.end.date != null
+                            ? event.end.date
+                            : event.end.dateTime.slice(0, 10)}
+                        </Card.Text>
+                      </div>
+                    </Card.Body>
+                  </div>
+                </Card>
+              );
+            })}
+        </div>
+        {/* END OF FETCH EVENT FORM */}
+
         <Container
           className="d-flex align-items-center justify-content-center"
           style={{ minHeight: "100vh" }}
         >
-          <section class="create-event-section">
-            <form class="create-event-form" onSubmit={(e) => handleClick(e)}>
+          {/* CREATE EVENT FORM */}
+          <section className="create-event-section">
+            <form
+              className="create-event-form"
+              onSubmit={(e) => handleClick(e)}
+            >
               <h1 className="mb-3"> Create an Event </h1>
-              <div class="input-group">
-                <label for="name">Name</label>
+              <div className="input-group">
+                <label>Name</label>
                 <input
                   onChange={(e) => handleSubmitForm(e)}
                   id="name"
@@ -133,8 +190,8 @@ export default function Calendar() {
                   type="text"
                 ></input>
               </div>
-              <div class="input-group">
-                <label for="name">Description</label>
+              <div className="input-group">
+                <label>Description</label>
                 <input
                   onChange={(e) => handleSubmitForm(e)}
                   id="description"
@@ -143,8 +200,8 @@ export default function Calendar() {
                   type="text"
                 ></input>
               </div>
-              <div class="input-group">
-                <label for="name">Location</label>
+              <div className="input-group">
+                <label>Location</label>
                 <input
                   onChange={(e) => handleSubmitForm(e)}
                   id="location"
@@ -153,8 +210,8 @@ export default function Calendar() {
                   type="text"
                 ></input>
               </div>
-              <div class="input-group">
-                <label for="name">Start Date</label>
+              <div className="input-group">
+                <label>Start Date</label>
                 <input
                   onChange={(e) => handleSubmitForm(e)}
                   id="startDate"
@@ -163,8 +220,8 @@ export default function Calendar() {
                   type="text"
                 ></input>
               </div>
-              <div class="input-group">
-                <label for="name">End Date</label>
+              <div className="input-group">
+                <label>End Date</label>
                 <input
                   onChange={(e) => handleSubmitForm(e)}
                   id="endDate"
@@ -181,6 +238,8 @@ export default function Calendar() {
               </button>
             </form>
           </section>
+          {/* END OF CREATE EVENT FORM */}
+
           <button
             style={{ width: 100, height: 50 }}
             onClick={handleSecondClick}

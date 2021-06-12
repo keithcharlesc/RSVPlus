@@ -2,13 +2,14 @@ import { AuthProvider } from "../contexts/AuthContext";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import Dashboard from "./Navbar Pages/Dashboard";
-import Signup from "./Account Components/Signup";
 import Login from "./Account Components/Login";
-import ForgotPassword from "./Account Components/ForgotPassword";
 import Channels from "./Navbar Pages/Channels";
 import Calendar from "./Navbar Pages/Calendar";
-import Profile from "./Navbar Pages/Profile";
 import ContactUs from "./Navbar Pages/ContactUs";
+/*
+import Signup from "./Account Components/Signup";
+import ForgotPassword from "./Account Components/ForgotPassword";
+import Profile from "./Navbar Pages/Profile";*/
 
 //PrivateRoutes only when users are logged in
 
@@ -21,11 +22,11 @@ function App() {
             <PrivateRoute exact path="/" component={Dashboard} />
             <PrivateRoute path="/channels" component={Channels} />
             <PrivateRoute path="/calendar" component={Calendar} />
-            <PrivateRoute path="/profile" component={Profile} />
             <PrivateRoute path="/contact-us" component={ContactUs} />
-            <Route path="/signup" component={Signup} />
             <Route path="/login" component={Login} />
-            <Route path="/forgot-password" component={ForgotPassword} />
+            {/*<Route path="/signup" component={Signup} />
+            <Route path="/forgot-password" component={ForgotPassword} /> 
+            <PrivateRoute path="/profile" component={Profile} />*/}
           </Switch>
         </AuthProvider>
       </Router>
