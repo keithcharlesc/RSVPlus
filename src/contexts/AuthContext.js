@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { auth } from "../firebase";
-import firebase from "../firebase";
-import { useHistory } from "react-router-dom";
+//import firebase from "../firebase";
+//import { useHistory } from "react-router-dom";
 
 const AuthContext = React.createContext();
 
@@ -10,11 +10,12 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-  const history = useHistory();
+  //const history = useHistory();
   const [currentUser, setCurrentUser] = useState();
   const [loading, setLoading] = useState(true);
 
-  //Sign up function
+  /*
+//Sign up function
   function signUp(email, password) {
     //***SELF-REMINDER: POSSIBLE TO CHANGE THIS TO A DIFF BACKEND IF NEEDED
     return auth.createUserWithEmailAndPassword(email, password);
@@ -42,11 +43,6 @@ export function AuthProvider({ children }) {
       });
   }
 
-  //Logout function
-  function logout() {
-    return auth.signOut();
-  }
-
   //Reset password function
   function resetPassword(email) {
     return auth.sendPasswordResetEmail(email);
@@ -61,6 +57,12 @@ export function AuthProvider({ children }) {
   function updatePassword(password) {
     return currentUser.updatePassword(password);
   }
+  */
+
+  //Logout function
+  function logout() {
+    return auth.signOut();
+  }
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -73,12 +75,12 @@ export function AuthProvider({ children }) {
 
   const value = {
     currentUser,
-    login,
-    signUp,
+    //login,
+    //signUp,
     logout,
-    resetPassword,
-    updateEmail,
-    updatePassword,
+    //resetPassword,
+    //updateEmail,
+    //updatePassword,
   };
 
   return (

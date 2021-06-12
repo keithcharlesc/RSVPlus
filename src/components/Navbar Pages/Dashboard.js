@@ -6,6 +6,8 @@ import NavigationBar from "./NavigationBar";
 export default function Dashboard() {
   const { currentUser } = useAuth();
 
+  console.log(currentUser);
+
   return (
     <>
       <NavigationBar />
@@ -16,6 +18,9 @@ export default function Dashboard() {
         >
           <div className="w-100" style={{ maxWidth: "400px" }}>
             <h2 className="text-center mb-4">Welcome</h2>
+            {/*<div>
+              <img src={currentUser.photoURL} alt="user profile"></img>
+            </div>*/}
             <p className="d-flex align-items-center justify-content-center">
               {currentUser.displayName}
             </p>

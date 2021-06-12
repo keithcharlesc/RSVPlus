@@ -59,7 +59,9 @@ export default function Login() {
         }
       });
   }
-  /* ---------- Get Calendar (For testing)-------------*/
+
+  /* --------------- TESTING MODULE ----------------------
+  //---------- Get Calendar (For testing)-------------
   async function getCalendar() {
     const events = await gapi.client.calendar.events.list({
       calendarId: "primary",
@@ -75,7 +77,7 @@ export default function Login() {
     console.log(events.result.items);
   }
 
-  /*------------ Insert Event (For testing) ------------*/
+  //------------ Insert Event (For testing) ------------
   async function insertEvent() {
     const insert = await gapi.client.calendar.events.insert({
       calendarId: "primary",
@@ -97,7 +99,7 @@ export default function Login() {
   const hoursFromNow = (n) =>
     new Date(Date.now() + n * 1000 * 60 * 60).toISOString();
 
-  /* ------------ Handlers (For testing)------------*/
+  // ------------ Handlers (For testing)------------
   const handleGetCalendar = () => {
     getCalendar();
   };
@@ -105,6 +107,7 @@ export default function Login() {
   const handleInsertEvent = () => {
     insertEvent();
   };
+  --------------- TESTING MODULE ----------------------*/
   /*----------Submit Button Functionalities----------*/
 
   async function handleSubmit(event) {
