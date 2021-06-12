@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Container, Card, Row, Col } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
+import { firebase } from "@firebase/app";
 
 /*----- GAPI------*/
 var gapi = window.gapi;
@@ -27,6 +28,31 @@ gapi.load("client:auth2", () => {
 /*---------------*/
 
 export default function Dashboard() {
+  /*
+  function displayFirestore() {
+    //-- Reading Data from Firestore on Initial Load--
+    const uid = firebase.auth().currentUser?.uid;
+    const db = firebase.firestore();
+    var docRef = db.collection("calendarEvents").doc(uid);
+
+    docRef
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          console.log("Document data:", doc.data());
+
+        } else {
+          // doc.data() will be undefined in this case
+          console.log("No such document!");
+        }
+      })
+      .catch((error) => {
+        console.log("Error getting document:", error);
+      });
+  }
+  */
+  /*---------------------------------*/
+
   /* -------------- RETRIEVING EVENTS ------------*/
   const [events, setEvents] = useState(null);
 
@@ -44,7 +70,46 @@ export default function Dashboard() {
         .then((response) => {
           const events = response.result.items;
           console.log("EVENTS: ", events);
-          setEvents(events);
+          //setEvents(events);
+
+          const uid = firebase.auth().currentUser?.uid;
+          console.log("uid: " + uid);
+
+          /*-- Upload to Firestore --*/
+          const db = firebase.firestore();
+          console.log("db: " + db);
+          db.collection("calendarEvents")
+            .doc(uid)
+            .set({
+              events: events,
+            })
+            .then(() => {
+              console.log("Document successfully written!");
+            })
+            .catch((error) => {
+              console.error("Error writing document: ", error);
+            });
+          /*----------*/
+
+          /*-- Reading Data from Firestore--*/
+          var docRef = db.collection("calendarEvents").doc(uid);
+
+          docRef
+            .get()
+            .then((doc) => {
+              if (doc.exists) {
+                console.log("Document data:", doc.data());
+                setEvents(doc.data().events);
+              } else {
+                // doc.data() will be undefined in this case
+                console.log("No such document!");
+              }
+            })
+            .catch((error) => {
+              console.log("Error getting document:", error);
+            });
+
+          /*---------------------------------*/
         });
     });
   };
