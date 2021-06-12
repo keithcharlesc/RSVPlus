@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Card, Container } from "react-bootstrap";
+import { Form, Button, Card, Container } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
 import "./Calendar.css";
 
@@ -121,8 +121,11 @@ export default function Calendar() {
   return (
     <>
       <NavigationBar />
-      <div className="p-3 mb-2 bg-dark text-white">
-        <h2 className="text-center mb-4">Calendar</h2>
+      <div
+        className="p-3 mb-2 bg-dark text-white"
+        style={{ minHeight: "100vh" }}
+      >
+        <h2 className="text-center mb-5">Calendar</h2>
 
         {/* FETCH EVENT FORM 
         <div className="events">
@@ -174,12 +177,12 @@ export default function Calendar() {
        */}
 
         <Container
-          className="d-flex  justify-content-center"
-          style={{ minHeight: "100vh" }}
+          className="d-flex justify-content-center mt-5"
+          style={{ minHeight: "75vh" }}
         >
           {/* CREATE EVENT FORM */}
           <section className="create-event-section">
-            <form
+            <Form
               className="create-event-form"
               onSubmit={(e) => handleClick(e)}
             >
@@ -242,7 +245,7 @@ export default function Calendar() {
               >
                 Add Event
               </button>
-            </form>
+            </Form>
           </section>
           {/* END OF CREATE EVENT FORM */}
 
