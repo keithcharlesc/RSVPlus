@@ -6,6 +6,7 @@ import Login from "./Account Components/Login";
 import Channels from "./Navbar Pages/Channels";
 import Calendar from "./Navbar Pages/Calendar";
 import ContactUs from "./Navbar Pages/ContactUs";
+import "firebase/firestore";
 /*
 import Signup from "./Account Components/Signup";
 import ForgotPassword from "./Account Components/ForgotPassword";
