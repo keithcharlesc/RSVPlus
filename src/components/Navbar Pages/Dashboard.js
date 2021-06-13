@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, Container, Card, Row, Col } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
 import { firebase } from "@firebase/app";
+import obtainBusyDates from "./Functions/obtainBusyDates";
 
 /*----- GAPI------*/
 var gapi = window.gapi;
@@ -14,7 +15,7 @@ var DISCOVERY_DOCS = [
 var SCOPES = "https://www.googleapis.com/auth/calendar.events";
 
 gapi.load("client:auth2", () => {
-  console.log("loaded client!");
+  console.log("loaded auth2 client!");
 
   gapi.client.init({
     apiKey: API_KEY,
@@ -23,36 +24,13 @@ gapi.load("client:auth2", () => {
     scope: SCOPES,
   });
 
-  gapi.client.load("calendar", "v3", () => console.log("entry!"));
+  gapi.client.load("calendar", "v3", () =>
+    console.log("loaded calendar v3, entry!")
+  );
 });
 /*---------------*/
 
 export default function Dashboard() {
-  /*
-  function displayFirestore() {
-    //-- Reading Data from Firestore on Initial Load--
-    const uid = firebase.auth().currentUser?.uid;
-    const db = firebase.firestore();
-    var docRef = db.collection("calendarEvents").doc(uid);
-
-    docRef
-      .get()
-      .then((doc) => {
-        if (doc.exists) {
-          console.log("Document data:", doc.data());
-
-        } else {
-          // doc.data() will be undefined in this case
-          console.log("No such document!");
-        }
-      })
-      .catch((error) => {
-        console.log("Error getting document:", error);
-      });
-  }
-  */
-  /*---------------------------------*/
-
   /* -------------- RETRIEVING EVENTS ------------*/
   const [events, setEvents] = useState(null);
 
@@ -69,37 +47,56 @@ export default function Dashboard() {
         })
         .then((response) => {
           const events = response.result.items;
-          console.log("EVENTS: ", events);
-          //setEvents(events);
+          console.log("Google Events Fetched: ", events);
+          setEvents(events);
+          let busyDates = [];
+          if (events.length > 0) {
+            busyDates = obtainBusyDates(events);
+          }
+          //console.log(busyDates);
 
           const uid = firebase.auth().currentUser?.uid;
-          console.log("uid: " + uid);
+          //console.log("uid: " + uid);
 
           /*-- Upload to Firestore --*/
           const db = firebase.firestore();
-          console.log("db: " + db);
           db.collection("calendarEvents")
             .doc(uid)
             .set({
               events: events,
             })
             .then(() => {
-              console.log("Document successfully written!");
+              console.log("Google events successfully stored!");
+            })
+            .catch((error) => {
+              console.error("Error writing document: ", error);
+            });
+
+          db.collection("busyDates")
+            .doc(uid)
+            .set({
+              dates: busyDates,
+            })
+            .then(() => {
+              console.log("Busy dates successfully stored!");
             })
             .catch((error) => {
               console.error("Error writing document: ", error);
             });
           /*----------*/
 
-          /*-- Reading Data from Firestore--*/
+          /*-- Reading Data from Firestore--
           var docRef = db.collection("calendarEvents").doc(uid);
 
           docRef
             .get()
             .then((doc) => {
               if (doc.exists) {
-                console.log("Document data:", doc.data());
-                setEvents(doc.data().events);
+                //console.log("Document data:", doc.data());
+                //console.log(doc.data().events);
+                //setEvents(doc.data().events);
+                //console.log(doc.data().events[0]);
+                console.log("Document read!");
               } else {
                 // doc.data() will be undefined in this case
                 console.log("No such document!");
@@ -109,7 +106,7 @@ export default function Dashboard() {
               console.log("Error getting document:", error);
             });
 
-          /*---------------------------------*/
+          ---------------------------------*/
         });
     });
   };
@@ -174,7 +171,7 @@ export default function Dashboard() {
                               <Card.Text>
                                 End date:{" "}
                                 {event.end.date != null
-                                  ? event.end.date
+                                  ? event.end.date //-1 for day might need to implement since full day event = day itself and day after
                                   : event.end.dateTime.slice(0, 10)}
                               </Card.Text>
                             </div>
