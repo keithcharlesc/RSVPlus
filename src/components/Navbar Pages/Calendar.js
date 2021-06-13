@@ -55,7 +55,6 @@ export default function Calendar() {
       };
 
       //console.log(event.start.dateTime);
-
       var request = gapi.client.calendar.events.insert({
         calendarId: "primary",
         resource: event,
@@ -67,41 +66,6 @@ export default function Calendar() {
       });
     });
   };
-  /* -------------- RETRIEVING EVENTS ------------
-  const [events, setEvents] = useState(null);
-
-  const handleSecondClick = () => {
-    gapi.load("client:auth2", () => {
-      console.log("loaded client!");
-
-      gapi.client.init({
-        apiKey: API_KEY,
-        clientId: CLIENT_ID,
-        discoveryDocs: DISCOVERY_DOCS,
-        scope: SCOPES,
-      });
-
-      gapi.client.load("calendar", "v3", () => console.log("entry!"));
-
-      gapi.auth2.getAuthInstance().then(() => {
-        gapi.client.calendar.events
-          .list({
-            calendarId: "primary",
-            timeMin: new Date().toISOString(),
-            showDeleted: false,
-            singleEvents: true,
-            maxResults: 10,
-            orderBy: "startTime",
-          })
-          .then((response) => {
-            const events = response.result.items;
-            console.log("EVENTS: ", events);
-            setEvents(events);
-          });
-      });
-    });
-  };
-  ------------*/
   /* ----------Handle Form Input to use in API---------*/
   const [data, setData] = useState({
     name: "",
@@ -127,55 +91,6 @@ export default function Calendar() {
       >
         <h2 className="text-center mb-5">Calendar</h2>
 
-        {/* FETCH EVENT FORM 
-        <div className="events">
-          {events &&
-            events.map((event, index) => {
-              return (
-                <Card
-                  className="card text-dark bg-light mb-3"
-                  style={{ maxWidth: "18rem" }}
-                  key={index}
-                >
-                  <div className="event">
-                    <Card.Header>Event {index + 1}</Card.Header>
-                    <Card.Body>
-                      <Card.Title>
-                        {event.summary != null ? event.summary : "N/A"}
-                      </Card.Title>
-                      <div className="details">
-                        <Card.Text>
-                          Description:{" "}
-                          {event.description != null
-                            ? event.description
-                            : "N/A"}
-                        </Card.Text>
-                        <Card.Text>
-                          Location:{" "}
-                          {event.location != null ? event.location : "N/A"}
-                        </Card.Text>
-                        <Card.Text>
-                          Start Date:{" "}
-                          {event.start.date != null
-                            ? event.start.date
-                            : event.start.dateTime.slice(0, 10)}
-                          {//*console.log(event.start.date)
-                        </Card.Text>
-                        <Card.Text>
-                          End date:{" "}
-                          {event.end.date != null
-                            ? event.end.date
-                            : event.end.dateTime.slice(0, 10)}
-                        </Card.Text>
-                      </div>
-                    </Card.Body>
-                  </div>
-                </Card>
-              );
-            })}
-        </div>
-       */}
-
         <Container
           className="d-flex justify-content-center mt-5"
           style={{ minHeight: "75vh" }}
@@ -186,7 +101,8 @@ export default function Calendar() {
               className="create-event-form"
               onSubmit={(e) => handleClick(e)}
             >
-              <h1 className="mb-3"> Create an Event </h1>
+              <h1 className="mb-1"> Create an Event </h1>
+              <h6 className="text-center mb-3">(Google Calendar)</h6>
               <div className="input-group">
                 <label>Name</label>
                 <input
@@ -248,15 +164,6 @@ export default function Calendar() {
             </Form>
           </section>
           {/* END OF CREATE EVENT FORM */}
-
-          {/*}
-          <button
-            style={{ width: 100, height: 50 }}
-            onClick={handleSecondClick}
-          >
-            Fetch Events
-          </button>
-          */}
         </Container>
       </div>
     </>
