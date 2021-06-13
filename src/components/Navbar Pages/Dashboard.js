@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Container, Card, Row, Col } from "react-bootstrap";
+import { Button, Container, Card, Row, Badge } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
 import { firebase } from "@firebase/app";
 import obtainBusyDates from "./Functions/obtainBusyDates";
@@ -138,16 +138,17 @@ export default function Dashboard() {
                   events.map((event, index) => {
                     return (
                       <Card
-                        className="card text-dark bg-light mb-3"
-                        style={{ maxWidth: "18rem" }}
+                        className="mb-3"
+                        style={{ maxWidth: "23rem" }}
                         key={index}
                       >
                         <div className="event">
-                          <Card.Header>Event {index + 1}</Card.Header>
-                          <Card.Body>
+                          <Card.Header className="d-flex justify-content-center">
                             <Card.Title>
                               {event.summary != null ? event.summary : "N/A"}
                             </Card.Title>
+                          </Card.Header>
+                          <Card.Body>
                             <div className="details">
                               <Card.Text>
                                 Description:{" "}
@@ -163,16 +164,21 @@ export default function Dashboard() {
                               </Card.Text>
                               <Card.Text>
                                 Start Date:{" "}
-                                {event.start.date != null
-                                  ? event.start.date
-                                  : event.start.dateTime.slice(0, 10)}
+                                <Badge pill variant="dark">
+                                  {" "}
+                                  {event.start.date != null
+                                    ? event.start.date
+                                    : event.start.dateTime.slice(0, 10)}
+                                </Badge>
                                 {/*console.log(event.start.date)*/}
                               </Card.Text>
                               <Card.Text>
-                                End date:{" "}
-                                {event.end.date != null
-                                  ? event.end.date //-1 for day might need to implement since full day event = day itself and day after
-                                  : event.end.dateTime.slice(0, 10)}
+                                End Date:{" "}
+                                <Badge pill variant="dark">
+                                  {event.end.date != null
+                                    ? event.end.date //-1 for day might need to implement since full day event = day itself and day after
+                                    : event.end.dateTime.slice(0, 10)}
+                                </Badge>
                               </Card.Text>
                             </div>
                           </Card.Body>

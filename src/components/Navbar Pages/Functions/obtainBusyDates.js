@@ -35,10 +35,9 @@ export default function obtainBusyDates(events) {
   let uniq = [...new Set(combinedArray)];
 
   //Converts dd/mm/yyyy back into yyyy-mm-dd
-  for (var i = 0; i < uniq.length; i++) {
+  for (i = 0; i < uniq.length; i++) {
     uniq[i] = uniq[i].split("/").reverse().join("-");
   }
-
   //console.log(uniq);
   return uniq;
 }

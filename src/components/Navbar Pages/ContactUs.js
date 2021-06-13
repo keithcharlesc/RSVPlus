@@ -42,12 +42,12 @@ export default function ContactUs() {
         className="p-3 mb-2 bg-dark text-white"
         style={{ minHeight: "100vh" }}
       >
-        <h2 className="text-center mt-5 ">Contact Us</h2>
+        <h2 className="text-center">Contact Us</h2>
         <Container
           className="d-flex align-items-center justify-content-center"
           style={{ minHeight: "75vh" }}
         >
-          <Card className="h-50">
+          <Card className="mt-5">
             <Card.Body>
               <h3 className="text-center mb-4">Form</h3>
               {success && <Alert variant="success">{success}</Alert>}
