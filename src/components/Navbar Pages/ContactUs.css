@@ -1,0 +1,9 @@
+.card {
+  background-color: #202027 !important;
+  border-radius: 20px !important;
+  padding: 1rem 2rem !important;
+}
+
+.card label {
+  color: #ffffff !important;
+}
