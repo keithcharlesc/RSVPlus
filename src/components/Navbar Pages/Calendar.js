@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Button, Card, Container } from "react-bootstrap";
+import { Form, Button, Container } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
 import "./Calendar.css";
 
@@ -97,10 +97,7 @@ export default function Calendar() {
         >
           {/* CREATE EVENT FORM */}
           <section className="create-event-section">
-            <Form
-              className="create-event-form"
-              onSubmit={(e) => handleClick(e)}
-            >
+            <Form className="create-event-form">
               <h1 className="mb-1"> Create an Event </h1>
               <h6 className="text-center mb-3">(Google Calendar)</h6>
               <div className="input-group">
@@ -153,14 +150,14 @@ export default function Calendar() {
                   type="text"
                 ></input>
               </div>
-              <button
+              <Button
                 className="mt-2"
                 variant="danger"
                 style={{ width: 100, height: 50 }}
-                /*onClick={handleClick}*/
+                onClick={(e) => handleClick(e)}
               >
                 Add Event
-              </button>
+              </Button>
             </Form>
           </section>
           {/* END OF CREATE EVENT FORM */}
