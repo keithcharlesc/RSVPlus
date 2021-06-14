@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Form, Button, Container } from "react-bootstrap";
+import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
 import "./Calendar.css";
+import GoogleCal from "./GoogleCal";
 
 /*----- GAPI ------*/
 var gapi = window.gapi;
@@ -92,11 +93,12 @@ export default function Calendar() {
         <h2 className="text-center mb-5">Calendar</h2>
 
         <Container
-          className="d-flex justify-content-center mt-5"
+          className=""
           style={{ minHeight: "75vh" }}
         >
-          {/* CREATE EVENT FORM */}
-          <section className="create-event-section">
+        <Row>
+    <Col md={7}><GoogleCal /></Col>
+    <Col md={{ span: 4, offset: 1 }}><section className="create-event-section">
             <Form className="create-event-form">
               <h1 className="mb-1"> Create an Event </h1>
               <h6 className="text-center mb-3">(Google Calendar)</h6>
@@ -108,7 +110,7 @@ export default function Calendar() {
                   value={data.name}
                   placeholder=""
                   type="text"
-                ></input>
+                  ></input>
               </div>
               <div className="input-group">
                 <label>Description</label>
@@ -159,9 +161,15 @@ export default function Calendar() {
                 Add Event
               </Button>
             </Form>
-          </section>
+          </section></Col>
+  </Row>
+          {/* CREATE EVENT FORM */}
+          
           {/* END OF CREATE EVENT FORM */}
         </Container>
+
+
+
       </div>
     </>
   );
