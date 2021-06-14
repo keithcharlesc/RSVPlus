@@ -9534,6 +9534,11 @@ react-dom@^17.0.2:
     object-assign "^4.1.1"
     scheduler "^0.20.2"
 
+react-embedded-google-calendar@^1.0.11:
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/react-embedded-google-calendar/-/react-embedded-google-calendar-1.0.11.tgz#12f34262c9257d6dbca8ccef01073f08742920c7"
+  integrity sha512-dFdkIrIbrWRwu0XbdwAU1BtcpMwSmLlPyPyYlDdhh6eWb30kpY9siABItZt0Wcj7N8YHR5O0JnLGnbFgkh291A==
+
 react-error-overlay@^6.0.9:
   version "6.0.9"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.9.tgz#3c743010c9359608c375ecd6bc76f35d93995b0a"
