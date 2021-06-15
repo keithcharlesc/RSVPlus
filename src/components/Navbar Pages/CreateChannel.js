@@ -1,9 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, Component } from "react";
 import { Container, Form, Card, Button, Alert } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
 import { firebase } from "@firebase/app";
 
-export default function Channels() {
+export default function CreateChannel() {
 
   const nameRef = useRef();
   const locationRef = useRef();
@@ -14,8 +14,7 @@ export default function Channels() {
   const emailInviteRef3 = useRef();
 
   const db = firebase.firestore();
-  
-  console.log(db)
+  //console.log(db)
   const [loading, setLoader] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -82,7 +81,7 @@ export default function Channels() {
                 <Form.Group id="endDate">
                 <Form.Label>End Date</Form.Label>
                 <Form.Control required type="endDate" ref={endDateRef} placeholder = "YYYY-MM-DD" />
-                </Form.Group> 
+                </Form.Group>  
                 <br></br>
                 <Form.Group id="emailInvite">
                 <Form.Label>Email addresses of people you wish to invite</Form.Label>
