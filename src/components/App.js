@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import Dashboard from "./Navbar Pages/Dashboard";
 import Login from "./Account Components/Login";
-import Channels from "./Navbar Pages/Channels";
+import CreateChannel from "./Navbar Pages/CreateChannel";
+import ViewChannel from "./Navbar Pages/ViewChannel";
 import Calendar from "./Navbar Pages/Calendar";
 import ContactUs from "./Navbar Pages/ContactUs";
 import "firebase/firestore";
@@ -21,7 +22,8 @@ function App() {
         <AuthProvider>
           <Switch>
             <PrivateRoute exact path="/" component={Dashboard} />
-            <PrivateRoute path="/channels" component={Channels} />
+            <PrivateRoute path="/create-channel/" component={CreateChannel} />
+            <PrivateRoute path="/view-channel/" component={ViewChannel} />
             <PrivateRoute path="/calendar" component={Calendar} />
             <PrivateRoute path="/contact-us" component={ContactUs} />
             <Route path="/login" component={Login} />

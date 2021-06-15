@@ -30,7 +30,8 @@ export default function NavigationBar() {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="mr-auto">
             <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/channels">Channels</Nav.Link>
+            <Nav.Link href="/create-channel">Create channel</Nav.Link>
+            <Nav.Link href="/view-channel">View channel</Nav.Link>
             <Nav.Link href="/calendar">Calendar</Nav.Link>
             <Nav.Link href="/contact-us">Contact Us</Nav.Link>
           </Nav>
