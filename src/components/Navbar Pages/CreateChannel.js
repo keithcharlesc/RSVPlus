@@ -1,7 +1,8 @@
-import React, { useRef, useState, Component } from "react";
+import React, { useRef, useState, useEffect} from "react";
 import { Container, Form, Card, Button, Alert } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
 import { firebase } from "@firebase/app";
+import Popup from './Functions/Popup'
 
 export default function CreateChannel() {
 
@@ -25,7 +26,7 @@ export default function CreateChannel() {
     setLoader(true);
     setError("");
     setSuccess("");
-    db.collection("form")
+    db.collection("channelsCreatedByUser")
       .add({
         name: nameRef.current.value,
         location: locationRef.current.value,
@@ -46,7 +47,35 @@ export default function CreateChannel() {
       });
   };
 
+  //-------------------------------------------//
 
+  const [buttonPopup, setButtonPopup] = useState(false);
+
+//-------------------------------------------//
+    const [channels, setChannels] = useState([]);
+    const [loadingx, setLoading] = useState(false);
+
+    const ref = firebase.firestore().collection("channelsCreatedByUser")
+  
+    function getChannels() {
+      setLoading(true);
+      ref.onSnapshot((querySnapshot) => {
+        const items = [];
+        querySnapshot.forEach((doc) => {
+          items.push(doc.data());
+        });
+        setChannels(items);
+        setLoading(false);;
+      });
+    }
+
+    useEffect(() => {
+      getChannels();
+    }, []);
+
+    if (loadingx) {
+      return <h1>Loading...</h1>
+    }
 
 
   return (
@@ -58,6 +87,20 @@ export default function CreateChannel() {
           style={{ minHeight: "100vh" }}
         >
           <Card className="mt-5">
+            <button onClick={() => setButtonPopup(true)}> Create an event! </button>
+            <br></br>
+            {channels.map((channel) => (
+              <card>
+                <div key={channel.name}>
+                  <h2>{channel.name}</h2>
+                  <p>Location: {channel.location}</p>
+                  <p>From {channel.start_date} to {channel.end_date}</p>
+                  <p>Invited {channel.name1}, {channel.name2} and {channel.name3} </p>
+                  <br></br>
+                </div>
+              </card>
+            ))}
+            <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
             <Card.Body>
               <h3 className="text-center mb-4">Create a channel for your event!</h3>
               {success && <Alert variant="success">{success}</Alert>}
@@ -99,7 +142,8 @@ export default function CreateChannel() {
                 Create channel
                 </Button>
               </form>
-            </Card.Body>
+              </Card.Body>
+            </Popup>
           </Card>  
         </Container>
       </div>
