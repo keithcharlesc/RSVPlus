@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import Dashboard from "./Navbar Pages/Dashboard";
 import Login from "./Account Components/Login";
-import CreateChannel from "./Navbar Pages/CreateChannel";
+import Channels from "./Navbar Pages/Channels";
 import Calendar from "./Navbar Pages/Calendar";
 import ContactUs from "./Navbar Pages/ContactUs";
 import FAQ from "./Navbar Pages/FAQ";
@@ -18,7 +18,7 @@ function App() {
         <AuthProvider>
           <Switch>
             <PrivateRoute exact path="/" component={Dashboard} />
-            <PrivateRoute path="/create-channel/" component={CreateChannel} />
+            <PrivateRoute path="/channels/" component={Channels} />
             <PrivateRoute path="/calendar" component={Calendar} />
             <PrivateRoute path="/contact-us" component={ContactUs} />
             <PrivateRoute path="/faq" component={FAQ} />*

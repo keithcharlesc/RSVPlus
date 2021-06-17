@@ -11,15 +11,14 @@ import {
 import NavigationBar from "./NavigationBar";
 import { firebase } from "@firebase/app";
 import Popup from "./Functions/Popup";
+import InviteList from "./InviteList";
 
-export default function CreateChannel() {
+export default function Channels() {
   const nameRef = useRef();
+  const descriptionRef = useRef();
   const locationRef = useRef();
   const startDateRef = useRef();
   const endDateRef = useRef();
-  const emailInviteRef1 = useRef();
-  const emailInviteRef2 = useRef();
-  const emailInviteRef3 = useRef();
 
   const db = firebase.firestore();
   //console.log(db)
@@ -27,21 +26,22 @@ export default function CreateChannel() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  //Pop up submission
   const handleSubmit = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setLoader(true);
     setError("");
     setSuccess("");
+    const emails = findAll();
     db.collection("channelsCreatedByUser")
       .add({
         name: nameRef.current.value,
+        description: descriptionRef.current.value,
         location: locationRef.current.value,
         start_date: startDateRef.current.value,
         end_date: endDateRef.current.value,
-        name1: emailInviteRef1.current.value,
-        name2: emailInviteRef2.current.value,
-        name3: emailInviteRef3.current.value,
+        emails: emails,
       })
       .then(() => {
         setLoader(false);
@@ -55,6 +55,7 @@ export default function CreateChannel() {
         setLoader(false);
       });
   };
+  //End of Pop up submission
 
   //-------------------------------------------//
 
@@ -65,6 +66,18 @@ export default function CreateChannel() {
   const [loadingx, setLoading] = useState(false);
 
   const ref = firebase.firestore().collection("channelsCreatedByUser");
+
+  function findAll() {
+    const emailAddresses = [];
+    var inputs = document.getElementsByName("emailAddress");
+    for (var i = 0; i < inputs.length; i++) {
+      emailAddresses.push(inputs[i].value);
+      //console.log(inputs[i].value);
+    }
+
+    //console.log(emailAddresses.toString());
+    return emailAddresses;
+  }
 
   function getChannels() {
     setLoading(true);
@@ -103,47 +116,53 @@ export default function CreateChannel() {
           </Row>
           <Row>
             <Container style={{ minHeight: "100vh" }}>
-              {channels.map((channel) => (
-                <div className="d-flex align-items-center justify-content-center mb-4">
-                  <Card>
-                    <div key={channel.name}>
-                      <Card.Header className="d-flex justify-content-center">
-                        <Card.Title>
-                          <h2>{channel.name}</h2>
-                        </Card.Title>
-                      </Card.Header>
-
-                      <Card.Body>
-                        <div className="details">
-                          <Card.Text>Description: </Card.Text>
-                          <Card.Text>Location: {channel.location}</Card.Text>
-                          <Card.Text>
-                            Start Date:{" "}
-                            <Badge pill variant="dark">
-                              {" "}
-                              {channel.start_date}
-                            </Badge>
-                            {/*console.log(event.start.date)*/}
-                          </Card.Text>
-                          <Card.Text>
-                            End Date:{" "}
-                            <Badge pill variant="dark">
-                              {channel.end_date}
-                            </Badge>
-                          </Card.Text>
-                        </div>
-                      </Card.Body>
-
-                      <p>
-                        Invited {channel.name1}, {channel.name2} and{" "}
-                        {channel.name3}{" "}
-                      </p>
-                      <br></br>
-                    </div>
+              {channels.map((channel, index) => (
+                //Rendered Channels
+                <div
+                  key={index}
+                  className="d-flex align-items-center justify-content-center mb-4"
+                >
+                  <Card style={{ width: 800 }}>
+                    <Card.Header className="d-flex justify-content-center">
+                      <Card.Title>
+                        <h2>{channel.name}</h2>
+                      </Card.Title>
+                    </Card.Header>
+                    <Card.Body>
+                      <div className="details">
+                        <Card.Text>
+                          Description:{" "}
+                          {channel.description != null
+                            ? channel.description
+                            : "N/A"}
+                        </Card.Text>
+                        <Card.Text>
+                          Location:{" "}
+                          {channel.location != null ? channel.location : "N/A"}
+                        </Card.Text>
+                        <Card.Text>
+                          Start Date:{" "}
+                          <Badge pill variant="dark">
+                            {" "}
+                            {channel.start_date}
+                          </Badge>
+                          {/*console.log(event.start.date)*/}
+                        </Card.Text>
+                        <Card.Text>
+                          End Date:{" "}
+                          <Badge pill variant="dark">
+                            {channel.end_date}
+                          </Badge>
+                        </Card.Text>
+                        <Card.Text>Invited List: {channel.emails}</Card.Text>
+                      </div>
+                    </Card.Body>
                   </Card>
                 </div>
+                //End of Rendered Channels
               ))}
 
+              {/*Pop up */}
               <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
                 <Card.Body>
                   <h3 className="text-center mb-4">
@@ -151,13 +170,23 @@ export default function CreateChannel() {
                   </h3>
                   {success && <Alert variant="success">{success}</Alert>}
                   {error && <Alert variant="danger">{error}</Alert>}
-                  <form className="text-dark" onSubmit={handleSubmit}>
+                  <form className="text-white" onSubmit={handleSubmit}>
                     <Form.Group id="name">
                       <Form.Label>Name of event</Form.Label>
                       <Form.Control
                         required
                         type="name"
                         ref={nameRef}
+                        placeholder="eg. Study Session"
+                      />
+                    </Form.Group>
+                    <br></br>
+                    <Form.Group id="description">
+                      <Form.Label>Description of event</Form.Label>
+                      <Form.Control
+                        required
+                        type="description"
+                        ref={descriptionRef}
                         placeholder="eg. Study meet with Rebecca"
                       />
                     </Form.Group>
@@ -193,24 +222,8 @@ export default function CreateChannel() {
                     </Form.Group>
                     <br></br>
                     <Form.Group id="emailInvite">
-                      <Form.Label>
-                        Email addresses of people you wish to invite
-                      </Form.Label>
-                      <Form.Control
-                        type="emailInvite"
-                        ref={emailInviteRef1}
-                        placeholder="name@example.com"
-                      />
-                      <Form.Control
-                        type="emailInvite"
-                        ref={emailInviteRef2}
-                        placeholder="name@example.com"
-                      />
-                      <Form.Control
-                        type="emailInvite"
-                        ref={emailInviteRef3}
-                        placeholder="name@example.com"
-                      />
+                      <Form.Label>Number of People to Invite: (1-9)</Form.Label>
+                      <InviteList />
                     </Form.Group>
                     <br></br>
                     <Button
@@ -224,6 +237,7 @@ export default function CreateChannel() {
                   </form>
                 </Card.Body>
               </Popup>
+              {/*End of Pop up */}
             </Container>
           </Row>
         </Container>
