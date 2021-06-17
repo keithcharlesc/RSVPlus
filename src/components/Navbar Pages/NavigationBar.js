@@ -33,7 +33,7 @@ export default function NavigationBar() {
             <Nav.Link className="px-3" href="/">
               Home
             </Nav.Link>
-            <Nav.Link className="px-3" href="/create-channel">
+            <Nav.Link className="px-3" href="/channels">
               Channels
             </Nav.Link>
             <Nav.Link className="px-3" href="/calendar">
