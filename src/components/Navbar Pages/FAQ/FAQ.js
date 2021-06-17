@@ -1,7 +1,7 @@
 //NOT REQUIRED PAGE
 import React from "react";
 import { Container } from "react-bootstrap";
-import NavigationBar from "./NavigationBar";
+import NavigationBar from "../../Navbar Pages/NavigationBar/NavigationBar";
 
 export default function FAQ() {
   return (
@@ -14,8 +14,6 @@ export default function FAQ() {
         >
           <div className="w-100" style={{ maxWidth: "400px" }}>
             <h2 className="text-center mb-4">FAQ</h2>
-
-            <div className="w-100 text-center mt-2"></div>
           </div>
         </Container>
       </div>

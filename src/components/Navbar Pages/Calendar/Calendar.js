@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import NavigationBar from "./NavigationBar";
-import "./CSS/Calendar.css";
+import NavigationBar from "../NavigationBar/NavigationBar";
+import "./Calendar.css";
 import GoogleCal from "./GoogleCal";
 
 /*----- GAPI ------*/
@@ -39,11 +39,11 @@ export default function Calendar() {
         location: data.location,
         description: data.description,
         start: {
-          dateTime: data.startDate + "T09:00:00+08:00",
+          dateTime: data.startDate + "T09:00:00+08:00", //requires time input
           timeZone: "Asia/Singapore",
         },
         end: {
-          dateTime: data.endDate + "T17:00:00+08:00",
+          dateTime: data.endDate + "T17:00:00+08:00", //requires time input
           timeZone: "Asia/Singapore",
         },
         reminders: {

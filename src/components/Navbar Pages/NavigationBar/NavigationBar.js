@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Nav, Navbar } from "react-bootstrap";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../../contexts/AuthContext";
 import { useHistory } from "react-router-dom";
 import { Button, Image } from "react-bootstrap";
-import "./CSS/NavigationBar.css";
+import "./NavigationBar.css";
 
 export default function NavigationBar() {
   const [error, setError] = useState("");

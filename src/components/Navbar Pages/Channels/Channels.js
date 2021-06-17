@@ -8,9 +8,9 @@ import {
   Row,
   Badge,
 } from "react-bootstrap";
-import NavigationBar from "./NavigationBar";
+import NavigationBar from "../NavigationBar/NavigationBar";
 import { firebase } from "@firebase/app";
-import Popup from "./Functions/Popup";
+import Popup from "./Popup";
 import InviteList from "./InviteList";
 
 export default function Channels() {
@@ -77,6 +77,12 @@ export default function Channels() {
 
     //console.log(emailAddresses.toString());
     return emailAddresses;
+  }
+
+  function separateArray(arr) {
+    console.log(arr);
+    const list = JSON.stringify(arr);
+    return list;
   }
 
   function getChannels() {
@@ -154,7 +160,9 @@ export default function Channels() {
                             {channel.end_date}
                           </Badge>
                         </Card.Text>
-                        <Card.Text>Invited List: {channel.emails}</Card.Text>
+                        <Card.Text>
+                          Invited List: {separateArray(channel.emails)}
+                        </Card.Text>
                       </div>
                     </Card.Body>
                   </Card>
