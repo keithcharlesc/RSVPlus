@@ -1,5 +1,5 @@
 import React from "react";
-
+//Component used in Channels
 export default class InviteList extends React.Component {
   constructor() {
     super();

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Button, Container, Card, Row, Badge } from "react-bootstrap";
-import NavigationBar from "./NavigationBar";
+import NavigationBar from "../NavigationBar/NavigationBar";
 import { firebase } from "@firebase/app";
-import obtainBusyDates from "./Functions/obtainBusyDates";
+import obtainBusyDates from "./obtainBusyDates";
 
 /*----- GAPI------*/
 var gapi = window.gapi;
