@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Nav, Navbar } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthContext";
 import { useHistory } from "react-router-dom";
-import { Button } from "react-bootstrap";
+import { Button, Image } from "react-bootstrap";
+import "./CSS/NavigationBar.css";
 
 export default function NavigationBar() {
   const [error, setError] = useState("");
@@ -29,13 +30,29 @@ export default function NavigationBar() {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="mr-auto">
-            <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/create-channel">Channels</Nav.Link>
-            <Nav.Link href="/calendar">Calendar</Nav.Link>
-            <Nav.Link href="/contact-us">Contact Us</Nav.Link>
+            <Nav.Link className="px-3" href="/">
+              Home
+            </Nav.Link>
+            <Nav.Link className="px-3" href="/create-channel">
+              Channels
+            </Nav.Link>
+            <Nav.Link className="px-3" href="/calendar">
+              Calendar
+            </Nav.Link>
+            <Nav.Link className="px-3" href="/faq">
+              FAQ
+            </Nav.Link>
+            <Nav.Link className="px-3" href="/contact-us">
+              Contact Us
+            </Nav.Link>
           </Nav>
           <Nav>
             <Navbar.Text>Signed in as: {currentUser.displayName}</Navbar.Text>
+            <Image
+              className="photo ml-2 mt-1"
+              src={currentUser.photoURL}
+              roundedCircle
+            />
           </Nav>
         </Navbar.Collapse>
         <Button

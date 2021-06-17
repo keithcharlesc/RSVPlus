@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { Container, Form, Card, Button, Alert } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
 import { firebase } from "@firebase/app";
-import "./ContactUs.css";
+import "./CSS/ContactUs.css";
 
 export default function ContactUs() {
   const nameRef = useRef();

@@ -138,7 +138,7 @@ export default function Dashboard() {
                   events.map((event, index) => {
                     return (
                       <Card
-                        className="mb-3"
+                        className="cardDesign mb-3"
                         style={{ maxWidth: "23rem" }}
                         key={index}
                       >
