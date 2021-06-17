@@ -12,11 +12,12 @@
 }
 
 .popup-inner {
+  border-radius: 25px;
   position: relative;
   padding: 32px;
   width: 100vh;
-  max-width: 640px;
-  background-color: rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  background-color: rgb(45, 42, 42);
 }
 
 .popup-inner .close-btn {

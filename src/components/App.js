@@ -6,11 +6,8 @@ import Login from "./Account Components/Login";
 import CreateChannel from "./Navbar Pages/CreateChannel";
 import Calendar from "./Navbar Pages/Calendar";
 import ContactUs from "./Navbar Pages/ContactUs";
+import FAQ from "./Navbar Pages/FAQ";
 import "firebase/firestore";
-/*
-import Signup from "./Account Components/Signup";
-import ForgotPassword from "./Account Components/ForgotPassword";
-import Profile from "./Navbar Pages/Profile";*/
 
 //PrivateRoutes only when users are logged in
 
@@ -24,10 +21,8 @@ function App() {
             <PrivateRoute path="/create-channel/" component={CreateChannel} />
             <PrivateRoute path="/calendar" component={Calendar} />
             <PrivateRoute path="/contact-us" component={ContactUs} />
+            <PrivateRoute path="/faq" component={FAQ} />*
             <Route path="/login" component={Login} />
-            {/*<Route path="/signup" component={Signup} />
-            <Route path="/forgot-password" component={ForgotPassword} /> 
-            <PrivateRoute path="/profile" component={Profile} />*/}
           </Switch>
         </AuthProvider>
       </Router>

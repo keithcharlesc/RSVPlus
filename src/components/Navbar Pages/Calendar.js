@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import NavigationBar from "./NavigationBar";
-import "./Calendar.css";
+import "./CSS/Calendar.css";
 import GoogleCal from "./GoogleCal";
 
 /*----- GAPI ------*/
@@ -92,84 +92,82 @@ export default function Calendar() {
       >
         <h2 className="text-center mb-5">Calendar</h2>
 
-        <Container
-          className=""
-          style={{ minHeight: "75vh" }}
-        >
-        <Row>
-    <Col md={7}><GoogleCal /></Col>
-    <Col md={{ span: 4, offset: 1 }}><section className="create-event-section">
-            <Form className="create-event-form">
-              <h1 className="mb-1"> Create an Event </h1>
-              <h6 className="text-center mb-3">(Google Calendar)</h6>
-              <div className="input-group">
-                <label>Name</label>
-                <input
-                  onChange={(e) => handleSubmitForm(e)}
-                  id="name"
-                  value={data.name}
-                  placeholder=""
-                  type="text"
-                  ></input>
-              </div>
-              <div className="input-group">
-                <label>Description</label>
-                <input
-                  onChange={(e) => handleSubmitForm(e)}
-                  id="description"
-                  value={data.description}
-                  placeholder=""
-                  type="text"
-                ></input>
-              </div>
-              <div className="input-group">
-                <label>Location</label>
-                <input
-                  onChange={(e) => handleSubmitForm(e)}
-                  id="location"
-                  value={data.location}
-                  placeholder=""
-                  type="text"
-                ></input>
-              </div>
-              <div className="input-group">
-                <label>Start Date</label>
-                <input
-                  onChange={(e) => handleSubmitForm(e)}
-                  id="startDate"
-                  value={data.startDate}
-                  placeholder="YYYY-MM-DD"
-                  type="text"
-                ></input>
-              </div>
-              <div className="input-group">
-                <label>End Date</label>
-                <input
-                  onChange={(e) => handleSubmitForm(e)}
-                  id="endDate"
-                  value={data.endDate}
-                  placeholder="YYYY-MM-DD"
-                  type="text"
-                ></input>
-              </div>
-              <Button
-                className="mt-2"
-                variant="danger"
-                style={{ width: 100, height: 50 }}
-                onClick={(e) => handleClick(e)}
-              >
-                Add Event
-              </Button>
-            </Form>
-          </section></Col>
-  </Row>
+        <Container className="" style={{ minHeight: "75vh" }}>
+          <Row>
+            <Col md={7}>
+              <GoogleCal />
+            </Col>
+            <Col md={{ span: 4, offset: 1 }}>
+              <section className="create-event-section">
+                <Form className="create-event-form">
+                  <h1 className="mb-1"> Create an Event </h1>
+                  <h6 className="text-center mb-3">(Google Calendar)</h6>
+                  <div className="input-group">
+                    <label>Name</label>
+                    <input
+                      onChange={(e) => handleSubmitForm(e)}
+                      id="name"
+                      value={data.name}
+                      placeholder=""
+                      type="text"
+                    ></input>
+                  </div>
+                  <div className="input-group">
+                    <label>Description</label>
+                    <input
+                      onChange={(e) => handleSubmitForm(e)}
+                      id="description"
+                      value={data.description}
+                      placeholder=""
+                      type="text"
+                    ></input>
+                  </div>
+                  <div className="input-group">
+                    <label>Location</label>
+                    <input
+                      onChange={(e) => handleSubmitForm(e)}
+                      id="location"
+                      value={data.location}
+                      placeholder=""
+                      type="text"
+                    ></input>
+                  </div>
+                  <div className="input-group">
+                    <label>Start Date</label>
+                    <input
+                      onChange={(e) => handleSubmitForm(e)}
+                      id="startDate"
+                      value={data.startDate}
+                      placeholder="YYYY-MM-DD"
+                      type="text"
+                    ></input>
+                  </div>
+                  <div className="input-group">
+                    <label>End Date</label>
+                    <input
+                      onChange={(e) => handleSubmitForm(e)}
+                      id="endDate"
+                      value={data.endDate}
+                      placeholder="YYYY-MM-DD"
+                      type="text"
+                    ></input>
+                  </div>
+                  <Button
+                    className="mt-2"
+                    variant="danger"
+                    style={{ width: 100, height: 50 }}
+                    onClick={(e) => handleClick(e)}
+                  >
+                    Add Event
+                  </Button>
+                </Form>
+              </section>
+            </Col>
+          </Row>
           {/* CREATE EVENT FORM */}
-          
+
           {/* END OF CREATE EVENT FORM */}
         </Container>
-
-
-
       </div>
     </>
   );
