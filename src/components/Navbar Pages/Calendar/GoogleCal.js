@@ -20,14 +20,15 @@ export default function GoogleCal() {
   };
 
   const db = firebase.firestore();
-  const uid = firebase.auth().currentUser?.uid;
+  //const uid = firebase.auth().currentUser?.uid;
+  const currentUserEmail = firebase.auth().currentUser?.email;
 
   //Storing Google Calendar URL
   const handleSubmit = (e) => {
     e.preventDefault();
 
     db.collection("displayCalendarURL")
-      .doc(uid)
+      .doc(currentUserEmail)
       .set({
         url: url,
       })
@@ -42,7 +43,7 @@ export default function GoogleCal() {
   //-- Reading Data from Firestore--
   const handleLoadUrl = (e) => {
     e.preventDefault();
-    var docRef = db.collection("displayCalendarURL").doc(uid);
+    var docRef = db.collection("displayCalendarURL").doc(currentUserEmail);
     onClear();
 
     docRef
