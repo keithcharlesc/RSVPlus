@@ -13,6 +13,7 @@ import NavigationBar from "../NavigationBar/NavigationBar";
 import { firebase } from "@firebase/app";
 import Popup from "./Popup";
 import InviteList from "./InviteList";
+import dateRange from "./dateRange";
 
 export default function Channels() {
   const nameRef = useRef();
@@ -36,18 +37,25 @@ export default function Channels() {
     setError("");
     setSuccess("");
     const emails = findAll();
+    const dates = dateRange(
+      startDateRef.current.value,
+      endDateRef.current.value
+    );
     db.collection("channelsCreatedByUser")
       .add({
-        host: hostName,
-        name: nameRef.current.value,
-        description: descriptionRef.current.value,
-        location: locationRef.current.value,
-        start_date: startDateRef.current.value,
-        end_date: endDateRef.current.value,
-        invitedEmails: emails,
-        respondedEmails: [],
-        pendingEmails: [],
-        decidedOutcome: "None yet",
+        host: hostName, //User who created Channel
+        name: nameRef.current.value, //Name of Event
+        description: descriptionRef.current.value, //Description of Event
+        location: locationRef.current.value, //Location of Event
+        start_date: startDateRef.current.value, //Start Date of Event
+        end_date: endDateRef.current.value, // End Date of Event
+        dateRange: dates, //Dates in between Start Date & End Date of Event
+        counterForDates: new Array(dates.length).fill(0), //Counter for Date Date
+        busyUsersForDates: new Array(dates.length).fill(""), //Busy List for Each Date
+        invitedEmails: emails, //List of Invited Users
+        respondedEmails: [], //List of Responded Users
+        pendingEmails: [], //List of Pending Users
+        decidedOutcome: "None yet", //Outcome
       })
       .then(() => {
         setLoader(false);
@@ -91,6 +99,11 @@ export default function Channels() {
     return userList;
   }
 
+  //Agree to Sync Implementation
+  const handleAgreeToSync = (channel) => {
+    console.log(channel.name);
+  };
+
   //Load channels details
   function getChannels() {
     setLoading(true);
@@ -116,7 +129,6 @@ export default function Channels() {
     <div>
       <NavigationBar />
       <div className="p-3 mb-2 bg-dark text-white">
-        <h2 className="text-center mb-4">Channels</h2>
         <Container fluid>
           <Row className="d-flex align-items-center justify-content-center mb-4">
             <Button
@@ -175,6 +187,7 @@ export default function Channels() {
                               <Button
                                 variant="danger"
                                 style={{ width: 260, height: 40 }}
+                                onClick={() => handleAgreeToSync(channel)}
                               >
                                 Agree to Sync Calendar Data
                               </Button>
