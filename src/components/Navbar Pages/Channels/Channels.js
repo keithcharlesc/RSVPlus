@@ -42,7 +42,10 @@ export default function Channels() {
       startDateRef.current.value,
       endDateRef.current.value
     );
+
     db.collection("channelsCreatedByUser")
+      .doc(currentUserEmail)
+      .collection("channels")
       .add({
         host: hostName, //User who created Channel
         name: nameRef.current.value, //Name of Event
@@ -80,7 +83,11 @@ export default function Channels() {
   const [channels, setChannels] = useState([]);
   const [loadingx, setLoading] = useState(false);
 
-  const ref = firebase.firestore().collection("channelsCreatedByUser");
+  const ref = firebase
+    .firestore()
+    .collection("channelsCreatedByUser")
+    .doc(currentUserEmail)
+    .collection("channels");
 
   //Obtaining emailAddresses by input fields
   function findAll() {
@@ -114,7 +121,7 @@ export default function Channels() {
         const emails = doc.data().invitedEmails; //arr of Invited Emails
         //console.log(emails);
         const boolean = emails.indexOf(currentUserEmail) > -1; //Check if logged in user email belongs to Invited Emails
-        if (boolean == true) {
+        if (boolean === true) {
           //Push channels if belongs
           items.push(doc.data());
         }

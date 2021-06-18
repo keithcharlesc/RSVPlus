@@ -33,6 +33,7 @@ gapi.load("client:auth2", () => {
 export default function Dashboard() {
   /* -------------- RETRIEVING EVENTS ------------*/
   const [events, setEvents] = useState(null);
+  const currentUserEmail = firebase.auth().currentUser?.email;
 
   const handleSecondClick = () => {
     gapi.auth2.getAuthInstance().then(() => {
@@ -61,7 +62,7 @@ export default function Dashboard() {
           /*-- Upload to Firestore --*/
           const db = firebase.firestore();
           db.collection("calendarEvents")
-            .doc(uid)
+            .doc(currentUserEmail)
             .set({
               events: events,
             })
@@ -73,7 +74,7 @@ export default function Dashboard() {
             });
 
           db.collection("busyDates")
-            .doc(uid)
+            .doc(currentUserEmail)
             .set({
               dates: busyDates,
             })
