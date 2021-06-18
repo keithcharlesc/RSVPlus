@@ -7,6 +7,7 @@ import {
   Alert,
   Row,
   Badge,
+  Col,
 } from "react-bootstrap";
 import NavigationBar from "../NavigationBar/NavigationBar";
 import { firebase } from "@firebase/app";
@@ -25,6 +26,7 @@ export default function Channels() {
   const [loading, setLoader] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const hostName = firebase.auth().currentUser?.displayName;
 
   //Pop up submission
   const handleSubmit = (e) => {
@@ -36,12 +38,16 @@ export default function Channels() {
     const emails = findAll();
     db.collection("channelsCreatedByUser")
       .add({
+        host: hostName,
         name: nameRef.current.value,
         description: descriptionRef.current.value,
         location: locationRef.current.value,
         start_date: startDateRef.current.value,
         end_date: endDateRef.current.value,
-        emails: emails,
+        invitedEmails: emails,
+        respondedEmails: [],
+        pendingEmails: [],
+        decidedOutcome: "None yet",
       })
       .then(() => {
         setLoader(false);
@@ -67,6 +73,7 @@ export default function Channels() {
 
   const ref = firebase.firestore().collection("channelsCreatedByUser");
 
+  //Obtaining emailAddresses by input fields
   function findAll() {
     const emailAddresses = [];
     var inputs = document.getElementsByName("emailAddress");
@@ -74,17 +81,17 @@ export default function Channels() {
       emailAddresses.push(inputs[i].value);
       //console.log(inputs[i].value);
     }
-
     //console.log(emailAddresses.toString());
     return emailAddresses;
   }
 
-  function separateArray(arr) {
-    console.log(arr);
-    const list = JSON.stringify(arr);
-    return list;
+  //Display Invited List
+  function displayUsersList(arr) {
+    const userList = arr.map((email, index) => <li key={index}>{email}</li>);
+    return userList;
   }
 
+  //Load channels details
   function getChannels() {
     setLoading(true);
     ref.onSnapshot((querySnapshot) => {
@@ -136,33 +143,60 @@ export default function Channels() {
                     </Card.Header>
                     <Card.Body>
                       <div className="details">
-                        <Card.Text>
-                          Description:{" "}
-                          {channel.description != null
-                            ? channel.description
-                            : "N/A"}
-                        </Card.Text>
-                        <Card.Text>
-                          Location:{" "}
-                          {channel.location != null ? channel.location : "N/A"}
-                        </Card.Text>
-                        <Card.Text>
-                          Start Date:{" "}
-                          <Badge pill variant="dark">
-                            {" "}
-                            {channel.start_date}
-                          </Badge>
-                          {/*console.log(event.start.date)*/}
-                        </Card.Text>
-                        <Card.Text>
-                          End Date:{" "}
-                          <Badge pill variant="dark">
-                            {channel.end_date}
-                          </Badge>
-                        </Card.Text>
-                        <Card.Text>
-                          Invited List: {separateArray(channel.emails)}
-                        </Card.Text>
+                        <Row>
+                          <Col xs={12} md={8}>
+                            <Card.Text>
+                              Description:{" "}
+                              {channel.description != null
+                                ? channel.description
+                                : "N/A"}
+                            </Card.Text>
+                            <Card.Text>
+                              Location:{" "}
+                              {channel.location != null
+                                ? channel.location
+                                : "N/A"}
+                            </Card.Text>
+                            <Card.Text>
+                              Start Date:{" "}
+                              <Badge pill variant="dark">
+                                {" "}
+                                {channel.start_date}
+                              </Badge>
+                              {/*console.log(event.start.date)*/}
+                            </Card.Text>
+                            <Card.Text>
+                              End Date:{" "}
+                              <Badge pill variant="dark">
+                                {channel.end_date}
+                              </Badge>
+                            </Card.Text>
+                            <Card.Text>
+                              <Button
+                                variant="danger"
+                                style={{ width: 260, height: 40 }}
+                              >
+                                Agree to Sync Calendar Data
+                              </Button>
+                            </Card.Text>
+                            <Card.Text>
+                              Decided Outcome: {channel.decidedOutcome}
+                            </Card.Text>
+                          </Col>
+                          <Col xs={6} md={4}>
+                            <Card.Text>
+                              Invited List:{" "}
+                              {displayUsersList(channel.invitedEmails)}
+                            </Card.Text>
+                            <Card.Text>
+                              Responded:
+                              {displayUsersList(channel.respondedEmails)}
+                            </Card.Text>
+                            <Card.Text>
+                              Pending:{displayUsersList(channel.pendingEmails)}
+                            </Card.Text>
+                          </Col>
+                        </Row>
                       </div>
                     </Card.Body>
                   </Card>
