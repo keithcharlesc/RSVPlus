@@ -28,6 +28,7 @@ export default function Channels() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const hostName = firebase.auth().currentUser?.displayName;
+  const currentUserEmail = firebase.auth().currentUser?.email;
 
   //Pop up submission
   const handleSubmit = (e) => {
@@ -110,9 +111,16 @@ export default function Channels() {
     ref.onSnapshot((querySnapshot) => {
       const items = [];
       querySnapshot.forEach((doc) => {
-        items.push(doc.data());
+        const emails = doc.data().invitedEmails; //arr of Invited Emails
+        //console.log(emails);
+        const boolean = emails.indexOf(currentUserEmail) > -1; //Check if logged in user email belongs to Invited Emails
+        if (boolean == true) {
+          //Push channels if belongs
+          items.push(doc.data());
+        }
       });
       setChannels(items);
+      //console.log(items);
       setLoading(false);
     });
   }
