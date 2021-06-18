@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ReactEmbeddedGoogleCalendar } from "react-embedded-google-calendar";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Button } from "react-bootstrap";
 import { firebase } from "@firebase/app";
 import { Link } from "react-router-dom";
 
@@ -8,7 +8,7 @@ const MoonPhasesCalendar =
   "https://calendar.google.com/calendar/embed?src=ht3jlfaac5lfd6263ulfh4tql8%40group.calendar.google.com&ctz=Europe%2FRome";
 
 export default function GoogleCal() {
-  const [url, setUrl] = useState();
+  const [url, setUrl] = useState("");
   const onUrlChange = (event) => {
     setUrl(event.target.value);
   };
@@ -69,7 +69,7 @@ export default function GoogleCal() {
     <>
       <form>
         <label>
-          Input Google Calendar Link Below:
+          <strong>Input Google Calendar Link Below:</strong>
           <Link className="ml-2" to="/calendar-guide">
             Guide
           </Link>
@@ -84,22 +84,46 @@ export default function GoogleCal() {
               ></input>
             </Col>
             <Col sm={3}>
-              <input type="button" onClick={onClear} value="Reset"></input>
+              <Button
+                variant="danger"
+                className="d-flex align-items-center justify-content-center ml-2"
+                style={{ width: 74, height: 30 }}
+                onClick={onClear}
+              >
+                Reset
+              </Button>
             </Col>
           </Row>
           <Row className="mt-3">
             <Col>
-              <button onClick={handleSubmit}>SaveURL</button>
+              <Button
+                variant="danger"
+                className="d-flex align-items-center justify-content-center"
+                style={{ height: 30 }}
+                onClick={handleSubmit}
+              >
+                SaveURL
+              </Button>
             </Col>
             <Col>
-              <button onClick={handleLoadUrl}>Fetch</button>
+              <Button
+                variant="danger"
+                className="d-flex align-items-center justify-content-center"
+                style={{ height: 30 }}
+                onClick={handleLoadUrl}
+              >
+                Fetch
+              </Button>
             </Col>
             <Col>
-              <input
-                type="button"
+              <Button
+                variant="danger"
+                className="d-flex align-items-center justify-content-center"
+                style={{ width: 200, height: 30 }}
                 onClick={onClick}
-                value="Use Sample Calendar"
-              ></input>
+              >
+                Use Sample Calendar
+              </Button>
             </Col>
           </Row>
         </label>

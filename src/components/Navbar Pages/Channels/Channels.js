@@ -142,40 +142,40 @@ export default function Channels() {
     //Check if user is under responded list already
     const respondedEmails = [...channel.respondedEmails]; //Responded Emails Array
     const userHasResponded = respondedEmails.includes(currentUserEmail);
-    console.log(userBusyDates);
+    //console.log(userBusyDates);
     if (userHasResponded === true) {
-      console.log("You alr responded!");
+      alert("You already responded!");
       return;
     }
-    console.log(userHasResponded);
-    console.log(userBusyDates);
+    //console.log(userHasResponded);
+    //console.log(userBusyDates);
     //console.log(channel.documentID);
     const invitedEmails = [...channel.invitedEmails]; //Invited Emails Array
-    console.log(respondedEmails);
+    //console.log(respondedEmails);
     respondedEmails.push(currentUserEmail); //Update Responded Email Array
     const pendingEmails = invitedEmails.filter(
       //Filter out duplicates (Invited - Responded) for Pending
       //Update Pending List
       (val) => !respondedEmails.includes(val)
     );
-    console.log(pendingEmails);
+    //console.log(pendingEmails);
     const dateRange = [...channel.dateRange]; //dateRange Array
     const updateCounterDates = [...channel.counterForDates]; //counterForDateRange Array (renamed to prevent clashing of var names)
     const updateBusyUsersForDates = [...channel.busyUsersForDates]; //busyUsersForDates Array (renamed to prevent clashing of var names)
-    console.log(dateRange);
+    //console.log(dateRange);
     var index = 0;
     for (index = 0; index < dateRange.length; index++) {
       for (var k = 0; k < userBusyDates.length; k++) {
         if (userBusyDates[k] === dateRange[index]) {
-          console.log("Busy Date: " + dateRange[index]);
+          //console.log("Busy Date: " + dateRange[index]);
           updateCounterDates[index]++; //Increment busy counter of array element
           //console.log(counterForDates[index]);
           updateBusyUsersForDates[index] += currentUserEmail + " "; //Append user email to the array element (busy)
         }
       }
     }
-    console.log(updateCounterDates);
-    console.log(updateBusyUsersForDates);
+    //console.log(updateCounterDates);
+    //console.log(updateBusyUsersForDates);
 
     db.collection("channelsCreatedByUser")
       //.doc(currentUserEmail)
@@ -197,9 +197,9 @@ export default function Channels() {
       for (var z = 0; z < updateCounterDates.length; z++) {
         if (updateCounterDates[z] < lowest) {
           lowest = updateCounterDates[z];
-          console.log(updateCounterDates[z] + " < " + lowest);
+          //console.log(updateCounterDates[z] + " < " + lowest);
           lowestIndex = z;
-          console.log(lowestIndex);
+          //console.log(lowestIndex);
         }
       }
       const bestDate = dateRange[lowestIndex];
@@ -237,13 +237,18 @@ export default function Channels() {
   }, []);
 
   if (loadingx) {
-    return <h1>Loading...</h1>;
+    return (
+      <div className="bg-dark" style={{ minHeight: "100vh" }}>
+        <h1>Loading...</h1>
+      </div>
+    );
   }
 
   return (
     <div>
       <NavigationBar />
       <div className="p-3 mb-2 bg-dark text-white">
+        <h2 className="text-center mb-4">Channels</h2>
         <Container fluid>
           <Row className="d-flex align-items-center justify-content-center mb-4">
             <Button
