@@ -56,8 +56,8 @@ export default function Dashboard() {
           }
           //console.log(busyDates);
 
-          const uid = firebase.auth().currentUser?.uid;
-          console.log("uid: " + uid);
+          //const uid = firebase.auth().currentUser?.uid;
+          //console.log("uid: " + uid);
 
           /*-- Upload to Firestore --*/
           const db = firebase.firestore();
