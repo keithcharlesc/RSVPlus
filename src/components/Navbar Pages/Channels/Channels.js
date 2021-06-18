@@ -30,7 +30,7 @@ export default function Channels() {
   const hostName = firebase.auth().currentUser?.displayName;
   const currentUserEmail = firebase.auth().currentUser?.email;
 
-  //Pop up submission
+  //----------------- Pop up submission -----------------//
   const handleSubmit = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -44,8 +44,8 @@ export default function Channels() {
     );
 
     db.collection("channelsCreatedByUser")
-      .doc(currentUserEmail)
-      .collection("channels")
+      //.doc(currentUserEmail)
+      //.collection("channels")
       .add({
         host: hostName, //User who created Channel
         name: nameRef.current.value, //Name of Event
@@ -58,10 +58,20 @@ export default function Channels() {
         busyUsersForDates: new Array(dates.length).fill(""), //Busy List for Each Date
         invitedEmails: emails, //List of Invited Users
         respondedEmails: [], //List of Responded Users
-        pendingEmails: [], //List of Pending Users
+        pendingEmails: emails, //List of Pending Users
         decidedOutcome: "None yet", //Outcome
       })
-      .then(() => {
+      .then((docRef) => {
+        //console.log(docRef);
+        //console.log(docRef.id);
+        db.collection("channelsCreatedByUser")
+          //.doc(currentUserEmail)
+          // .collection("channels")
+          .doc(docRef.id)
+          .update({
+            documentID: docRef.id, //Adding documentID to document (Purpose: to update)
+          });
+
         setLoader(false);
         setSuccess("Your channel has been created");
         console.log(
@@ -74,7 +84,6 @@ export default function Channels() {
       });
   };
   //End of Pop up submission
-
   //-------------------------------------------//
 
   const [buttonPopup, setButtonPopup] = useState(false);
@@ -83,13 +92,12 @@ export default function Channels() {
   const [channels, setChannels] = useState([]);
   const [loadingx, setLoading] = useState(false);
 
-  const ref = firebase
-    .firestore()
-    .collection("channelsCreatedByUser")
-    .doc(currentUserEmail)
-    .collection("channels");
+  //------------------------REF SNAPSHOT----------------------//
+  const ref = firebase.firestore().collection("channelsCreatedByUser");
+  //.doc(currentUserEmail) //can't use currentUserEmail here
+  //.collection("channels");
 
-  //Obtaining emailAddresses by input fields
+  //---------------------Obtaining emailAddresses by form input fields---------------------//
   function findAll() {
     const emailAddresses = [];
     var inputs = document.getElementsByName("emailAddress");
@@ -101,18 +109,109 @@ export default function Channels() {
     return emailAddresses;
   }
 
-  //Display Invited List
+  //---------------------Display Invited List---------------------//
   function displayUsersList(arr) {
     const userList = arr.map((email, index) => <li key={index}>{email}</li>);
     return userList;
   }
 
-  //Agree to Sync Implementation
+  //--------------------------[ Reading Data from Firestore ]--------------------------//
+  const userBusyDates = []; //User Busy Dates
+  var docRef = db.collection("busyDates").doc(currentUserEmail);
+
+  docRef
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        //console.log("Document read!");
+        for (var i = 0; i < doc.data().dates.length; i++) {
+          userBusyDates.push(doc.data().dates[i]);
+        }
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    })
+    .catch((error) => {
+      console.log("Error getting document:", error);
+    });
+  //console.log(userBusyDates);
+
+  //------------------------------------------*** [Agree to Sync Implementation] ***------------------------------------------//
   const handleAgreeToSync = (channel) => {
-    console.log(channel.name);
+    //Check if user is under responded list already
+    const respondedEmails = [...channel.respondedEmails]; //Responded Emails Array
+    const userHasResponded = respondedEmails.includes(currentUserEmail);
+    console.log(userBusyDates);
+    if (userHasResponded === true) {
+      console.log("You alr responded!");
+      return;
+    }
+    console.log(userHasResponded);
+    console.log(userBusyDates);
+    //console.log(channel.documentID);
+    const invitedEmails = [...channel.invitedEmails]; //Invited Emails Array
+    console.log(respondedEmails);
+    respondedEmails.push(currentUserEmail); //Update Responded Email Array
+    const pendingEmails = invitedEmails.filter(
+      //Filter out duplicates (Invited - Responded) for Pending
+      //Update Pending List
+      (val) => !respondedEmails.includes(val)
+    );
+    console.log(pendingEmails);
+    const dateRange = [...channel.dateRange]; //dateRange Array
+    const updateCounterDates = [...channel.counterForDates]; //counterForDateRange Array (renamed to prevent clashing of var names)
+    const updateBusyUsersForDates = [...channel.busyUsersForDates]; //busyUsersForDates Array (renamed to prevent clashing of var names)
+    console.log(dateRange);
+    var index = 0;
+    for (index = 0; index < dateRange.length; index++) {
+      for (var k = 0; k < userBusyDates.length; k++) {
+        if (userBusyDates[k] === dateRange[index]) {
+          console.log("Busy Date: " + dateRange[index]);
+          updateCounterDates[index]++; //Increment busy counter of array element
+          //console.log(counterForDates[index]);
+          updateBusyUsersForDates[index] += currentUserEmail + " "; //Append user email to the array element (busy)
+        }
+      }
+    }
+    console.log(updateCounterDates);
+    console.log(updateBusyUsersForDates);
+
+    db.collection("channelsCreatedByUser")
+      //.doc(currentUserEmail)
+      //.collection("channels")
+      .doc(channel.documentID)
+      .update({
+        counterForDates: updateCounterDates, //Counter for Date Date
+        busyUsersForDates: updateBusyUsersForDates, //Busy List for Each Date
+        invitedEmails: invitedEmails, //List of Invited Users
+        respondedEmails: respondedEmails, //List of Responded Users
+        pendingEmails: pendingEmails, //List of Pending Users
+        //decidedOutcome: "None yet", //Outcome
+      });
+
+    //If everyone has fully responded, give the most optimal date
+    if (respondedEmails.length === invitedEmails.length) {
+      let lowest = updateCounterDates[0];
+      let lowestIndex = 0;
+      for (var z = 0; z < updateCounterDates.length; z++) {
+        if (updateCounterDates[z] < lowest) {
+          lowest = updateCounterDates[z];
+          console.log(updateCounterDates[z] + " < " + lowest);
+          lowestIndex = z;
+          console.log(lowestIndex);
+        }
+      }
+      const bestDate = dateRange[lowestIndex];
+      db.collection("channelsCreatedByUser")
+        .doc(channel.documentID)
+        .update({
+          decidedOutcome: "Most optimal date is " + bestDate + " !", //Outcome
+        });
+    }
   };
 
-  //Load channels details
+  //Load channels details REF SNAPSHOT
   function getChannels() {
     setLoading(true);
     ref.onSnapshot((querySnapshot) => {
@@ -125,6 +224,7 @@ export default function Channels() {
           //Push channels if belongs
           items.push(doc.data());
         }
+        //console.log(doc.id);
       });
       setChannels(items);
       //console.log(items);
