@@ -39,11 +39,11 @@ export default function Calendar() {
         location: data.location,
         description: data.description,
         start: {
-          dateTime: data.startDate + "T09:00:00+08:00", //requires time input
+          dateTime: data.startDate + ":00+08:00", //requires time input
           timeZone: "Asia/Singapore",
         },
         end: {
-          dateTime: data.endDate + "T17:00:00+08:00", //requires time input
+          dateTime: data.endDate + ":00+08:00", //requires time input
           timeZone: "Asia/Singapore",
         },
         reminders: {
@@ -138,7 +138,7 @@ export default function Calendar() {
                       onChange={(e) => handleSubmitForm(e)}
                       id="startDate"
                       value={data.startDate}
-                      placeholder="YYYY-MM-DD"
+                      placeholder="YYYY-MM-DDT09:00"
                       type="text"
                     ></input>
                   </div>
@@ -148,7 +148,7 @@ export default function Calendar() {
                       onChange={(e) => handleSubmitForm(e)}
                       id="endDate"
                       value={data.endDate}
-                      placeholder="YYYY-MM-DD"
+                      placeholder="YYYY-MM-DDT17:00"
                       type="text"
                     ></input>
                   </div>
