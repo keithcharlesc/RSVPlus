@@ -1,5 +1,6 @@
 import React from "react";
 import "./Popup.css";
+import Channels from "./Channels";
 
 function Popup(props) {
   return props.trigger ? (
