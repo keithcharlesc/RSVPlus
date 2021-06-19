@@ -2,3 +2,24 @@
   height: 30px !important;
   width: 30px !important;
 }
+
+.nav-bar-text {
+  font-family: "Baloo 2", cursive !important;
+  font-size: 23px !important;
+  color: white !important;
+}
+
+.nav-bar-name {
+  font-family: "Baloo 2", cursive !important;
+  font-size: 23px !important;
+  color: white !important;
+}
+
+.nav-bar-text:hover {
+  color: rgb(176, 165, 165) !important;
+}
+
+.nav-bar-appName {
+  font-family: "Spartan", sans-serif !important;
+  letter-spacing: 0.2em !important;
+}

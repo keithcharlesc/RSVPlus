@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Alert } from "react-bootstrap";
+import { Container, Button, Alert, Row, Col } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthContext";
 import { useHistory } from "react-router-dom";
 import firebase from "../../firebase";
+import "./Login.css";
 
 export default function Login() {
   //const { login } = useAuth();
@@ -60,54 +61,6 @@ export default function Login() {
       });
   }
 
-  /* --------------- TESTING MODULE ----------------------
-  //---------- Get Calendar (For testing)-------------
-  async function getCalendar() {
-    const events = await gapi.client.calendar.events.list({
-      calendarId: "primary",
-      timeMin: new Date().toISOString(),
-      showDeleted: false,
-      singleEvents: true,
-      maxResults: 10,
-      orderBy: "startTime",
-    });
-
-    console.log(events);
-
-    console.log(events.result.items);
-  }
-
-  //------------ Insert Event (For testing) ------------
-  async function insertEvent() {
-    const insert = await gapi.client.calendar.events.insert({
-      calendarId: "primary",
-      start: {
-        dateTime: hoursFromNow(2),
-        timeZone: "Asia/Singapore",
-      },
-      end: {
-        dateTime: hoursFromNow(3),
-        timeZone: "Asia/Singapore",
-      },
-      summary: "Have fun!!!",
-      description: "Do some cool stuff",
-    });
-
-    getCalendar();
-  }
-
-  const hoursFromNow = (n) =>
-    new Date(Date.now() + n * 1000 * 60 * 60).toISOString();
-
-  // ------------ Handlers (For testing)------------
-  const handleGetCalendar = () => {
-    getCalendar();
-  };
-
-  const handleInsertEvent = () => {
-    insertEvent();
-  };
-  --------------- TESTING MODULE ----------------------*/
   /*----------Submit Button Functionalities----------*/
 
   async function handleSubmit(event) {
@@ -131,33 +84,33 @@ export default function Login() {
           className="d-flex align-items-center justify-content-center"
           style={{ minHeight: "100vh" }}
         >
-          <div className="w-100" style={{ maxWidth: "400px" }}>
-            <h1 className="text-center mb-5">
-              Welcome to <em className="text-danger">RSVP+</em>
-            </h1>
-            {error && <Alert variant="danger">{error}</Alert>}
-            <Button
-              disabled={loading}
-              className="w-100"
-              type="button"
-              onClick={handleSubmit}
-            >
-              Log In With Google!
-            </Button>
-            {/*
-            <button
-              style={{ width: 100, height: 50 }}
-              onClick={handleGetCalendar}
-            >
-              Fetch Events
-            </button>
-            <button
-              style={{ width: 100, height: 50 }}
-              onClick={handleInsertEvent}
-            >
-              Insert Events
-            </button>
-            */}
+          <div className="w-100" style={{ maxWidth: "460px" }}>
+            <Row> {error && <Alert className="alert-fail">{error}</Alert>}</Row>
+            <Row>
+              <Col>
+                {" "}
+                <div className="mb-3">
+                  <h1 className="welcome-text text-center mb-5">Welcome to </h1>
+                  <h1 className="app-text text-danger">RSVP+</h1>
+                  <h1 className="welcome-text">!</h1>
+                </div>
+              </Col>
+              <Col>
+                <div className="vl">
+                  <div className="ml-4">
+                    <Button
+                      variant="danger"
+                      disabled={loading}
+                      className="login-button mt-4 w-100"
+                      type="button"
+                      onClick={handleSubmit}
+                    >
+                      Login with Google!
+                    </Button>
+                  </div>
+                </div>
+              </Col>
+            </Row>
           </div>
         </Container>
       </div>

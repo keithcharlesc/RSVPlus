@@ -1,3 +1,8 @@
+.page-header {
+  font-family: "Nunito", sans-serif;
+  letter-spacing: 0.5em;
+}
+
 .card {
   background-color: #202027 !important;
   border-radius: 20px !important;

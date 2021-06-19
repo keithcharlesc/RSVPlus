@@ -42,7 +42,7 @@ export default function ContactUs() {
         className="p-3 mb-2 bg-dark text-white"
         style={{ minHeight: "100vh" }}
       >
-        <h2 className="text-center">Contact Us</h2>
+        <h2 className="page-header text-center">CONTACT US</h2>
         <Container
           className="d-flex align-items-center justify-content-center"
           style={{ minHeight: "75vh" }}
