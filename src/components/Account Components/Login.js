@@ -89,8 +89,8 @@ export default function Login() {
             <Row>
               <Col>
                 {" "}
-                <div className="mb-3">
-                  <h1 className="welcome-text text-center mb-5">Welcome to </h1>
+                <div>
+                  <h1 className="welcome-text text-center">Welcome to </h1>
                   <h1 className="app-text text-danger">RSVP+</h1>
                   <h1 className="welcome-text">!</h1>
                 </div>
