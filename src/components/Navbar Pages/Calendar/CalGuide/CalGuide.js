@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import NavigationBar from "../../NavigationBar/NavigationBar";
-import { Carousel, Button } from "react-bootstrap";
+import { Carousel } from "react-bootstrap";
 import StepOne from "./img/StepOne.png";
 import StepTwo from "./img/StepTwo.png";
 import StepThree from "./img/StepThree.png";

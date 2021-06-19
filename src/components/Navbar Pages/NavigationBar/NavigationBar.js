@@ -24,32 +24,34 @@ export default function NavigationBar() {
   return (
     <div>
       <Navbar collapseOnSelect expand="sm" bg="dark" variant="dark">
-        <Navbar.Brand href="/" className="text-danger">
+        <Navbar.Brand href="/" className="nav-bar-appName text-danger">
           RSVP+
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="mr-auto">
-            <Nav.Link className="px-3" href="/">
+            <Nav.Link className="nav-bar-text px-3" href="/">
               Home
             </Nav.Link>
-            <Nav.Link className="px-3" href="/channels">
+            <Nav.Link className="nav-bar-text px-3" href="/channels">
               Channels
             </Nav.Link>
-            <Nav.Link className="px-3" href="/calendar">
+            <Nav.Link className="nav-bar-text px-3" href="/calendar">
               Calendar
             </Nav.Link>
-            <Nav.Link className="px-3" href="/faq">
+            <Nav.Link className="nav-bar-text px-3" href="/faq">
               FAQ
             </Nav.Link>
-            <Nav.Link className="px-3" href="/contact-us">
+            <Nav.Link className="nav-bar-text px-3" href="/contact-us">
               Contact Us
             </Nav.Link>
           </Nav>
           <Nav>
-            <Navbar.Text>Signed in as: {currentUser.displayName}</Navbar.Text>
+            <Navbar.Text className="nav-bar-name">
+              Signed in as: {currentUser.displayName}
+            </Navbar.Text>
             <Image
-              className="photo ml-2 mt-1"
+              className="photo ml-2 mt-2"
               src={currentUser.photoURL}
               roundedCircle
             />

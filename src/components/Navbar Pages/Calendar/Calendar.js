@@ -90,7 +90,7 @@ export default function Calendar() {
         className="p-3 mb-2 bg-dark text-white"
         style={{ minHeight: "100vh" }}
       >
-        <h2 className="text-center mb-5">Calendar</h2>
+        <h2 className="page-header text-center mb-5">CALENDAR</h2>
 
         <Container className="" style={{ minHeight: "75vh" }}>
           <Row>

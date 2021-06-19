@@ -3,6 +3,7 @@ import { Button, Container, Card, Row, Badge } from "react-bootstrap";
 import NavigationBar from "../NavigationBar/NavigationBar";
 import { firebase } from "@firebase/app";
 import obtainBusyDates from "./obtainBusyDates";
+import "./Dashboard.css";
 
 /*----- GAPI------*/
 var gapi = window.gapi;
@@ -116,12 +117,13 @@ export default function Dashboard() {
     <>
       <NavigationBar />
       <div className="p-3 mb-2 bg-dark text-white">
-        <h2 className="text-center mb-4">Dashboard</h2>
+        <h2 className="page-header text-center mb-4">DASHBOARD</h2>
         <Container fluid>
           <Row className="d-flex align-items-center justify-content-center mb-4">
             {" "}
             <Button
               variant="warning"
+              className="fetch-events-button"
               style={{ width: 100, height: 60 }}
               onClick={handleSecondClick}
             >

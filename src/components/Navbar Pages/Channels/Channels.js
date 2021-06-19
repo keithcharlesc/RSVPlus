@@ -248,14 +248,15 @@ export default function Channels() {
     <div>
       <NavigationBar />
       <div className="p-3 mb-2 bg-dark text-white">
-        <h2 className="text-center mb-4">Channels</h2>
+        <h2 className="page-header text-center mb-4">CHANNELS</h2>
         <Container fluid>
           <Row className="d-flex align-items-center justify-content-center mb-4">
             <Button
+              className="create-event-button"
               style={{ width: 100, height: 60 }}
               onClick={() => setButtonPopup(true)}
             >
-              {" "}
+              {""}
               Create an Event!{" "}
             </Button>
           </Row>

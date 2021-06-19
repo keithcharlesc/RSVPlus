@@ -1,3 +1,8 @@
+.page-header {
+  font-family: "Nunito", sans-serif;
+  letter-spacing: 0.5em;
+}
+
 .faqs {
   width: 100%;
   max-width: 768px;
@@ -8,7 +13,7 @@
 .faqs .faq {
   margin: 15px;
   padding: 15px;
-  background-color: rgb(214, 22, 22);
+  background-color: rgb(128, 33, 33);
   border-radius: 8px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }

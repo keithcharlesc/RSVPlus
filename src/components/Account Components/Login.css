@@ -1,0 +1,25 @@
+.welcome-text {
+  font-family: "Nunito", cursive;
+  display: inline;
+}
+
+.app-text {
+  font-family: "Spartan", sans-serif !important;
+  letter-spacing: 0.2em !important;
+  display: inline;
+}
+
+.login-button {
+  font-family: "Nunito", cursive;
+}
+
+.alert-fail {
+  font-family: "Nunito", cursive !important;
+  background-color: rgba(128, 33, 33, 0.269) !important;
+  text-align: center;
+}
+
+.vl {
+  border-left: 4px solid rgb(31, 33, 31);
+  height: 100px;
+}
