@@ -35,6 +35,7 @@ export default function Dashboard() {
   /* -------------- RETRIEVING EVENTS ------------*/
   const [events, setEvents] = useState(null);
   const currentUserEmail = firebase.auth().currentUser?.email;
+  const db = firebase.firestore();
 
   const handleSecondClick = () => {
     gapi.auth2.getAuthInstance().then(() => {
@@ -49,19 +50,23 @@ export default function Dashboard() {
         })
         .then((response) => {
           const events = response.result.items;
-          console.log("Google Events Fetched: ", events);
+          //console.log("Google Events Fetched: ", events);
           setEvents(events);
-          let busyDates = [];
+          //let busyDates = [];
+          obtainBusyDates(events, db, currentUserEmail);
+          /*
           if (events.length > 0) {
-            busyDates = obtainBusyDates(events);
+            busyDates = obtainBusyDates(events, db, currentUserEmail);
           }
-          //console.log(busyDates);
-
+          console.log(busyDates);
+          */
           //const uid = firebase.auth().currentUser?.uid;
           //console.log("uid: " + uid);
 
           /*-- Upload to Firestore --*/
-          const db = firebase.firestore();
+
+          //LATEST CHANGE BELOW
+          /*
           db.collection("calendarEvents")
             .doc(currentUserEmail)
             .set({
@@ -84,7 +89,8 @@ export default function Dashboard() {
             })
             .catch((error) => {
               console.error("Error writing document: ", error);
-            });
+            }); */
+          //END OF CHANGE
           /*----------*/
 
           /*-- Reading Data from Firestore--
