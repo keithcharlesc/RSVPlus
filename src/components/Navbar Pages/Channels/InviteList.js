@@ -1,4 +1,5 @@
 import React from "react";
+import { Form } from "react-bootstrap";
 //Component used in Channels
 export default class InviteList extends React.Component {
   constructor() {
@@ -19,7 +20,12 @@ export default class InviteList extends React.Component {
     for (let i = 0; i < value; i++) {
       inputs.push(
         <div key={i}>
-          <input type="text" name="emailAddress" placeholder="Gmail Address" />
+          <Form.Control
+            type="email"
+            name="emailAddress"
+            placeholder="Gmail Address of RSVP+ User"
+            required
+          />
         </div>
       );
     }
@@ -30,12 +36,13 @@ export default class InviteList extends React.Component {
     //console.log(this.state.inputSize);
     return (
       <div>
-        <input
+        <Form.Control
           type="tel"
           name="quantity"
           min="1"
           max="9"
           maxLength="1"
+          required
           onChange={(value) => this.handleOnChange(value)}
         />
         <div>{this.renderInputs(this.state.inputSize)}</div>
