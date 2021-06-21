@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Container, Button, Alert, Row, Col } from "react-bootstrap";
-import { useAuth } from "../../contexts/AuthContext";
 import { useHistory } from "react-router-dom";
 import firebase from "../../firebase";
 import "./Login.css";
 
 export default function Login() {
-  //const { login } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const history = useHistory();
-  const [currentUser, setCurrentUser] = useState();
 
   /*------------- Gapi Initialization --------------*/
   var gapi = window.gapi;
