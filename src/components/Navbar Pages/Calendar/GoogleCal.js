@@ -8,15 +8,39 @@ const MoonPhasesCalendar =
   "https://calendar.google.com/calendar/embed?src=ht3jlfaac5lfd6263ulfh4tql8%40group.calendar.google.com&ctz=Europe%2FRome";
 
 export default function GoogleCal() {
+  const [loading, setLoader] = useState(false);
+  const [loadingTwo, setLoaderTwo] = useState(false);
+  const [loadingThree, setLoaderThree] = useState(false);
+  const [loadingFour, setLoaderFour] = useState(false);
+
   const [url, setUrl] = useState("");
   const onUrlChange = (event) => {
     setUrl(event.target.value);
   };
   const onClick = (event) => {
-    setUrl(MoonPhasesCalendar);
+    event.preventDefault();
+    setLoaderFour(true);
+    return Promise.resolve(setUrl(MoonPhasesCalendar))
+      .then(() => {
+        setLoaderFour(false);
+        console.log("Sample URL has been set");
+      })
+      .catch((error) => {
+        alert(error.message);
+        setLoaderFour(false);
+      });
   };
   const onClear = (event) => {
-    setUrl("");
+    setLoader(true);
+    return Promise.resolve(setUrl(""))
+      .then(() => {
+        setLoader(false);
+        console.log("URL cleared");
+      })
+      .catch((error) => {
+        alert(error.message);
+        setLoader(false);
+      });
   };
 
   const db = firebase.firestore();
@@ -26,23 +50,26 @@ export default function GoogleCal() {
   //Storing Google Calendar URL
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    setLoaderTwo(true);
     db.collection("displayCalendarURL")
       .doc(currentUserEmail)
       .set({
         url: url,
       })
       .then(() => {
+        setLoaderTwo(false);
         alert("Your URL has been stored");
       })
       .catch((error) => {
         alert(error.message);
+        setLoaderTwo(false);
       });
   };
 
   //-- Reading Data from Firestore--
   const handleLoadUrl = (e) => {
     e.preventDefault();
+    setLoaderThree(true);
     var docRef = db.collection("displayCalendarURL").doc(currentUserEmail);
     onClear();
 
@@ -51,15 +78,18 @@ export default function GoogleCal() {
       .then((doc) => {
         if (doc.exists) {
           setUrl(doc.data().url);
+          setLoaderThree(false);
           //console.log(doc.data().url);
           console.log("Document read!");
         } else {
           // doc.data() will be undefined in this case
           setUrl(MoonPhasesCalendar);
+          setLoaderThree(false);
           alert("No data found, using sample Url instead");
         }
       })
       .catch((error) => {
+        setLoaderThree(false);
         console.log("Error getting document:", error);
       });
   };
@@ -89,6 +119,7 @@ export default function GoogleCal() {
                 className="d-flex align-items-center justify-content-center ml-2"
                 style={{ width: 74, height: 30 }}
                 onClick={onClear}
+                disabled={loading}
               >
                 Reset
               </Button>
@@ -101,6 +132,7 @@ export default function GoogleCal() {
                 className="d-flex align-items-center justify-content-center"
                 style={{ height: 30 }}
                 onClick={handleSubmit}
+                disabled={loadingTwo}
               >
                 SaveURL
               </Button>
@@ -111,6 +143,7 @@ export default function GoogleCal() {
                 className="d-flex align-items-center justify-content-center"
                 style={{ height: 30 }}
                 onClick={handleLoadUrl}
+                disabled={loadingThree}
               >
                 Fetch
               </Button>
@@ -121,6 +154,7 @@ export default function GoogleCal() {
                 className="d-flex align-items-center justify-content-center"
                 style={{ width: 200, height: 30 }}
                 onClick={onClick}
+                disabled={loadingFour}
               >
                 Use Sample Calendar
               </Button>
