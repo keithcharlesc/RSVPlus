@@ -55,17 +55,17 @@ export default function ContactUs() {
               <Form className="text-dark" onSubmit={handleSubmit}>
                 <Form.Group id="name">
                   <Form.Label>Name</Form.Label>
-                  <Form.Control type="name" ref={nameRef} />
+                  <Form.Control type="name" ref={nameRef} required />
                 </Form.Group>
                 <br></br>
                 <Form.Group id="email">
                   <Form.Label>Email</Form.Label>
-                  <Form.Control type="email" ref={emailRef} />
+                  <Form.Control type="email" ref={emailRef} required />
                 </Form.Group>
                 <br></br>
                 <Form.Group id="message">
                   <Form.Label>Message</Form.Label>
-                  <Form.Control type="message" ref={messageRef} />
+                  <Form.Control type="message" ref={messageRef} required />
                 </Form.Group>
                 <br></br>
                 <Button
