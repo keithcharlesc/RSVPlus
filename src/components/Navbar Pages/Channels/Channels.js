@@ -37,7 +37,8 @@ export default function Channels() {
     setLoader(true);
     setError("");
     setSuccess("");
-    const emails = findAll();
+    const emails = [currentUserEmail, ...findAll()];
+    console.log(emails);
     const dates = dateRange(
       startDateRef.current.value,
       endDateRef.current.value
