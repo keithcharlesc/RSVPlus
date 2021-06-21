@@ -33,11 +33,14 @@ gapi.load("client:auth2", () => {
 
 export default function Dashboard() {
   /* -------------- RETRIEVING EVENTS ------------*/
+  const [loading, setLoader] = useState(false);
   const [events, setEvents] = useState(null);
   const currentUserEmail = firebase.auth().currentUser?.email;
   const db = firebase.firestore();
 
   const handleSecondClick = () => {
+    setLoader(true);
+
     gapi.auth2.getAuthInstance().then(() => {
       gapi.client.calendar.events
         .list({
@@ -53,7 +56,12 @@ export default function Dashboard() {
           //console.log("Google Events Fetched: ", events);
           setEvents(events);
           //let busyDates = [];
-          obtainBusyDates(events, db, currentUserEmail);
+          //Prevents Button Spamming
+          return Promise.resolve(
+            obtainBusyDates(events, db, currentUserEmail)
+          ).then(() => {
+            setLoader(false);
+          });
           /*
           if (events.length > 0) {
             busyDates = obtainBusyDates(events, db, currentUserEmail);
@@ -132,6 +140,7 @@ export default function Dashboard() {
               className="fetch-events-button"
               style={{ width: 100, height: 60 }}
               onClick={handleSecondClick}
+              disabled={loading}
             >
               Fetch Events
             </Button>
