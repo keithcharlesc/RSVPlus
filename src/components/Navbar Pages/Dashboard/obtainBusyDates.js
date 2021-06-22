@@ -7,7 +7,7 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
 
   await db
     .collection("busyDates")
-    .doc("test")
+    .doc(currentUserEmail)
     .collection("busyDatesWithTimeBlocks")
     .get()
     .then((querySnapshot) => {
@@ -74,7 +74,7 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
 
     //Range of dates between start and end for that event
     console.log(dateRangeForCurrentEvent);
-    var datesRef = db.collection("busyDates").doc("test");
+    var datesRef = db.collection("busyDates").doc(currentUserEmail);
 
     //Creates documents for dates if the dates havent been initialized
     async function initializeBlocks() {
@@ -182,7 +182,7 @@ async function incrementDateInBetweenTwoSlotsOnSameDay(
     .get()
     .then((doc) => {
       if (doc.exists) {
-        console.log("test");
+        //console.log("test");
         let updatedHours = [...doc.data().hours];
         //All-time days - all blocks filled
         if (rawStartDate.length === 10) {
