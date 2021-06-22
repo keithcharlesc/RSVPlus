@@ -13,14 +13,15 @@ import NavigationBar from "../NavigationBar/NavigationBar";
 import { firebase } from "@firebase/app";
 import Popup from "./Popup";
 import InviteList from "./InviteList";
+import "./Channels.css";
 import dateRange from "./dateRange";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function Channels() {
   const nameRef = useRef();
   const descriptionRef = useRef();
   const locationRef = useRef();
-  const startDateRef = useRef();
-  const endDateRef = useRef();
 
   const db = firebase.firestore();
   //console.log(db)
@@ -29,6 +30,9 @@ export default function Channels() {
   const [success, setSuccess] = useState("");
   const hostName = firebase.auth().currentUser?.displayName;
   const currentUserEmail = firebase.auth().currentUser?.email;
+
+  const [dateRangeForPicker, setDateRangeForPicker] = useState([null, null]);
+  const [startDate, endDate] = dateRangeForPicker;
 
   //----------------- Pop up submission -----------------//
   const handleSubmit = (e) => {
@@ -39,10 +43,7 @@ export default function Channels() {
     setSuccess("");
     const emails = [currentUserEmail, ...findAll()];
     console.log(emails);
-    const dates = dateRange(
-      startDateRef.current.value,
-      endDateRef.current.value
-    );
+    const dates = dateRange(startDate, endDate);
 
     db.collection("channelsCreatedByUser")
       //.doc(currentUserEmail)
@@ -52,8 +53,8 @@ export default function Channels() {
         name: nameRef.current.value, //Name of Event
         description: descriptionRef.current.value, //Description of Event
         location: locationRef.current.value, //Location of Event
-        start_date: startDateRef.current.value, //Start Date of Event
-        end_date: endDateRef.current.value, // End Date of Event
+        start_date: startDate.toLocaleDateString("en-CA"), //Start Date of Event
+        end_date: endDate.toLocaleDateString("en-CA"), // End Date of Event
         dateRange: dates, //Dates in between Start Date & End Date of Event
         invitedEmails: emails, //List of Invited Users
         respondedEmails: [], //List of Responded Users
@@ -142,8 +143,6 @@ export default function Channels() {
     const userList = arr.map((email, index) => <li key={index}>{email}</li>);
     return userList;
   }
-
-  var docRef = db.collection("busyDates").doc(currentUserEmail);
 
   //------------------------------------------*** MAIN:[Agree to Sync Implementation] ***------------------------------------------//
   async function handleAgreeToSync(channel) {
@@ -251,8 +250,8 @@ export default function Channels() {
 
     ///*
     //If everyone has fully responded, give the most optimal date and time below:
-    let startTime = 8;
-    let endTime = 20;
+    //let startTime = 8;
+    //let endTime = 20;
 
     let latestUpdatedTotalOptimalDates;
     await db
@@ -467,23 +466,23 @@ export default function Channels() {
                       />
                     </Form.Group>
                     <br></br>
-                    <Form.Group id="startDate">
-                      <Form.Label>Start date</Form.Label>
-                      <Form.Control
+
+                    <Form.Group id="startDateEndDate">
+                      <Form.Label className="mr-3">
+                        Start Date & End Date:{" "}
+                      </Form.Label>
+                      <DatePicker
+                        className="date-picker"
+                        selectsRange={true}
+                        startDate={startDate}
+                        endDate={endDate}
+                        minDate={new Date()}
+                        placeholderText="eg. 06/24/2021 - 06/25/2021"
                         required
-                        type="startDate"
-                        ref={startDateRef}
-                        placeholder="YYYY-MM-DD"
-                      />
-                    </Form.Group>
-                    <br></br>
-                    <Form.Group id="endDate">
-                      <Form.Label>End Date</Form.Label>
-                      <Form.Control
-                        required
-                        type="endDate"
-                        ref={endDateRef}
-                        placeholder="YYYY-MM-DD"
+                        onChange={(update) => {
+                          setDateRangeForPicker(update);
+                        }}
+                        isClearable={true}
                       />
                     </Form.Group>
                     <br></br>

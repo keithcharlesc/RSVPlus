@@ -6,3 +6,10 @@
 .create-event-button {
   font-family: "Raleway", sans-serif !important;
 }
+
+.date-picker {
+  border-radius: 5px !important;
+  width: 225px !important;
+  border: none !important;
+  height: 37px !important;
+}
