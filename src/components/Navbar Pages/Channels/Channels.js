@@ -55,8 +55,8 @@ export default function Channels() {
         start_date: startDateRef.current.value, //Start Date of Event
         end_date: endDateRef.current.value, // End Date of Event
         dateRange: dates, //Dates in between Start Date & End Date of Event
-        counterForDates: new Array(dates.length).fill(0), //Counter for Date Date
-        busyUsersForDates: new Array(dates.length).fill(""), //Busy List for Each Date
+        counterForDates: new Array(dates.length).fill(0), //Counter for Date Date //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
+        busyUsersForDates: new Array(dates.length).fill(""), //Busy List for Each Date //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
         invitedEmails: emails, //List of Invited Users
         respondedEmails: [], //List of Responded Users
         pendingEmails: emails, //List of Pending Users
@@ -73,6 +73,21 @@ export default function Channels() {
             documentID: docRef.id, //Adding documentID to document (Purpose: to update)
           });
 
+        for (var i = 0; i < dates.length; i++) {
+          let date = dates[i];
+
+          //Creates dates documents with the busy hours blocks for those date range of the channel created
+          db.collection("channelsCreatedByUser")
+            .doc(docRef.id)
+            .collection("busyDatesWithTimeBlocks")
+            .doc(date)
+            .set({
+              date: date,
+              busyHours: new Array(24).fill(0),
+              busyUsersForHours: new Array(24).fill(""),
+            });
+        }
+
         setLoader(false);
         setSuccess("Your channel has been created");
         console.log(
@@ -80,6 +95,7 @@ export default function Channels() {
         );
       })
       .catch((error) => {
+        console.log(error);
         setError("Your channel has not been created, please try again!");
         setLoader(false);
       });
@@ -139,15 +155,17 @@ export default function Channels() {
   //console.log(userBusyDates);
 
   //------------------------------------------*** [Agree to Sync Implementation] ***------------------------------------------//
-  const handleAgreeToSync = (channel) => {
+  async function handleAgreeToSync(channel) {
     //Check if user is under responded list already
     const respondedEmails = [...channel.respondedEmails]; //Responded Emails Array
     const userHasResponded = respondedEmails.includes(currentUserEmail);
     //console.log(userBusyDates);
+
     if (userHasResponded === true) {
       alert("You already responded!");
       return;
     }
+
     //console.log(userHasResponded);
     //console.log(userBusyDates);
     //console.log(channel.documentID);
@@ -161,19 +179,79 @@ export default function Channels() {
     );
     //console.log(pendingEmails);
     const dateRange = [...channel.dateRange]; //dateRange Array
-    const updateCounterDates = [...channel.counterForDates]; //counterForDateRange Array (renamed to prevent clashing of var names)
-    const updateBusyUsersForDates = [...channel.busyUsersForDates]; //busyUsersForDates Array (renamed to prevent clashing of var names)
+    const updateCounterDates = [...channel.counterForDates]; //counterForDateRange Array (renamed to prevent clashing of var names) //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
+    const updateBusyUsersForDates = [...channel.busyUsersForDates]; //busyUsersForDates Array (renamed to prevent clashing of var names) //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
     //console.log(dateRange);
+
+    //Updating of Dates
     var index = 0;
     for (index = 0; index < dateRange.length; index++) {
-      for (var k = 0; k < userBusyDates.length; k++) {
-        if (userBusyDates[k] === dateRange[index]) {
-          //console.log("Busy Date: " + dateRange[index]);
-          updateCounterDates[index]++; //Increment busy counter of array element
-          //console.log(counterForDates[index]);
-          updateBusyUsersForDates[index] += currentUserEmail + " "; //Append user email to the array element (busy)
+      let date = dateRange[index];
+      let channelHoursForThatDate = [];
+      let userBusyHoursForThatDate = [];
+
+      //Retrieves the busyHours of that Date Document of that CHANNEL
+      await db
+        .collection("channelsCreatedByUser")
+        .doc(channel.documentID)
+        .collection("busyDatesWithTimeBlocks")
+        .doc(date)
+        .get()
+        .then((doc) => {
+          //console.log(doc.data().busyHours);
+          console.log("Channel Hours for " + date);
+          channelHoursForThatDate = doc.data().busyHours;
+        });
+      console.log(channelHoursForThatDate);
+
+      //Retrieves the busyHours of that Date Document of that USER
+      await db
+        .collection("busyDates")
+        .doc("test")
+        .collection("busyDatesWithTimeBlocks")
+        .doc(date)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            console.log("UserBusyHours for " + date);
+            userBusyHoursForThatDate = doc.data().hours;
+          } else {
+            console.log(
+              "User don't have busy hours for that date, giving blank array instead: "
+            );
+            userBusyHoursForThatDate = new Array(24).fill(0);
+          }
+        });
+      console.log(userBusyHoursForThatDate);
+
+      //Checks if for every hour, if the user has something on (aka > 0),
+      //if yes then +1 to the channel hour as well to indicate how many pax is busy
+      for (
+        var hourIndex = 0;
+        hourIndex < channelHoursForThatDate.length;
+        hourIndex++
+      ) {
+        if (userBusyHoursForThatDate[hourIndex] > 0) {
+          channelHoursForThatDate[hourIndex]++;
         }
       }
+
+      console.log("------For Date: " + date + "-------");
+      console.log("New Updated channelHours is:");
+      console.log(channelHoursForThatDate);
+      console.log("-----------------------------------");
+
+      //updateBusyUsersForDates[index] += currentUserEmail + " "; //Append user email to the array element (busy)
+      //Have to retrieve the array for it as well another await db if needed to be implemented.
+
+      //Updates the hours for that date document for channel
+      db.collection("channelsCreatedByUser")
+        .doc(channel.documentID)
+        .collection("busyDatesWithTimeBlocks")
+        .doc(date)
+        .update({
+          busyHours: channelHoursForThatDate,
+        });
     }
     //console.log(updateCounterDates);
     //console.log(updateBusyUsersForDates);
@@ -183,34 +261,55 @@ export default function Channels() {
       //.collection("channels")
       .doc(channel.documentID)
       .update({
-        counterForDates: updateCounterDates, //Counter for Date Date
-        busyUsersForDates: updateBusyUsersForDates, //Busy List for Each Date
+        counterForDates: updateCounterDates, //Counter for Date Date //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
+        busyUsersForDates: updateBusyUsersForDates, //Busy List for Each Date //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
         invitedEmails: invitedEmails, //List of Invited Users
         respondedEmails: respondedEmails, //List of Responded Users
         pendingEmails: pendingEmails, //List of Pending Users
         //decidedOutcome: "None yet", //Outcome
       });
 
-    //If everyone has fully responded, give the most optimal date
+    //If everyone has fully responded, give the most optimal date //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
     if (respondedEmails.length === invitedEmails.length) {
+      //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
       let lowest = updateCounterDates[0];
-      let lowestIndex = 0;
+      let lowestIndex = 0; //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
       for (var z = 0; z < updateCounterDates.length; z++) {
+        //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
         if (updateCounterDates[z] < lowest) {
-          lowest = updateCounterDates[z];
+          //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
+          lowest = updateCounterDates[z]; //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
           //console.log(updateCounterDates[z] + " < " + lowest);
-          lowestIndex = z;
+          lowestIndex = z; //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
           //console.log(lowestIndex);
-        }
-      }
-      const bestDate = dateRange[lowestIndex];
-      db.collection("channelsCreatedByUser")
-        .doc(channel.documentID)
+        } //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
+      } //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
+      const bestDate = dateRange[lowestIndex]; //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
+      db.collection("channelsCreatedByUser") //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
+        .doc(channel.documentID) //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
         .update({
-          decidedOutcome: "Most optimal date is " + bestDate + " !", //Outcome
-        });
-    }
-  };
+          //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
+          decidedOutcome: "Most optimal date is " + bestDate + " !", //Outcome //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
+        }); //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
+    } //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
+  }
+
+  async function dateTimeBlocksFromChannel(channel, date) {
+    let arr = [];
+
+    await db
+      .collection("channelsCreatedByUser")
+      .doc(channel.documentID)
+      .collection("busyDatesWithTimeBlocks")
+      .doc(date)
+      .get()
+      .then((doc) => {
+        arr = doc.data().busyHours;
+        return arr;
+        //console.log(doc.data().busyHours);
+        //console.log(doc.data().busyUsersForHours);
+      });
+  }
 
   //Load channels details REF SNAPSHOT
   function getChannels() {
