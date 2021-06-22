@@ -55,8 +55,6 @@ export default function Channels() {
         start_date: startDateRef.current.value, //Start Date of Event
         end_date: endDateRef.current.value, // End Date of Event
         dateRange: dates, //Dates in between Start Date & End Date of Event
-        counterForDates: new Array(dates.length).fill(0), //Counter for Date Date //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-        busyUsersForDates: new Array(dates.length).fill(""), //Busy List for Each Date //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
         invitedEmails: emails, //List of Invited Users
         respondedEmails: [], //List of Responded Users
         pendingEmails: emails, //List of Pending Users
@@ -154,7 +152,7 @@ export default function Channels() {
     });
   //console.log(userBusyDates);
 
-  //------------------------------------------*** [Agree to Sync Implementation] ***------------------------------------------//
+  //------------------------------------------*** MAIN:[Agree to Sync Implementation] ***------------------------------------------//
   async function handleAgreeToSync(channel) {
     //Check if user is under responded list already
     const respondedEmails = [...channel.respondedEmails]; //Responded Emails Array
@@ -179,11 +177,9 @@ export default function Channels() {
     );
     //console.log(pendingEmails);
     const dateRange = [...channel.dateRange]; //dateRange Array
-    const updateCounterDates = [...channel.counterForDates]; //counterForDateRange Array (renamed to prevent clashing of var names) //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-    const updateBusyUsersForDates = [...channel.busyUsersForDates]; //busyUsersForDates Array (renamed to prevent clashing of var names) //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
     //console.log(dateRange);
 
-    //Updating of Dates
+    //-------------- SUB OF MAIN <For Loop Algo: To update Dates>-----------
     var index = 0;
     for (index = 0; index < dateRange.length; index++) {
       let date = dateRange[index];
@@ -253,63 +249,18 @@ export default function Channels() {
           busyHours: channelHoursForThatDate,
         });
     }
-    //console.log(updateCounterDates);
-    //console.log(updateBusyUsersForDates);
+    //----------------End of For Loop Algo: to update Dates------------
 
-    db.collection("channelsCreatedByUser")
-      //.doc(currentUserEmail)
-      //.collection("channels")
-      .doc(channel.documentID)
-      .update({
-        counterForDates: updateCounterDates, //Counter for Date Date //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-        busyUsersForDates: updateBusyUsersForDates, //Busy List for Each Date //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-        invitedEmails: invitedEmails, //List of Invited Users
-        respondedEmails: respondedEmails, //List of Responded Users
-        pendingEmails: pendingEmails, //List of Pending Users
-        //decidedOutcome: "None yet", //Outcome
-      });
+    db.collection("channelsCreatedByUser").doc(channel.documentID).update({
+      invitedEmails: invitedEmails, //List of Invited Users
+      respondedEmails: respondedEmails, //List of Responded Users
+      pendingEmails: pendingEmails, //List of Pending Users
+      //decidedOutcome: "None yet", //Outcome
+    });
 
-    //If everyone has fully responded, give the most optimal date //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-    if (respondedEmails.length === invitedEmails.length) {
-      //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-      let lowest = updateCounterDates[0];
-      let lowestIndex = 0; //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-      for (var z = 0; z < updateCounterDates.length; z++) {
-        //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-        if (updateCounterDates[z] < lowest) {
-          //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-          lowest = updateCounterDates[z]; //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-          //console.log(updateCounterDates[z] + " < " + lowest);
-          lowestIndex = z; //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-          //console.log(lowestIndex);
-        } //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-      } //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-      const bestDate = dateRange[lowestIndex]; //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-      db.collection("channelsCreatedByUser") //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-        .doc(channel.documentID) //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-        .update({
-          //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-          decidedOutcome: "Most optimal date is " + bestDate + " !", //Outcome //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-        }); //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
-    } //--------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DELETE LTR>>>>
+    //If everyone has fully responded, give the most optimal date and time below:
   }
-
-  async function dateTimeBlocksFromChannel(channel, date) {
-    let arr = [];
-
-    await db
-      .collection("channelsCreatedByUser")
-      .doc(channel.documentID)
-      .collection("busyDatesWithTimeBlocks")
-      .doc(date)
-      .get()
-      .then((doc) => {
-        arr = doc.data().busyHours;
-        return arr;
-        //console.log(doc.data().busyHours);
-        //console.log(doc.data().busyUsersForHours);
-      });
-  }
+  // ------------------------------------------*** End of Sync Implementation ***---------------------------------------//
 
   //Load channels details REF SNAPSHOT
   function getChannels() {
