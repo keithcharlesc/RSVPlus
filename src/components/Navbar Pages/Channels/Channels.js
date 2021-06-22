@@ -58,7 +58,7 @@ export default function Channels() {
         invitedEmails: emails, //List of Invited Users
         respondedEmails: [], //List of Responded Users
         pendingEmails: emails, //List of Pending Users
-        decidedOutcome: "None yet", //Outcome
+        decidedOutcome: new Array(dates.length).fill(""), //Outcome
       })
       .then((docRef) => {
         //console.log(docRef);
@@ -71,8 +71,11 @@ export default function Channels() {
             documentID: docRef.id, //Adding documentID to document (Purpose: to update)
           });
 
+        let totalOptimalDateStrings = new Array(dates.length).fill("");
+
         for (var i = 0; i < dates.length; i++) {
           let date = dates[i];
+          let optimalDateString = date + ": ";
 
           //Creates dates documents with the busy hours blocks for those date range of the channel created
           db.collection("channelsCreatedByUser")
@@ -84,7 +87,17 @@ export default function Channels() {
               busyHours: new Array(24).fill(0),
               busyUsersForHours: new Array(24).fill(""),
             });
+
+          totalOptimalDateStrings[i] = optimalDateString;
         }
+
+        db.collection("channelsCreatedByUser")
+          //.doc(currentUserEmail)
+          // .collection("channels")
+          .doc(docRef.id)
+          .update({
+            decidedOutcome: totalOptimalDateStrings, //Adding documentID to document (Purpose: to update)
+          });
 
         setLoader(false);
         setSuccess("Your channel has been created");
@@ -130,34 +143,13 @@ export default function Channels() {
     return userList;
   }
 
-  //--------------------------[ Reading Data from Firestore ]--------------------------//
-  const userBusyDates = []; //User Busy Dates
   var docRef = db.collection("busyDates").doc(currentUserEmail);
-
-  docRef
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        //console.log("Document read!");
-        for (var i = 0; i < doc.data().dates.length; i++) {
-          userBusyDates.push(doc.data().dates[i]);
-        }
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
-      }
-    })
-    .catch((error) => {
-      console.log("Error getting document:", error);
-    });
-  //console.log(userBusyDates);
 
   //------------------------------------------*** MAIN:[Agree to Sync Implementation] ***------------------------------------------//
   async function handleAgreeToSync(channel) {
     //Check if user is under responded list already
     const respondedEmails = [...channel.respondedEmails]; //Responded Emails Array
     const userHasResponded = respondedEmails.includes(currentUserEmail);
-    //console.log(userBusyDates);
 
     if (userHasResponded === true) {
       alert("You already responded!");
@@ -165,7 +157,6 @@ export default function Channels() {
     }
 
     //console.log(userHasResponded);
-    //console.log(userBusyDates);
     //console.log(channel.documentID);
     const invitedEmails = [...channel.invitedEmails]; //Invited Emails Array
     //console.log(respondedEmails);
@@ -203,7 +194,7 @@ export default function Channels() {
       //Retrieves the busyHours of that Date Document of that USER
       await db
         .collection("busyDates")
-        .doc("test")
+        .doc(currentUserEmail)
         .collection("busyDatesWithTimeBlocks")
         .doc(date)
         .get()
@@ -258,7 +249,54 @@ export default function Channels() {
       //decidedOutcome: "None yet", //Outcome
     });
 
+    ///*
     //If everyone has fully responded, give the most optimal date and time below:
+    let startTime = 8;
+    let endTime = 20;
+
+    let latestUpdatedTotalOptimalDates;
+    await db
+      .collection("channelsCreatedByUser")
+      .doc(channel.documentID)
+      .get()
+      .then((doc) => {
+        latestUpdatedTotalOptimalDates = doc.data().decidedOutcome;
+      });
+
+    //console.log("Latest optimal dates: " + latestUpdatedTotalOptimalDates);
+
+    if (respondedEmails.length === invitedEmails.length) {
+      var dateIndex;
+      for (dateIndex = 0; dateIndex < dateRange.length; dateIndex++) {
+        let date = dateRange[dateIndex];
+        let busyHoursForThatDateOfChannel;
+        await db
+          .collection("channelsCreatedByUser")
+          .doc(channel.documentID)
+          .collection("busyDatesWithTimeBlocks")
+          .doc(date)
+          .get()
+          .then((doc) => {
+            //console.log(doc.data().busyHours);
+            //console.log("Channel Hours for " + date);
+            busyHoursForThatDateOfChannel = doc.data().busyHours.toString();
+          });
+
+        latestUpdatedTotalOptimalDates[dateIndex] =
+          latestUpdatedTotalOptimalDates[dateIndex].concat(
+            busyHoursForThatDateOfChannel
+          );
+      }
+      //Push update after getting all the arrays
+      db.collection("channelsCreatedByUser")
+        //.doc(currentUserEmail)
+        // .collection("channels")
+        .doc(channel.documentID)
+        .update({
+          decidedOutcome: latestUpdatedTotalOptimalDates, //Adding documentID to document (Purpose: to update)
+        });
+    }
+    //*/
   }
   // ------------------------------------------*** End of Sync Implementation ***---------------------------------------//
 
@@ -365,7 +403,8 @@ export default function Channels() {
                               </Button>
                             </Card.Text>
                             <Card.Text>
-                              Decided Outcome: {channel.decidedOutcome}
+                              Decided Outcome:{" "}
+                              {displayUsersList(channel.decidedOutcome)}
                             </Card.Text>
                           </Col>
                           <Col xs={6} md={4}>
