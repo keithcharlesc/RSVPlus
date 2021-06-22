@@ -3,6 +3,8 @@ import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import NavigationBar from "../NavigationBar/NavigationBar";
 import "./Calendar.css";
 import GoogleCal from "./GoogleCal";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 /*----- GAPI ------*/
 var gapi = window.gapi;
@@ -29,51 +31,67 @@ gapi.load("client:auth2", () => {
 /*-----------------*/
 
 export default function Calendar() {
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [loading, setLoader] = useState(false);
+
   /* ---------------- ADDING EVENT -------------*/
   const handleClick = (e) => {
     e.preventDefault();
+    setLoader(true);
 
-    gapi.auth2.getAuthInstance().then(() => {
-      var event = {
-        summary: data.name,
-        location: data.location,
-        description: data.description,
-        start: {
-          dateTime: data.startDate + ":00+08:00", //requires time input
-          timeZone: "Asia/Singapore",
-        },
-        end: {
-          dateTime: data.endDate + ":00+08:00", //requires time input
-          timeZone: "Asia/Singapore",
-        },
-        reminders: {
-          useDefault: false,
-          overrides: [
-            { method: "email", minutes: 24 * 60 },
-            { method: "popup", minutes: 10 },
-          ],
-        },
-      };
+    gapi.auth2
+      .getAuthInstance()
+      .then(() => {
+        var event = {
+          summary: data.name,
+          location: data.location,
+          description: data.description,
+          start: {
+            dateTime:
+              startDate.toLocaleDateString("en-CA") +
+              "T" +
+              startDate.toLocaleTimeString("it-IT").slice(0, 5) +
+              ":00+08:00", //requires time input
+            timeZone: "Asia/Singapore",
+          },
+          end: {
+            dateTime:
+              endDate.toLocaleDateString("en-CA") +
+              "T" +
+              endDate.toLocaleTimeString("it-IT").slice(0, 5) +
+              ":00+08:00", //requires time input
+            timeZone: "Asia/Singapore",
+          },
+          reminders: {
+            useDefault: false,
+            overrides: [
+              { method: "email", minutes: 24 * 60 },
+              { method: "popup", minutes: 10 },
+            ],
+          },
+        };
 
-      //console.log(event.start.dateTime);
-      var request = gapi.client.calendar.events.insert({
-        calendarId: "primary",
-        resource: event,
+        //console.log(event.start.dateTime);
+        var request = gapi.client.calendar.events.insert({
+          calendarId: "primary",
+          resource: event,
+        });
+
+        request.execute((event) => {
+          console.log(event);
+          window.open(event.htmlLink);
+        });
+      })
+      .then(() => {
+        setLoader(false);
       });
-
-      request.execute((event) => {
-        console.log(event);
-        window.open(event.htmlLink);
-      });
-    });
   };
   /* ----------Handle Form Input to use in API---------*/
   const [data, setData] = useState({
     name: "",
     description: "",
     location: "",
-    startDate: "",
-    endDate: "",
   });
 
   function handleSubmitForm(e) {
@@ -134,26 +152,32 @@ export default function Calendar() {
                   </div>
                   <div className="input-group">
                     <label>Start Date</label>
-                    <input
-                      onChange={(e) => handleSubmitForm(e)}
-                      id="startDate"
-                      value={data.startDate}
-                      placeholder="YYYY-MM-DDT09:00"
-                      type="text"
-                    ></input>
+                    <DatePicker
+                      selected={startDate}
+                      minDate={new Date()}
+                      required
+                      placeholderText=""
+                      onChange={(date) => setStartDate(date)}
+                      timeInputLabel="Time:"
+                      dateFormat="MM/dd/yyyy h:mm aa"
+                      showTimeInput
+                    />
                   </div>
                   <div className="input-group">
                     <label>End Date</label>
-                    <input
-                      onChange={(e) => handleSubmitForm(e)}
-                      id="endDate"
-                      value={data.endDate}
-                      placeholder="YYYY-MM-DDT17:00"
-                      type="text"
-                    ></input>
+                    <DatePicker
+                      selected={endDate}
+                      minDate={new Date()}
+                      required
+                      onChange={(date) => setEndDate(date)}
+                      timeInputLabel="Time:"
+                      dateFormat="MM/dd/yyyy h:mm aa"
+                      showTimeInput
+                    />
                   </div>
                   <Button
                     className="mt-2"
+                    disabled={loading}
                     variant="danger"
                     style={{ width: 100, height: 50 }}
                     onClick={(e) => handleClick(e)}

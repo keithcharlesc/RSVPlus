@@ -43,7 +43,10 @@ export default function Channels() {
     setSuccess("");
     const emails = [currentUserEmail, ...findAll()];
     console.log(emails);
-    const dates = dateRange(startDate, endDate);
+    const dates = dateRange(
+      startDate.toLocaleDateString("en-CA"),
+      endDate.toLocaleDateString("en-CA")
+    );
 
     db.collection("channelsCreatedByUser")
       //.doc(currentUserEmail)
