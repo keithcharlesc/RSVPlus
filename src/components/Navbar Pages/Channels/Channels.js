@@ -277,8 +277,8 @@ export default function Channels() {
 
     ///*
     //If everyone has fully responded, give the most optimal date and time below:
-    let beginningIndex = channel.startTimeToLookForIndex;
-    let endTime = channel.endTimeToLookForIndex;
+    let beginningIndex = parseInt(channel.startTimeToLookForIndex);
+    let endTime = parseInt(channel.endTimeToLookForIndex);
 
     let timeToBePushed = [
       " 12AM - 1AM ",
@@ -498,10 +498,6 @@ export default function Channels() {
                                 Agree to Sync Calendar Data
                               </Button>
                             </Card.Text>
-                            <Card.Text>
-                              Decided Outcome:{" "}
-                              {displayUsersList(channel.decidedOutcome)}
-                            </Card.Text>
                           </Col>
                           <Col xs={6} md={4}>
                             <Card.Text>
@@ -516,6 +512,13 @@ export default function Channels() {
                               Pending:{displayUsersList(channel.pendingEmails)}
                             </Card.Text>
                           </Col>
+                        </Row>
+                        <Row className="mt-3">
+                          {" "}
+                          <Card.Text>
+                            <strong>Decided Outcome: </strong>
+                            {displayUsersList(channel.decidedOutcome)}
+                          </Card.Text>
                         </Row>
                       </div>
                     </Card.Body>
