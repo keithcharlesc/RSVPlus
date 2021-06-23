@@ -50,6 +50,22 @@ export default function Channels() {
       endDate.toLocaleDateString("en-CA")
     );
 
+    //Checks whether input for End Time Slot (Range) is later than Start Time Slot
+    let startDateHoursAndMinutes = startOfTime.toLocaleTimeString("it-IT");
+    let endDateHoursAndMinutes = endOfTime.toLocaleTimeString("it-IT");
+
+    let minutesForStartDate = getMinutes(startDateHoursAndMinutes);
+    let minutesForEndDate = getMinutes(endDateHoursAndMinutes);
+
+    if (minutesForEndDate <= minutesForStartDate) {
+      setError(
+        "Error! End time slot to find must be later than start time slot!"
+      );
+      setLoader(false);
+      return;
+    }
+    //
+
     db.collection("channelsCreatedByUser")
       //.doc(currentUserEmail)
       //.collection("channels")
@@ -66,7 +82,13 @@ export default function Channels() {
         pendingEmails: emails, //List of Pending Users
         decidedOutcome: new Array(dates.length).fill(""), //Outcome
         startTimeToLookFor: startOfTime,
+        startTimeToLookForIndex: startOfTime
+          .toLocaleTimeString("it-IT")
+          .slice(0, 2),
         endTimeToLookFor: endOfTime,
+        endTimeToLookForIndex: endOfTime
+          .toLocaleTimeString("it-IT")
+          .slice(0, 2),
       })
       .then((docRef) => {
         //console.log(docRef);
@@ -109,9 +131,7 @@ export default function Channels() {
 
         setLoader(false);
         setSuccess("Your channel has been created");
-        console.log(
-          "Channel requisite information has been added to firestore"
-        );
+        //console.log("Channel requisite information has been added to firestore");
       })
       .catch((error) => {
         console.log(error);
@@ -257,12 +277,8 @@ export default function Channels() {
 
     ///*
     //If everyone has fully responded, give the most optimal date and time below:
-    let beginningIndex = channel.startTimeToLookFor
-      .toLocaleTimeString("it-IT")
-      .slice(0, 2);
-    let endTime = channel.endTimeToLookFor
-      .toLocaleTimeString("it-IT")
-      .slice(0, 2);
+    let beginningIndex = channel.startTimeToLookForIndex;
+    let endTime = channel.endTimeToLookForIndex;
 
     let timeToBePushed = [
       " 12AM - 1AM ",
@@ -362,6 +378,17 @@ export default function Channels() {
     return time.join(""); // return adjusted time or original string
   }
 
+  /*---------------------------------------------------*/
+  //Get minutes from HH:MM (hours and minutes 24 hr form)
+  function getMinutes(time) {
+    let str = time;
+    let arr = str.split(":");
+    let minutes = +arr[0] * 60 + +arr[1];
+    //console.log(minutes);
+    return minutes;
+  }
+  /*---------------------------------------------------*/
+
   //Load channels details REF SNAPSHOT
   function getChannels() {
     setLoading(true);
@@ -458,8 +485,8 @@ export default function Channels() {
                             <Card.Text>
                               Timeslots Range:{" "}
                               <Badge pill variant="dark">
-                                {timeToConvert(channel.startTimeToLookFor)} —{" "}
-                                {timeToConvert(channel.endTimeToLookFor)}
+                                {timeToConvert(channel.startTimeToLookForIndex)}{" "}
+                                — {timeToConvert(channel.endTimeToLookForIndex)}
                               </Badge>
                             </Card.Text>
                             <Card.Text>
@@ -558,10 +585,10 @@ export default function Channels() {
 
                     <Form.Group id="idealStartOfTimeRange">
                       <Form.Label className="mr-3">
-                        Ideal Start Time of Time Range:
+                        Start Time of Time Range:
                       </Form.Label>
                       <DatePicker
-                        className="date-picker"
+                        className="time-picker"
                         selected={startOfTime}
                         onChange={(date) => setStartOfTime(date)}
                         showTimeSelect
@@ -574,10 +601,10 @@ export default function Channels() {
 
                     <Form.Group id="idealEndOfTimeRange">
                       <Form.Label className="mr-3">
-                        Ideal End Time of Time Range:
+                        End Time of Time Range:
                       </Form.Label>
                       <DatePicker
-                        className="date-picker"
+                        className="time-picker"
                         selected={endOfTime}
                         onChange={(date) => setEndOfTime(date)}
                         showTimeSelect

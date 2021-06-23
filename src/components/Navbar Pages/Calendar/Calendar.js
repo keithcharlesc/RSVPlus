@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import NavigationBar from "../NavigationBar/NavigationBar";
 import "./Calendar.css";
 import GoogleCal from "./GoogleCal";
@@ -34,11 +34,15 @@ export default function Calendar() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [loading, setLoader] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   /* ---------------- ADDING EVENT -------------*/
   const handleClick = (e) => {
     e.preventDefault();
     setLoader(true);
+    setError("");
+    setSuccess("");
 
     gapi.auth2
       .getAuthInstance()
@@ -72,11 +76,35 @@ export default function Calendar() {
           },
         };
 
-        //console.log(event.start.dateTime);
+        if (
+          startDate.toLocaleDateString("en-CA") ===
+          endDate.toLocaleDateString("en-CA")
+        ) {
+          let startDateHoursAndMinutes = startDate
+            .toLocaleTimeString("it-IT")
+            .slice(0, 5);
+
+          let endDateHoursAndMinutes = endDate
+            .toLocaleTimeString("it-IT")
+            .slice(0, 5);
+
+          let minutesForStartDate = getMinutes(startDateHoursAndMinutes);
+          let minutesForEndDate = getMinutes(endDateHoursAndMinutes);
+
+          if (minutesForEndDate < minutesForStartDate) {
+            setError(
+              "Error! Start Time must be earlier than End Time for same date!"
+            );
+            return;
+          }
+        }
+
         var request = gapi.client.calendar.events.insert({
           calendarId: "primary",
           resource: event,
         });
+
+        setSuccess("Event successfully created!");
 
         request.execute((event) => {
           console.log(event);
@@ -101,6 +129,15 @@ export default function Calendar() {
     //console.log(newData);
   }
   /*---------------------------------------------------*/
+  //Get minutes from HH:MM (hours and minutes 24 hr form)
+  function getMinutes(time) {
+    let str = time;
+    let arr = str.split(":");
+    let minutes = +arr[0] * 60 + +arr[1];
+    //console.log(minutes);
+    return minutes;
+  }
+  /*---------------------------------------------------*/
   return (
     <>
       <NavigationBar />
@@ -120,6 +157,15 @@ export default function Calendar() {
                 <Form className="create-event-form">
                   <h1 className="mb-1"> Create an Event </h1>
                   <h6 className="text-center mb-3">(Google Calendar)</h6>
+                  {success && (
+                    <Alert
+                      className="d-flex align-items-center justify-content-center"
+                      variant="success"
+                    >
+                      {success}
+                    </Alert>
+                  )}
+                  {error && <Alert variant="danger">{error}</Alert>}
                   <div className="input-group">
                     <label>Name</label>
                     <input
