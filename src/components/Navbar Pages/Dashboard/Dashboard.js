@@ -127,6 +127,20 @@ export default function Dashboard() {
     });
   };
   /*---------------------------------------------------*/
+  function tConvert(time) {
+    // Check correct time format and split into components
+    time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)?$/) || [time];
+
+    if (time.length > 1) {
+      // If time format correct
+      time = time.slice(1); // Remove full string match value
+      time[5] = +time[0] < 12 ? "AM" : "PM"; // Set AM/PM
+      time[0] = +time[0] % 12 || 12; // Adjust hours
+    }
+    return time.join(""); // return adjusted time or original string
+  }
+
+  /*---------------------------------------------------*/
   return (
     <>
       <NavigationBar />
@@ -186,7 +200,12 @@ export default function Dashboard() {
                                   {" "}
                                   {event.start.date != null
                                     ? event.start.date
-                                    : event.start.dateTime.slice(0, 10)}
+                                    : event.start.dateTime.slice(0, 10) +
+                                      " (" +
+                                      tConvert(
+                                        event.start.dateTime.slice(11, 16)
+                                      ) +
+                                      ")"}
                                 </Badge>
                                 {/*console.log(event.start.date)*/}
                               </Card.Text>
@@ -195,7 +214,12 @@ export default function Dashboard() {
                                 <Badge pill variant="dark">
                                   {event.end.date != null
                                     ? event.end.date //-1 for day might need to implement since full day event = day itself and day after
-                                    : event.end.dateTime.slice(0, 10)}
+                                    : event.end.dateTime.slice(0, 10) +
+                                      " (" +
+                                      tConvert(
+                                        event.end.dateTime.slice(11, 16)
+                                      ) +
+                                      ")"}
                                 </Badge>
                               </Card.Text>
                             </div>
