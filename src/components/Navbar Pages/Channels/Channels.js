@@ -281,32 +281,31 @@ export default function Channels() {
     let endTime = parseInt(channel.endTimeToLookForIndex);
 
     let timeToBePushed = [
-      " 12AM - 1AM ",
-      " 1AM - 2AM",
-      " 2AM - 3AM ",
-      " 3AM - 4AM ",
-      " 4AM - 5AM ",
-      " 5AM - 6AM ",
+      "12AM - 1AM",
+      "1AM - 2AM",
+      "2AM - 3AM",
+      "3AM - 4AM",
+      "4AM - 5AM",
+      "5AM - 6AM",
       "6AM - 7AM",
-      " 7AM - 8AM ",
-      " 8AM - 9AM ",
-      " 9AM - 10AM ",
-      " 10AM - 11AM ",
-      " 11AM - 12PM ",
-      " 12PM - 1PM ",
-      " 1PM - 2PM ",
-      " 2PM - 3PM ",
-      " 3PM - 4PM ",
-      " 4PM - 5PM ",
-      " 5PM - 6PM ",
-      " 6PM - 7PM ",
-      " 7PM - 8PM ",
-      " 8PM - 9PM ",
-      " 9PM - 10PM ",
-      " 10PM - 11PM ",
-      " 11PM - 12AM ",
+      "7AM - 8AM",
+      "8AM - 9AM",
+      "9AM - 10AM",
+      "10AM - 11AM",
+      "11AM - 12PM",
+      "12PM - 1PM",
+      "1PM - 2PM",
+      "2PM - 3PM",
+      "3PM - 4PM",
+      "4PM - 5PM",
+      "5PM - 6PM",
+      "6PM - 7PM",
+      "7PM - 8PM",
+      "8PM - 9PM",
+      "9PM - 10PM",
+      "10PM - 11PM",
+      "11PM - 12AM",
     ];
-
     let latestUpdatedTotalOptimalDates;
     await db
       .collection("channelsCreatedByUser")
@@ -346,9 +345,13 @@ export default function Channels() {
           }
         }
 
+        //console.log(pushedTimeForDisplay);
+        let newCompressedTimeArr = simplifyTimeBlocks(pushedTimeForDisplay);
+        //console.log(newCompressedTimeArr);
+
         latestUpdatedTotalOptimalDates[dateIndex] =
           latestUpdatedTotalOptimalDates[dateIndex].concat(
-            pushedTimeForDisplay.toString()
+            newCompressedTimeArr.join(", ")
           );
       }
       //Push update after getting all the arrays
@@ -386,6 +389,37 @@ export default function Channels() {
     let minutes = +arr[0] * 60 + +arr[1];
     //console.log(minutes);
     return minutes;
+  }
+  /*---------------------------------------------------*/
+
+  function simplifyTimeBlocks(arr) {
+    var index = 0;
+    for (var k = 0; k < arr.length; k++) {
+      // only if arr length is greater than 1
+      for (var i = index; i < arr.length - 1; i) {
+        //console.log("i position at : " + i);
+        let currentElement = arr[index];
+        //console.log(currentElement);
+        let currentElementSplit = currentElement.split(" - "); //let splitStrings = arr[0].split(" - "); //12AM - 1AM" gives [ '12AM', '1AM' ]
+        let nextElement = arr[index + 1];
+        //console.log(nextElement);
+        let nextElementSplit = nextElement.split(" - ");
+        if (currentElementSplit[1] === nextElementSplit[0]) {
+          //console.log("currentElementSplit[1] : " + currentElementSplit[1]);
+          //console.log("nextElementSplit[0] : " + nextElementSplit[0]);
+          let newElement = currentElementSplit[0] + " - " + nextElementSplit[1];
+          //console.log("new currentElement[0]: " + newElement);
+          arr[index] = newElement;
+          arr.splice(index + 1, 1); //remove next element
+        } else {
+          break;
+        }
+        //console.log("New array length: " + arr.length);
+      }
+      index++;
+    }
+
+    return arr;
   }
   /*---------------------------------------------------*/
 
@@ -516,7 +550,7 @@ export default function Channels() {
                         <Row className="mt-3">
                           {" "}
                           <Card.Text>
-                            <strong>Decided Outcome: </strong>
+                            <strong>Available Timeslots: </strong>
                             {displayUsersList(channel.decidedOutcome)}
                           </Card.Text>
                         </Row>
