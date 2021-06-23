@@ -33,6 +33,8 @@ export default function Channels() {
 
   const [dateRangeForPicker, setDateRangeForPicker] = useState([null, null]);
   const [startDate, endDate] = dateRangeForPicker;
+  const [startOfTime, setStartOfTime] = useState(new Date());
+  const [endOfTime, setEndOfTime] = useState(new Date());
 
   //----------------- Pop up submission -----------------//
   const handleSubmit = (e) => {
@@ -63,6 +65,8 @@ export default function Channels() {
         respondedEmails: [], //List of Responded Users
         pendingEmails: emails, //List of Pending Users
         decidedOutcome: new Array(dates.length).fill(""), //Outcome
+        startTimeToLookFor: startOfTime,
+        endTimeToLookFor: endOfTime,
       })
       .then((docRef) => {
         //console.log(docRef);
@@ -253,8 +257,39 @@ export default function Channels() {
 
     ///*
     //If everyone has fully responded, give the most optimal date and time below:
-    //let startTime = 8;
-    //let endTime = 20;
+    let beginningIndex = channel.startTimeToLookFor
+      .toLocaleTimeString("it-IT")
+      .slice(0, 2);
+    let endTime = channel.endTimeToLookFor
+      .toLocaleTimeString("it-IT")
+      .slice(0, 2);
+
+    let timeToBePushed = [
+      " 12AM - 1AM ",
+      " 1AM - 2AM",
+      " 2AM - 3AM ",
+      " 3AM - 4AM ",
+      " 4AM - 5AM ",
+      " 5AM - 6AM ",
+      "6AM - 7AM",
+      " 7AM - 8AM ",
+      " 8AM - 9AM ",
+      " 9AM - 10AM ",
+      " 10AM - 11AM ",
+      " 11AM - 12PM ",
+      " 12PM - 1PM ",
+      " 1PM - 2PM ",
+      " 2PM - 3PM ",
+      " 3PM - 4PM ",
+      " 4PM - 5PM ",
+      " 5PM - 6PM ",
+      " 6PM - 7PM ",
+      " 7PM - 8PM ",
+      " 8PM - 9PM ",
+      " 9PM - 10PM ",
+      " 10PM - 11PM ",
+      " 11PM - 12AM ",
+    ];
 
     let latestUpdatedTotalOptimalDates;
     await db
@@ -262,7 +297,7 @@ export default function Channels() {
       .doc(channel.documentID)
       .get()
       .then((doc) => {
-        latestUpdatedTotalOptimalDates = doc.data().decidedOutcome;
+        latestUpdatedTotalOptimalDates = doc.data().decidedOutcome; //can be replaced with channel.decidedOutcome
       });
 
     //console.log("Latest optimal dates: " + latestUpdatedTotalOptimalDates);
@@ -272,6 +307,7 @@ export default function Channels() {
       for (dateIndex = 0; dateIndex < dateRange.length; dateIndex++) {
         let date = dateRange[dateIndex];
         let busyHoursForThatDateOfChannel;
+        let pushedTimeForDisplay = [];
         await db
           .collection("channelsCreatedByUser")
           .doc(channel.documentID)
@@ -281,12 +317,22 @@ export default function Channels() {
           .then((doc) => {
             //console.log(doc.data().busyHours);
             //console.log("Channel Hours for " + date);
-            busyHoursForThatDateOfChannel = doc.data().busyHours.toString();
+            busyHoursForThatDateOfChannel = doc.data().busyHours;
           });
+
+        for (
+          var loopIndex = beginningIndex;
+          loopIndex <= endTime - 1;
+          loopIndex++
+        ) {
+          if (busyHoursForThatDateOfChannel[loopIndex] === 0) {
+            pushedTimeForDisplay.push(timeToBePushed[loopIndex]);
+          }
+        }
 
         latestUpdatedTotalOptimalDates[dateIndex] =
           latestUpdatedTotalOptimalDates[dateIndex].concat(
-            busyHoursForThatDateOfChannel
+            pushedTimeForDisplay.toString()
           );
       }
       //Push update after getting all the arrays
@@ -301,6 +347,20 @@ export default function Channels() {
     //*/
   }
   // ------------------------------------------*** End of Sync Implementation ***---------------------------------------//
+
+  //Convert 24H into 9AM
+  function timeToConvert(time) {
+    // Check correct time format and split into components
+    time = time.toString().match(/^([01]\d|2[0-3])?$/) || [time];
+
+    if (time.length > 1) {
+      // If time format correct
+      time = time.slice(1); // Remove full string match value
+      time[5] = +time[0] < 12 ? "AM" : "PM"; // Set AM/PM
+      time[0] = +time[0] % 12 || 12; // Adjust hours
+    }
+    return time.join(""); // return adjusted time or original string
+  }
 
   //Load channels details REF SNAPSHOT
   function getChannels() {
@@ -396,6 +456,13 @@ export default function Channels() {
                               </Badge>
                             </Card.Text>
                             <Card.Text>
+                              Timeslots Range:{" "}
+                              <Badge pill variant="dark">
+                                {timeToConvert(channel.startTimeToLookFor)} —{" "}
+                                {timeToConvert(channel.endTimeToLookFor)}
+                              </Badge>
+                            </Card.Text>
+                            <Card.Text>
                               <Button
                                 variant="danger"
                                 style={{ width: 260, height: 40 }}
@@ -488,6 +555,39 @@ export default function Channels() {
                         isClearable={true}
                       />
                     </Form.Group>
+
+                    <Form.Group id="idealStartOfTimeRange">
+                      <Form.Label className="mr-3">
+                        Ideal Start Time of Time Range:
+                      </Form.Label>
+                      <DatePicker
+                        className="date-picker"
+                        selected={startOfTime}
+                        onChange={(date) => setStartOfTime(date)}
+                        showTimeSelect
+                        showTimeSelectOnly
+                        timeIntervals={60}
+                        timeCaption="Time"
+                        dateFormat="h:mm aa"
+                      />
+                    </Form.Group>
+
+                    <Form.Group id="idealEndOfTimeRange">
+                      <Form.Label className="mr-3">
+                        Ideal End Time of Time Range:
+                      </Form.Label>
+                      <DatePicker
+                        className="date-picker"
+                        selected={endOfTime}
+                        onChange={(date) => setEndOfTime(date)}
+                        showTimeSelect
+                        showTimeSelectOnly
+                        timeIntervals={60}
+                        timeCaption="Time"
+                        dateFormat="h:mm aa"
+                      />
+                    </Form.Group>
+
                     <br></br>
                     <Form.Group id="emailInvite">
                       <Form.Label>Number of People to Invite: (1-9)</Form.Label>
