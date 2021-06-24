@@ -34,17 +34,42 @@ export default function Login() {
     console.log(googleUser);
     const token = googleUser.getAuthResponse().id_token;
     const credential = firebase.auth.GoogleAuthProvider.credential(token);
+    const db = firebase.firestore();
 
     await firebase
       .auth()
       .signInWithCredential(credential)
       .then(({ user }) => {
+        db.collection("userAccounts")
+          .doc(user.email)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              console.log("Document read!");
+            } else {
+              db.collection("userAccounts")
+                .doc(user.email)
+                .set({
+                  email: user.email,
+                })
+                .then(() => {
+                  console.log("Email added to database!");
+                })
+                .catch((error) => {
+                  console.error("Error writing document: ", error);
+                });
+            }
+          })
+          .catch((error) => {
+            console.log("Error getting document:", error);
+          });
+
         console.log(user);
-        console.log("firebase: user signed in!", {
+        /*console.log("firebase: user signed in!", {
           displayName: user.displayName,
           email: user.email,
           photoURL: user.photoURL,
-        });
+        });*/
       })
       .catch(function (error) {
         // Handle Errors here.
