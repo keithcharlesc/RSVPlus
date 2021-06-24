@@ -37,14 +37,32 @@ export default function Channels() {
   const [endOfTime, setEndOfTime] = useState(new Date());
 
   //----------------- Pop up submission -----------------//
-  const handleSubmit = (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
     e.stopPropagation();
     setLoader(true);
     setError("");
     setSuccess("");
     const emails = [currentUserEmail, ...findAll()];
-    console.log(emails);
+    //console.log(emails);
+    let validation = [true, ""];
+    await validateEmails(emails).then((result) => {
+      //console.log("value from function:" + x);
+      console.log(result);
+      validation[0] = result[0];
+      validation[1] = result[1];
+    });
+    /* let wrongEmail;
+    await getWrongEmail(emails).then((doesNotExist) => {
+      wrongEmail = doesNotExist;
+    });*/
+    //console.log("validation:" + validation);
+    if (validation[0] === false) {
+      setError(validation[1] + " is not a user of RSVP+!");
+      setLoader(false);
+      return;
+    }
+    //console.log("emails validated");
     const dates = dateRange(
       startDate.toLocaleDateString("en-CA"),
       endDate.toLocaleDateString("en-CA")
@@ -55,11 +73,29 @@ export default function Channels() {
     let endDateHoursAndMinutes = endOfTime.toLocaleTimeString("it-IT");
 
     let minutesForStartDate = getMinutes(startDateHoursAndMinutes);
+    //console.log("minutesForStartDate: " + minutesForStartDate);
     let minutesForEndDate = getMinutes(endDateHoursAndMinutes);
+    //console.log("minutesForEndDate: " + minutesForEndDate);
 
     if (minutesForEndDate <= minutesForStartDate) {
       setError(
         "Error! End time slot to find must be later than start time slot!"
+      );
+      setLoader(false);
+      return;
+    }
+
+    if (minutesForStartDate % 60 !== 0) {
+      setError(
+        "Error! Start time slot must not contain any minutes HH:00 only!"
+      );
+      setLoader(false);
+      return;
+    }
+
+    if (minutesForEndDate % 60 !== 0) {
+      setError(
+        "Error! End time slot must not contain any minutes. HH:00 only!"
       );
       setLoader(false);
       return;
@@ -134,11 +170,11 @@ export default function Channels() {
         //console.log("Channel requisite information has been added to firestore");
       })
       .catch((error) => {
-        console.log(error);
+        //console.log(error);
         setError("Your channel has not been created, please try again!");
         setLoader(false);
       });
-  };
+  }
   //End of Pop up submission
   //-------------------------------------------//
 
@@ -421,6 +457,44 @@ export default function Channels() {
 
     return arr;
   }
+  /*---------------------------------------------------*/
+  async function validateEmails(emailArr) {
+    var arrayValues = [true, ""];
+
+    for (var i = 0; i < emailArr.length; i++) {
+      let currentEmail = emailArr[i];
+      await db
+        .collection("userAccounts")
+        .doc(currentEmail)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            //console.log(currentEmail);
+            //console.log("Email exists in database");
+            arrayValues[0] = true;
+            arrayValues[1] = currentEmail;
+          } else {
+            //console.log(currentEmail);
+            //console.log("Email don't exist in database");
+            arrayValues[0] = false;
+            arrayValues[1] = currentEmail;
+          }
+        })
+        .catch((error) => {
+          console.log("Error getting document:", error);
+        });
+
+      //console.log(emailCheck);
+
+      if (arrayValues[0] === false) {
+        break;
+      }
+    }
+    //console.log("emailcheck : " + emailCheck);
+
+    return arrayValues;
+  }
+
   /*---------------------------------------------------*/
 
   //Load channels details REF SNAPSHOT
