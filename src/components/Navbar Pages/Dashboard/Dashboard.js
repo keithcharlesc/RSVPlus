@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { Button, Container, Card, Row, Badge } from "react-bootstrap";
+import { Container, Card, Row, Badge } from "react-bootstrap";
 import NavigationBar from "../NavigationBar/NavigationBar";
-import { firebase } from "@firebase/app";
-import obtainBusyDates from "./obtainBusyDates";
 import "./Dashboard.css";
 
 /*----- GAPI------*/
@@ -32,14 +30,15 @@ gapi.load("client:auth2", () => {
 /*---------------*/
 
 export default function Dashboard() {
-  /* -------------- RETRIEVING EVENTS ------------*/
+  /* -------------- RETRIEVING AND DISPLAY EVENTS ------------*/
   const [loading, setLoader] = useState(false);
   const [events, setEvents] = useState(null);
-  const currentUserEmail = firebase.auth().currentUser?.email;
-  const db = firebase.firestore();
 
   const handleSecondClick = () => {
     setLoader(true);
+
+    const btn = document.querySelector(".button");
+    btn.classList.add("button--loading");
 
     gapi.auth2.getAuthInstance().then(() => {
       gapi.client.calendar.events
@@ -48,20 +47,19 @@ export default function Dashboard() {
           timeMin: new Date().toISOString(),
           showDeleted: false,
           singleEvents: true,
-          maxResults: 10,
+          maxResults: 20,
           orderBy: "startTime",
         })
         .then((response) => {
           const events = response.result.items;
           //console.log("Google Events Fetched: ", events);
           setEvents(events);
+          btn.classList.remove("button--loading");
+          setLoader(false);
+
           //let busyDates = [];
           //Prevents Button Spamming
-          return Promise.resolve(
-            obtainBusyDates(events, db, currentUserEmail)
-          ).then(() => {
-            setLoader(false);
-          });
+
           /*
           if (events.length > 0) {
             busyDates = obtainBusyDates(events, db, currentUserEmail);
@@ -149,15 +147,14 @@ export default function Dashboard() {
         <Container fluid>
           <Row className="d-flex align-items-center justify-content-center mb-4">
             {" "}
-            <Button
-              variant="warning"
-              className="fetch-events-button"
-              style={{ width: 100, height: 60 }}
+            <button
+              className="d-flex align-items-center justify-content-center button"
+              style={{ width: 250, height: 30 }}
               onClick={handleSecondClick}
               disabled={loading}
             >
-              Fetch Events
-            </Button>
+              <span className="button__text">DISPLAY UPCOMING EVENTS</span>
+            </button>
           </Row>
           <Row>
             <Container
