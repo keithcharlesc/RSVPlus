@@ -17,6 +17,33 @@ import "./Channels.css";
 import dateRange from "./dateRange";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import obtainBusyDates from "./obtainBusyDates";
+
+/*----- GAPI------*/
+var gapi = window.gapi;
+var CLIENT_ID =
+  "1011248109211-umpu5g48dj5p4hqlnhvuvl6f4c9qdhn3.apps.googleusercontent.com";
+var API_KEY = "AIzaSyD3-pnAPnBMzBqL_dAZYYyVGretc42zUnA";
+var DISCOVERY_DOCS = [
+  "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
+];
+var SCOPES = "https://www.googleapis.com/auth/calendar.events";
+
+gapi.load("client:auth2", () => {
+  console.log("loaded auth2 client!");
+
+  gapi.client.init({
+    apiKey: API_KEY,
+    clientId: CLIENT_ID,
+    discoveryDocs: DISCOVERY_DOCS,
+    scope: SCOPES,
+  });
+
+  gapi.client.load("calendar", "v3", () =>
+    console.log("loaded calendar v3, entry!")
+  );
+});
+/*---------------*/
 
 export default function Channels() {
   const nameRef = useRef();
@@ -35,6 +62,43 @@ export default function Channels() {
   const [startDate, endDate] = dateRangeForPicker;
   const [startOfTime, setStartOfTime] = useState(new Date());
   const [endOfTime, setEndOfTime] = useState(new Date());
+
+  /* -------------- GET EVENTS (BUSY DATES AND TIMINGS) ------------*/
+  //const [loading, setLoader] = useState(false);
+  //const currentUserEmail = firebase.auth().currentUser?.email;
+  //const db = firebase.firestore();
+
+  const handleSecondClick = () => {
+    setLoader(true);
+
+    const btn = document.querySelector(".button");
+    btn.classList.add("button--loading");
+
+    gapi.auth2.getAuthInstance().then(() => {
+      gapi.client.calendar.events
+        .list({
+          calendarId: "primary",
+          timeMin: new Date().toISOString(),
+          showDeleted: false,
+          singleEvents: true,
+          maxResults: 30,
+          orderBy: "startTime",
+        })
+        .then((response) => {
+          const events = response.result.items;
+          //console.log("Google Events Fetched: ", events);
+          //let busyDates = [];
+          //Prevents Button Spamming
+          return Promise.resolve(
+            obtainBusyDates(events, db, currentUserEmail)
+          ).then(() => {
+            setLoader(false);
+            btn.classList.remove("button--loading");
+          });
+        });
+    });
+  };
+  /*---------------------------------------------------*/
 
   //----------------- Pop up submission -----------------//
   async function handleSubmit(e) {
@@ -537,14 +601,22 @@ export default function Channels() {
         <h2 className="page-header text-center mb-4">CHANNELS</h2>
         <Container fluid>
           <Row className="d-flex align-items-center justify-content-center mb-4">
-            <Button
-              className="create-event-button"
-              style={{ width: 100, height: 60 }}
+            <button
+              type="button"
+              className="d-flex align-items-center justify-content-center button mr-4"
+              style={{ width: 250, height: 30 }}
+              onClick={handleSecondClick}
+              disabled={loading}
+            >
+              <span className="button__text">FETCH LATEST</span>
+            </button>
+            <button
+              className="d-flex align-items-center justify-content-center fetch-events-button"
+              style={{ width: 250, height: 30 }}
               onClick={() => setButtonPopup(true)}
             >
-              {""}
-              Create an Event!{" "}
-            </Button>
+              CREATE AN EVENT!
+            </button>
           </Row>
           <Row>
             <Container style={{ minHeight: "100vh" }}>
