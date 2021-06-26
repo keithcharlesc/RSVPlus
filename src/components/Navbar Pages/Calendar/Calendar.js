@@ -17,7 +17,7 @@ var DISCOVERY_DOCS = [
 var SCOPES = "https://www.googleapis.com/auth/calendar.events";
 
 gapi.load("client:auth2", () => {
-  console.log("loaded client!");
+  //console.log("loaded auth2 client!");
 
   gapi.client.init({
     apiKey: API_KEY,
@@ -26,7 +26,10 @@ gapi.load("client:auth2", () => {
     scope: SCOPES,
   });
 
-  gapi.client.load("calendar", "v3", () => console.log("entry!"));
+  gapi.client.load("calendar", "v3", () =>
+     console.log()
+    //console.log("loaded calendar v3, entry!")
+  );
 });
 /*-----------------*/
 

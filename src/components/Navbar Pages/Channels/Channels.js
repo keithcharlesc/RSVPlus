@@ -30,7 +30,7 @@ var DISCOVERY_DOCS = [
 var SCOPES = "https://www.googleapis.com/auth/calendar.events";
 
 gapi.load("client:auth2", () => {
-  console.log("loaded auth2 client!");
+  //console.log("loaded auth2 client!");
 
   gapi.client.init({
     apiKey: API_KEY,
@@ -40,7 +40,8 @@ gapi.load("client:auth2", () => {
   });
 
   gapi.client.load("calendar", "v3", () =>
-    console.log("loaded calendar v3, entry!")
+     console.log()
+    //console.log("loaded calendar v3, entry!")
   );
 });
 /*---------------*/
@@ -116,7 +117,7 @@ export default function Channels() {
     let validation = [true, ""];
     await validateEmails(emails).then((result) => {
       //console.log("value from function:" + x);
-      console.log(result);
+      //console.log(result);
       validation[0] = result[0];
       validation[1] = result[1];
     });
@@ -254,11 +255,6 @@ export default function Channels() {
   const [channels, setChannels] = useState([]);
   const [loadingx, setLoading] = useState(false);
 
-  //------------------------REF SNAPSHOT----------------------//
-  const ref = firebase.firestore().collection("channelsCreatedByUser");
-  //.doc(currentUserEmail) //can't use currentUserEmail here
-  //.collection("channels");
-
   //---------------------Obtaining emailAddresses by form input fields---------------------//
   function findAll() {
     const emailAddresses = [];
@@ -278,7 +274,7 @@ export default function Channels() {
   }
 
   function displayPendingList(arr) {
-    if (arr.length == 0) {
+    if (arr.length === 0) {
       return " None!";
     }
     const userList = arr.map((email, index) => <li key={index}>{email}</li>);
@@ -326,10 +322,10 @@ export default function Channels() {
         .get()
         .then((doc) => {
           //console.log(doc.data().busyHours);
-          console.log("Channel Hours for " + date);
+          //console.log("Channel Hours for " + date);
           channelHoursForThatDate = doc.data().busyHours;
         });
-      console.log(channelHoursForThatDate);
+      //console.log(channelHoursForThatDate);
 
       //Retrieves the busyHours of that Date Document of that USER
       await db
@@ -340,16 +336,14 @@ export default function Channels() {
         .get()
         .then((doc) => {
           if (doc.exists) {
-            console.log("UserBusyHours for " + date);
+            //console.log("UserBusyHours for " + date);
             userBusyHoursForThatDate = doc.data().hours;
           } else {
-            console.log(
-              "User don't have busy hours for that date, giving blank array instead: "
-            );
+            //console.log("User don't have busy hours for that date, giving blank array instead: ");
             userBusyHoursForThatDate = new Array(24).fill(0);
           }
         });
-      console.log(userBusyHoursForThatDate);
+      //console.log(userBusyHoursForThatDate);
 
       //Checks if for every hour, if the user has something on (aka > 0),
       //if yes then +1 to the channel hour as well to indicate how many pax is busy
@@ -363,10 +357,10 @@ export default function Channels() {
         }
       }
 
-      console.log("------For Date: " + date + "-------");
-      console.log("New Updated channelHours is:");
-      console.log(channelHoursForThatDate);
-      console.log("-----------------------------------");
+      //console.log("------For Date: " + date + "-------");
+      //console.log("New Updated channelHours is:");
+      //console.log(channelHoursForThatDate);
+      //console.log("-----------------------------------");
 
       //updateBusyUsersForDates[index] += currentUserEmail + " "; //Append user email to the array element (busy)
       //Have to retrieve the array for it as well another await db if needed to be implemented.
@@ -464,7 +458,7 @@ export default function Channels() {
         //console.log(newCompressedTimeArr);
 
         if (newCompressedTimeArr.length > 0) {
-          console.log(latestUpdatedTotalOptimalDates[dateIndex]);
+          //console.log(latestUpdatedTotalOptimalDates[dateIndex]);
           latestUpdatedTotalOptimalDates[dateIndex] =
           latestUpdatedTotalOptimalDates[dateIndex].concat(
             newCompressedTimeArr.join(", ")
@@ -580,7 +574,13 @@ export default function Channels() {
 
   /*---------------------------------------------------*/
 
-  //Load channels details REF SNAPSHOT
+
+
+  useEffect(() => {
+      //------------------------REF SNAPSHOT----------------------//
+  const ref = firebase.firestore().collection("channelsCreatedByUser");
+  const currentUserEmail = firebase.auth().currentUser?.email;
+      //Load channels details REF SNAPSHOT
   function getChannels() {
     setLoading(true);
     ref.onSnapshot((querySnapshot) => {
@@ -600,9 +600,7 @@ export default function Channels() {
       setLoading(false);
     });
   }
-
-  useEffect(() => {
-    getChannels();
+  getChannels();
   }, []);
 
   if (loadingx) {

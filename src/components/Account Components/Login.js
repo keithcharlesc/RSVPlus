@@ -13,7 +13,7 @@ export default function Login() {
   var gapi = window.gapi;
 
   gapi.load("client:auth2", () => {
-    console.log("loaded client");
+    //console.log("loaded client");
 
     gapi.client.init({
       apiKey: "AIzaSyD3-pnAPnBMzBqL_dAZYYyVGretc42zUnA",
@@ -25,13 +25,16 @@ export default function Login() {
       scope: "https://www.googleapis.com/auth/calendar",
     });
 
-    gapi.client.load("calendar", "v3", () => console.log("entry!"));
+    gapi.client.load("calendar", "v3", () =>
+     console.log()
+    //console.log("loaded calendar v3, entry!")
+  );
   });
   /* ------------ Login with gapi Auth and firebase -------------*/
   async function login() {
     const googleAuth = gapi.auth2.getAuthInstance();
     const googleUser = await googleAuth.signIn();
-    console.log(googleUser);
+    //console.log(googleUser);
     const token = googleUser.getAuthResponse().id_token;
     const credential = firebase.auth.GoogleAuthProvider.credential(token);
     const db = firebase.firestore();
@@ -45,7 +48,7 @@ export default function Login() {
           .get()
           .then((doc) => {
             if (doc.exists) {
-              console.log("Document read!");
+              //console.log("Document read!");
             } else {
               db.collection("userAccounts")
                 .doc(user.email)
@@ -53,18 +56,18 @@ export default function Login() {
                   email: user.email,
                 })
                 .then(() => {
-                  console.log("Email added to database!");
+                  //console.log("Email added to database!");
                 })
                 .catch((error) => {
-                  console.error("Error writing document: ", error);
+                  //console.error("Error writing document: ", error);
                 });
             }
           })
           .catch((error) => {
-            console.log("Error getting document:", error);
+            //console.log("Error getting document:", error);
           });
 
-        console.log(user);
+        //console.log(user);
         /*console.log("firebase: user signed in!", {
           displayName: user.displayName,
           email: user.email,

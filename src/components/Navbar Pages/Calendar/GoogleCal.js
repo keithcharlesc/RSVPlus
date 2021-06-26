@@ -23,7 +23,7 @@ export default function GoogleCal() {
     return Promise.resolve(setUrl(MoonPhasesCalendar))
       .then(() => {
         setLoaderFour(false);
-        console.log("Sample URL has been set");
+        //console.log("Sample URL has been set");
       })
       .catch((error) => {
         alert(error.message);
@@ -35,7 +35,7 @@ export default function GoogleCal() {
     return Promise.resolve(setUrl(""))
       .then(() => {
         setLoader(false);
-        console.log("URL cleared");
+        //console.log("URL cleared");
       })
       .catch((error) => {
         alert(error.message);
@@ -80,7 +80,7 @@ export default function GoogleCal() {
           setUrl(doc.data().url);
           setLoaderThree(false);
           //console.log(doc.data().url);
-          console.log("Document read!");
+          //console.log("Document read!");
         } else {
           // doc.data() will be undefined in this case
           setUrl(MoonPhasesCalendar);
