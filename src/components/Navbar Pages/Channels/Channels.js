@@ -174,7 +174,7 @@ export default function Channels() {
 
     if (minutesForEndDate % 60 !== 0) {
       setError(
-        "Error! End time slot must not contain any minutes. HH:00 only! Please reselect"
+        "Error! End time of time range must not contain any minutes. HH:00 only! Please reselect"
       );
       setLoader(false);
       return;
@@ -863,7 +863,7 @@ export default function Channels() {
                 isClearable={true}
               />
             </Form.Group>
-            <Form.Group id="idealStartOfTimeRange" className="">
+            <Form.Group id="idealStartOfTimeRange">
               <Form.Label className="mr-3">
                 Start Time of Time Range:
               </Form.Label>
@@ -904,7 +904,7 @@ export default function Channels() {
 
             <Form.Group id="emailInvite" className="mt-4">
               <Form.Label>
-                Number of People to Invite: 1 - 9 (Excludes you!)
+                Number of People to Invite: 1 - 9 (Excluding yourself!)
               </Form.Label>
               <InviteList />
             </Form.Group>
