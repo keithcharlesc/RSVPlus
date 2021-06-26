@@ -89,3 +89,7 @@
     transform: rotate(1turn);
   }
 }
+
+.create-channel-text {
+  color: #ffe600 !important;
+}

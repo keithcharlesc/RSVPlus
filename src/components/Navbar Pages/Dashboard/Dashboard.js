@@ -23,8 +23,10 @@ gapi.load("client:auth2", () => {
     scope: SCOPES,
   });
 
-  gapi.client.load("calendar", "v3", () =>
-    console.log()
+  gapi.client.load(
+    "calendar",
+    "v3",
+    () => console.log()
     //console.log("loaded calendar v3, entry!")
   );
 });
@@ -143,7 +145,10 @@ export default function Dashboard() {
   return (
     <>
       <NavigationBar />
-      <div className="p-3 mb-2 bg-dark text-white">
+      <div
+        className="p-3 mb-2 bg-dark text-white"
+        style={{ minHeight: "100vh" }}
+      >
         <h2 className="page-header text-center mb-4">DASHBOARD</h2>
         <Container fluid>
           <Row className="d-flex align-items-center justify-content-center mb-4">
@@ -158,10 +163,7 @@ export default function Dashboard() {
             </button>
           </Row>
           <Row>
-            <Container
-              className="d-flex justify-content-center"
-              style={{ minHeight: "100vh" }}
-            >
+            <Container className="d-flex justify-content-center">
               {/* FETCH EVENT FORM */}
               <div className="events">
                 {events &&
@@ -229,6 +231,117 @@ export default function Dashboard() {
               </div>
               {/* END OF FETCH EVENT FORM */}
             </Container>
+            {/*Welcome Message*/}
+            <Row>
+              <Container fluid className="d-flex justify-content-center">
+                <div>
+                  <Card>
+                    <Card.Body className="text-white h6">
+                      <small>
+                        <p>Hey, thanks for visiting RSVP+! 😃</p>
+                        <p className="mt-4">
+                          To get started on how to use RSVP+, check out our user
+                          guide (poster) using either one of these links !
+                        </p>
+                        <ul>
+                          <li>
+                            <a
+                              href="https://www.figma.com/file/GRiEbGtx1zu7emUTC9M2aK/RSVP-Milestone-2?node-id=0%3A1"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="mr-2"
+                            >
+                              Figma
+                            </a>
+                            <a
+                              href="https://drive.google.com/file/d/1WOiNfT6XtidInZEYaUMvzi29iuEna59L/view"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Google Drive
+                            </a>
+                          </li>
+                        </ul>
+                        <strong>New features for each tab! 🔥</strong>
+                        <ol>
+                          <li className="mt-4 mb-1">
+                            Home (Dashboard)
+                            <ul>
+                              <li className="mt-2">
+                                Display upcoming events from your Google
+                                Calendar to see what's on your schedule! (Does
+                                not show past events)
+                              </li>
+                            </ul>
+                          </li>
+                          <li className="mb-1 mt-4">
+                            Channels
+                            <ul>
+                              <li className="mt-2">
+                                Create your own channel for a meet-up or event
+                                and invite your friends of RSVP+.
+                              </li>
+                              <li className="mt-2">
+                                View channels you have been invited to or have
+                                created.
+                              </li>
+                              <li className="mt-2">
+                                Delete a channel that you are the host of should
+                                you wish to remove it.
+                              </li>
+                              <li className="mt-2">
+                                Derive optimal time slots for an event (channel)
+                                for specified dates and time range after
+                                everyone has "Agreed to Sync"! ✨
+                              </li>
+                            </ul>
+                          </li>{" "}
+                          <li className="mb-1 mt-4">
+                            Calendar{" "}
+                            <ul>
+                              <li className="mt-2">
+                                View your logged in Gmail's primary Google
+                                Calendar by saving your URL! (Guide provided)
+                              </li>
+                              <li className="mt-2">
+                                Create a custom event that will be automatically
+                                added to your Google Calendar!
+                              </li>
+                            </ul>
+                          </li>{" "}
+                          <li className="mb-1 mt-4">
+                            FAQ{" "}
+                            <ul>
+                              <li className="mt-2">
+                                View frequently asked questions or answers to
+                                questions you might have in mind!
+                              </li>
+                            </ul>
+                          </li>{" "}
+                          <li className="mb-1 mt-4">
+                            Contact Us
+                            <ul>
+                              <li className="mt-2">
+                                A platform to give feedback to the developers!
+                              </li>
+                            </ul>
+                          </li>
+                        </ol>
+                        <p className="mt-4">
+                          Other new updates includes: Google Login, input
+                          handling and a nicer design!
+                        </p>
+                        <p className="mt-4">
+                          Get started by clicking the "Display Upcoming Events"
+                          button you see above and explore the other tabs!
+                        </p>
+                      </small>
+                    </Card.Body>
+                  </Card>
+                </div>
+              </Container>
+            </Row>
+            {/*Welcome Message*/}
           </Row>
         </Container>
       </div>

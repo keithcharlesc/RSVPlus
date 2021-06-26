@@ -158,7 +158,7 @@ export default function Channels() {
 
     if (minutesForEndDate <= minutesForStartDate) {
       setError(
-        "Error! End time slot to find must be later than start time slot!"
+        "Error! End time of time range must minimally be 1 hour later than start time slot!"
       );
       setLoader(false);
       return;
@@ -166,7 +166,7 @@ export default function Channels() {
 
     if (minutesForStartDate % 60 !== 0) {
       setError(
-        "Error! Start time slot must not contain any minutes HH:00 only!"
+        "Error! Start time of time range must not contain any minutes. HH:00 only! Please reselect"
       );
       setLoader(false);
       return;
@@ -174,7 +174,7 @@ export default function Channels() {
 
     if (minutesForEndDate % 60 !== 0) {
       setError(
-        "Error! End time slot must not contain any minutes. HH:00 only!"
+        "Error! End time of time range must not contain any minutes. HH:00 only! Please reselect"
       );
       setLoader(false);
       return;
@@ -847,16 +847,15 @@ export default function Channels() {
               />
             </Form.Group>
             <br></br>
-
             <Form.Group id="startDateEndDate">
-              <Form.Label className="mr-3">Start Date & End Date: </Form.Label>
+              <Form.Label className="mr-3">Date Range: </Form.Label>
               <DatePicker
                 className="date-picker"
                 selectsRange={true}
                 startDate={startDate}
                 endDate={endDate}
                 minDate={new Date()}
-                placeholderText="eg. 06/24/2021 - 06/25/2021"
+                placeholderText="eg. 07/08/2021 - 07/12/2021"
                 required
                 onChange={(update) => {
                   setDateRangeForPicker(update);
@@ -864,7 +863,6 @@ export default function Channels() {
                 isClearable={true}
               />
             </Form.Group>
-
             <Form.Group id="idealStartOfTimeRange">
               <Form.Label className="mr-3">
                 Start Time of Time Range:
@@ -880,11 +878,10 @@ export default function Channels() {
                 dateFormat="h:mm aa"
               />
             </Form.Group>
-
             <Form.Group id="idealEndOfTimeRange">
               <Form.Label className="mr-3">End Time of Time Range:</Form.Label>
               <DatePicker
-                className="time-picker"
+                className="time-picker ml-2"
                 selected={endOfTime}
                 onChange={(date) => setEndOfTime(date)}
                 showTimeSelect
@@ -894,11 +891,20 @@ export default function Channels() {
                 dateFormat="h:mm aa"
               />
             </Form.Group>
+            <small className="create-channel-text">
+              Specify the dates and possible timings you are looking at
+            </small>
+            <p>
+              {" "}
+              <small className="create-channel-text">
+                {" "}
+                (eg. Finding avail 2PM - 4PM slots for the dates in the range!)
+              </small>
+            </p>
 
-            <br></br>
-            <Form.Group id="emailInvite">
+            <Form.Group id="emailInvite" className="mt-4">
               <Form.Label>
-                Number of People to Invite: 1 - 9 (Excluding you!)
+                Number of People to Invite: 1 - 9 (Excluding yourself!)
               </Form.Label>
               <InviteList />
             </Form.Group>
