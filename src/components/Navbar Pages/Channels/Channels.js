@@ -39,8 +39,10 @@ gapi.load("client:auth2", () => {
     scope: SCOPES,
   });
 
-  gapi.client.load("calendar", "v3", () =>
-     console.log()
+  gapi.client.load(
+    "calendar",
+    "v3",
+    () => console.log()
     //console.log("loaded calendar v3, entry!")
   );
 });
@@ -460,12 +462,15 @@ export default function Channels() {
         if (newCompressedTimeArr.length > 0) {
           //console.log(latestUpdatedTotalOptimalDates[dateIndex]);
           latestUpdatedTotalOptimalDates[dateIndex] =
-          latestUpdatedTotalOptimalDates[dateIndex].concat(
-            newCompressedTimeArr.join(", ")
-          );
-          } else {
-            latestUpdatedTotalOptimalDates[dateIndex] =  latestUpdatedTotalOptimalDates[dateIndex].concat("No timeslots found!")
-          }
+            latestUpdatedTotalOptimalDates[dateIndex].concat(
+              newCompressedTimeArr.join(", ")
+            );
+        } else {
+          latestUpdatedTotalOptimalDates[dateIndex] =
+            latestUpdatedTotalOptimalDates[dateIndex].concat(
+              "No timeslots found!"
+            );
+        }
       }
       //Push update after getting all the arrays
       db.collection("channelsCreatedByUser")
@@ -574,33 +579,31 @@ export default function Channels() {
 
   /*---------------------------------------------------*/
 
-
-
   useEffect(() => {
-      //------------------------REF SNAPSHOT----------------------//
-  const ref = firebase.firestore().collection("channelsCreatedByUser");
-  const currentUserEmail = firebase.auth().currentUser?.email;
-      //Load channels details REF SNAPSHOT
-  function getChannels() {
-    setLoading(true);
-    ref.onSnapshot((querySnapshot) => {
-      const items = [];
-      querySnapshot.forEach((doc) => {
-        const emails = doc.data().invitedEmails; //arr of Invited Emails
-        //console.log(emails);
-        const boolean = emails.indexOf(currentUserEmail) > -1; //Check if logged in user email belongs to Invited Emails
-        if (boolean === true) {
-          //Push channels if belongs
-          items.push(doc.data());
-        }
-        //console.log(doc.id);
+    //------------------------REF SNAPSHOT----------------------//
+    const ref = firebase.firestore().collection("channelsCreatedByUser");
+    const currentUserEmail = firebase.auth().currentUser?.email;
+    //Load channels details REF SNAPSHOT
+    function getChannels() {
+      setLoading(true);
+      ref.onSnapshot((querySnapshot) => {
+        const items = [];
+        querySnapshot.forEach((doc) => {
+          const emails = doc.data().invitedEmails; //arr of Invited Emails
+          //console.log(emails);
+          const boolean = emails.indexOf(currentUserEmail) > -1; //Check if logged in user email belongs to Invited Emails
+          if (boolean === true) {
+            //Push channels if belongs
+            items.push(doc.data());
+          }
+          //console.log(doc.id);
+        });
+        setChannels(items);
+        //console.log(items);
+        setLoading(false);
       });
-      setChannels(items);
-      //console.log(items);
-      setLoading(false);
-    });
-  }
-  getChannels();
+    }
+    getChannels();
   }, []);
 
   if (loadingx) {
@@ -612,61 +615,62 @@ export default function Channels() {
   }
   //*-----------------------Function for Delete Channel Pop up----*/
 
-async function handleSubmitTwo(e) {
+  async function handleSubmitTwo(e) {
     e.preventDefault();
     e.stopPropagation();
     setLoaderTwo(true);
     setErrorTwo("");
     setSuccessTwo("");
-       let channelID = channelIDRef.current.value;
-       let hostEmail;
+    let channelID = channelIDRef.current.value;
+    let hostEmail;
 
     await db
+      .collection("channelsCreatedByUser")
+      .doc(channelID)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          hostEmail = doc.data().hostEmail;
+        } else {
+          hostEmail = "null";
+        }
+      });
+    //console.log(channelID);
+    //console.log(hostEmail);
+    if (hostEmail === "null") {
+      setErrorTwo("Channel does not exist!");
+      setLoaderTwo(false);
+      return;
+    } else if (currentUserEmail === hostEmail) {
+      await db
         .collection("channelsCreatedByUser")
         .doc(channelID)
+        .collection("busyDatesWithTimeBlocks")
         .get()
-        .then((doc) => {
-           if (doc.exists) {
-            hostEmail = doc.data().hostEmail;
-           } else {
-            hostEmail = "null";
-          }
+        .then((querySnapshot) => {
+          querySnapshot.docs.forEach((snapshot) => {
+            snapshot.ref.delete();
+          });
         });
-        //console.log(channelID);
-        //console.log(hostEmail);
-        if (hostEmail === "null") {
-          setErrorTwo("Channel does not exist!");
-          setLoaderTwo(false);
-          return;
-        } else if (currentUserEmail === hostEmail) {
-          await db
-    .collection("channelsCreatedByUser")
-    .doc(channelID)
-    .collection("busyDatesWithTimeBlocks")
-    .get()
-    .then((querySnapshot) => {
-      querySnapshot.docs.forEach((snapshot) => {
-        snapshot.ref.delete();
-      });
-    });
-           await db.collection("channelsCreatedByUser").doc(channelID).delete();
-           setSuccessTwo("Channel successfully deleted!");
-           setLoaderTwo(false);
-           return;
-        } else {
-          setErrorTwo("Failed to delete channel, you are not the host!");
-          setLoaderTwo(false);
-          return;
-        }
-   
-}
+      await db.collection("channelsCreatedByUser").doc(channelID).delete();
+      setSuccessTwo("Channel successfully deleted!");
+      setLoaderTwo(false);
+      return;
+    } else {
+      setErrorTwo("Failed to delete channel, you are not the host!");
+      setLoaderTwo(false);
+      return;
+    }
+  }
   //*-------------------------------------------------------------------------------------------*/
-
 
   return (
     <div>
       <NavigationBar />
-      <div className="p-3 mb-2 bg-dark text-white" style={{ minHeight: "100vh" }}>
+      <div
+        className="p-3 mb-2 bg-dark text-white"
+        style={{ minHeight: "100vh" }}
+      >
         <h2 className="page-header text-center mb-4">CHANNELS</h2>
         <Container fluid>
           <Row className="d-flex align-items-center justify-content-center mb-4">
@@ -684,269 +688,253 @@ async function handleSubmitTwo(e) {
               style={{ width: 250, height: 30 }}
               onClick={() => setButtonPopup(true)}
             >
-              CREATE A CHANNEL!
+              CREATE A CHANNEL
             </button>
             <button
               className="d-flex align-items-center justify-content-center fetch-events-button"
               style={{ width: 250, height: 30 }}
               onClick={() => setButtonPopupTwo(true)}
             >
-              DELETE A CHANNEL!
+              DELETE A CHANNEL [HOST]
             </button>
           </Row>
           <Row>
-              {channels.map((channel, index) => (
-                //Rendered Channels
-                <div
-                  key={index}
-                  className="d-flex align-items-center justify-content-center mb-4"
-                >
-                  <Card style={{ width: 800 }}>
-                    <Card.Header className="d-flex justify-content-center">
-                      <Card.Title>
-                        <h2>{channel.name}</h2>
-                      </Card.Title>
-                    </Card.Header>
-                    <Card.Body>
-                      <div className="details">
-                        <Row>
-                          <Col xs={12} md={8}>
-                            <Card.Text>
-                              Description:{" "}
-                              {channel.description != null
-                                ? channel.description
-                                : "N/A"}
-                            </Card.Text>
-                            <Card.Text>
-                              Location:{" "}
-                              {channel.location != null
-                                ? channel.location
-                                : "N/A"}
-                            </Card.Text>
-                            <Card.Text>
-                              Date Range:{" "}
-                              <Badge pill variant="dark">
-                                {" "}
-                                {channel.start_date}
-                              </Badge>
-                              {"  "}to{"  "}
-                              <Badge pill variant="dark">
-                                {channel.end_date}
-                              </Badge>
-                              {/*console.log(event.start.date)*/}
-                            </Card.Text>
-                            <Card.Text>
-                              Timeslots Range:{" "}
-                              <Badge pill variant="dark">
-                                {timeToConvert(channel.startTimeToLookForIndex)}{" "}
-                                — {timeToConvert(channel.endTimeToLookForIndex)}
-                              </Badge>
-                            </Card.Text>
-                            <Card.Text>
-                              <Button
-                                variant="danger"
-                                style={{ width: 260, height: 40 }}
-                                onClick={() => handleAgreeToSync(channel)}
-                              >
-                                Agree to Sync Calendar Data
-                              </Button>
-                            </Card.Text>
-                          </Col>
-                          <Col xs={6} md={4}>
-                            <Card.Text>
-                              Invited List:{" "}
-                              {displayUsersList(channel.invitedEmails)}
-                            </Card.Text>
-                            <Card.Text>
-                              Responded:
-                              {displayUsersList(channel.respondedEmails)}
-                            </Card.Text>
-                            <Card.Text>
-                              Pending:{displayPendingList(channel.pendingEmails)}
-                            </Card.Text>
-                          </Col>
-                        </Row>
-                        <Row className="mt-3">
-                          {" "}
+            {channels.map((channel, index) => (
+              //Rendered Channels
+              <div
+                key={index}
+                className="d-flex align-items-center justify-content-center mb-4"
+              >
+                <Card style={{ width: 800 }}>
+                  <Card.Header className="d-flex justify-content-center">
+                    <Card.Title>
+                      <h2>{channel.name}</h2>
+                    </Card.Title>
+                  </Card.Header>
+                  <Card.Body>
+                    <div className="details">
+                      <Row>
+                        <Col xs={12} md={8}>
                           <Card.Text>
-                            <strong>Available Timeslots: </strong>
-                            {displayUsersList(channel.decidedOutcome)}
+                            Description:{" "}
+                            {channel.description != null
+                              ? channel.description
+                              : "N/A"}
                           </Card.Text>
-                        </Row>
-                        <div className="mt-2 float-right">
-                        <Row className = "float-right">
+                          <Card.Text>
+                            Location:{" "}
+                            {channel.location != null
+                              ? channel.location
+                              : "N/A"}
+                          </Card.Text>
+                          <Card.Text>
+                            Date Range:{" "}
+                            <Badge pill variant="dark">
+                              {" "}
+                              {channel.start_date}
+                            </Badge>
+                            {"  "}to{"  "}
+                            <Badge pill variant="dark">
+                              {channel.end_date}
+                            </Badge>
+                            {/*console.log(event.start.date)*/}
+                          </Card.Text>
+                          <Card.Text>
+                            Timeslots Range:{" "}
+                            <Badge pill variant="dark">
+                              {timeToConvert(channel.startTimeToLookForIndex)} —{" "}
+                              {timeToConvert(channel.endTimeToLookForIndex)}
+                            </Badge>
+                          </Card.Text>
+                          <Card.Text>
+                            <Button
+                              variant="danger"
+                              style={{ width: 260, height: 40 }}
+                              onClick={() => handleAgreeToSync(channel)}
+                            >
+                              Agree to Sync Calendar Data
+                            </Button>
+                          </Card.Text>
+                        </Col>
+                        <Col xs={6} md={4}>
+                          <Card.Text>
+                            Invited List:{" "}
+                            {displayUsersList(channel.invitedEmails)}
+                          </Card.Text>
+                          <Card.Text>
+                            Responded:
+                            {displayUsersList(channel.respondedEmails)}
+                          </Card.Text>
+                          <Card.Text>
+                            Pending:{displayPendingList(channel.pendingEmails)}
+                          </Card.Text>
+                        </Col>
+                      </Row>
+                      <Row className="mt-3">
+                        {" "}
+                        <Card.Text>
+                          <strong>Available Timeslots: </strong>
+                          {displayUsersList(channel.decidedOutcome)}
+                        </Card.Text>
+                      </Row>
+                      <div className="mt-2 float-right">
+                        <Row className="float-right">
                           <Card.Text className="font-italic">
-                           <small>
-                           Channel ID: {" "}
-                            {channel.documentID}
-                            </small>
+                            <small>Channel ID: {channel.documentID}</small>
                           </Card.Text>
                         </Row>
                         <br></br>
-                          <Row className = "float-right">
+                        <Row className="float-right">
                           <Card.Text className="font-italic">
-                          <small>
-                           Host: {" "}
-                            {channel.hostEmail}
-                            </small>
+                            <small>Host: {channel.hostEmail}</small>
                           </Card.Text>
-                        </Row>              
-                        </div>    
+                        </Row>
                       </div>
-                    </Card.Body>
-                  </Card>
-                </div>
-                //End of Rendered Channels
-              ))}
-   
+                    </div>
+                  </Card.Body>
+                </Card>
+              </div>
+              //End of Rendered Channels
+            ))}
           </Row>
         </Container>
       </div>
 
+      {/*Pop up */}
+      <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
+        <Card.Body>
+          <h3 className="text-center mb-4 text-white">
+            Create a channel for your event!
+          </h3>
+          {success && <Alert variant="success">{success}</Alert>}
+          {error && <Alert variant="danger">{error}</Alert>}
+          <form className="text-white" onSubmit={handleSubmit}>
+            <Form.Group id="name">
+              <Form.Label>Name of Event</Form.Label>
+              <Form.Control
+                required
+                type="name"
+                ref={nameRef}
+                placeholder="eg. Study Session"
+              />
+            </Form.Group>
+            <br></br>
+            <Form.Group id="description">
+              <Form.Label>Description of Event</Form.Label>
+              <Form.Control
+                required
+                type="description"
+                ref={descriptionRef}
+                placeholder="eg. Study meet with Rebecca"
+              />
+            </Form.Group>
+            <br></br>
+            <Form.Group id="location">
+              <Form.Label>Location of Event</Form.Label>
+              <Form.Control
+                required
+                type="location"
+                ref={locationRef}
+                placeholder="eg. NUS Central Library 4th floor"
+              />
+            </Form.Group>
+            <br></br>
 
-              {/*Pop up */}
-              <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
-                <Card.Body>
-                  <h3 className="text-center mb-4 text-white">
-                    Create a channel for your event!
-                  </h3>
-                  {success && <Alert variant="success">{success}</Alert>}
-                  {error && <Alert variant="danger">{error}</Alert>}
-                  <form className="text-white" onSubmit={handleSubmit}>
-                    <Form.Group id="name">
-                      <Form.Label>Name of Event</Form.Label>
-                      <Form.Control
-                        required
-                        type="name"
-                        ref={nameRef}
-                        placeholder="eg. Study Session"
-                      />
-                    </Form.Group>
-                    <br></br>
-                    <Form.Group id="description">
-                      <Form.Label>Description of Event</Form.Label>
-                      <Form.Control
-                        required
-                        type="description"
-                        ref={descriptionRef}
-                        placeholder="eg. Study meet with Rebecca"
-                      />
-                    </Form.Group>
-                    <br></br>
-                    <Form.Group id="location">
-                      <Form.Label>Location of Event</Form.Label>
-                      <Form.Control
-                        required
-                        type="location"
-                        ref={locationRef}
-                        placeholder="eg. NUS Central Library 4th floor"
-                      />
-                    </Form.Group>
-                    <br></br>
+            <Form.Group id="startDateEndDate">
+              <Form.Label className="mr-3">Start Date & End Date: </Form.Label>
+              <DatePicker
+                className="date-picker"
+                selectsRange={true}
+                startDate={startDate}
+                endDate={endDate}
+                minDate={new Date()}
+                placeholderText="eg. 06/24/2021 - 06/25/2021"
+                required
+                onChange={(update) => {
+                  setDateRangeForPicker(update);
+                }}
+                isClearable={true}
+              />
+            </Form.Group>
 
-                    <Form.Group id="startDateEndDate">
-                      <Form.Label className="mr-3">
-                        Start Date & End Date:{" "}
-                      </Form.Label>
-                      <DatePicker
-                        className="date-picker"
-                        selectsRange={true}
-                        startDate={startDate}
-                        endDate={endDate}
-                        minDate={new Date()}
-                        placeholderText="eg. 06/24/2021 - 06/25/2021"
-                        required
-                        onChange={(update) => {
-                          setDateRangeForPicker(update);
-                        }}
-                        isClearable={true}
-                      />
-                    </Form.Group>
+            <Form.Group id="idealStartOfTimeRange">
+              <Form.Label className="mr-3">
+                Start Time of Time Range:
+              </Form.Label>
+              <DatePicker
+                className="time-picker"
+                selected={startOfTime}
+                onChange={(date) => setStartOfTime(date)}
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={60}
+                timeCaption="Time"
+                dateFormat="h:mm aa"
+              />
+            </Form.Group>
 
-                    <Form.Group id="idealStartOfTimeRange">
-                      <Form.Label className="mr-3">
-                        Start Time of Time Range:
-                      </Form.Label>
-                      <DatePicker
-                        className="time-picker"
-                        selected={startOfTime}
-                        onChange={(date) => setStartOfTime(date)}
-                        showTimeSelect
-                        showTimeSelectOnly
-                        timeIntervals={60}
-                        timeCaption="Time"
-                        dateFormat="h:mm aa"
-                      />
-                    </Form.Group>
+            <Form.Group id="idealEndOfTimeRange">
+              <Form.Label className="mr-3">End Time of Time Range:</Form.Label>
+              <DatePicker
+                className="time-picker"
+                selected={endOfTime}
+                onChange={(date) => setEndOfTime(date)}
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={60}
+                timeCaption="Time"
+                dateFormat="h:mm aa"
+              />
+            </Form.Group>
 
-                    <Form.Group id="idealEndOfTimeRange">
-                      <Form.Label className="mr-3">
-                        End Time of Time Range:
-                      </Form.Label>
-                      <DatePicker
-                        className="time-picker"
-                        selected={endOfTime}
-                        onChange={(date) => setEndOfTime(date)}
-                        showTimeSelect
-                        showTimeSelectOnly
-                        timeIntervals={60}
-                        timeCaption="Time"
-                        dateFormat="h:mm aa"
-                      />
-                    </Form.Group>
+            <br></br>
+            <Form.Group id="emailInvite">
+              <Form.Label>
+                Number of People to Invite: 1 - 9 (Excluding you!)
+              </Form.Label>
+              <InviteList />
+            </Form.Group>
+            <br></br>
+            <Button
+              variant="danger"
+              disabled={loading}
+              className="w-100"
+              type="submit"
+            >
+              Create channel
+            </Button>
+          </form>
+        </Card.Body>
+      </Popup>
+      {/*End of Pop up */}
 
-                    <br></br>
-                    <Form.Group id="emailInvite">
-                      <Form.Label>Number of People to Invite: (1-9)</Form.Label>
-                      <InviteList />
-                    </Form.Group>
-                    <br></br>
-                    <Button
-                      variant="danger"
-                      disabled={loading}
-                      className="w-100"
-                      type="submit"
-                    >
-                      Create channel
-                    </Button>
-                  </form>
-                </Card.Body>
-              </Popup>
-              {/*End of Pop up */}
-
-              {/*Start of Pop up Two*/}
-              <Popup trigger={buttonPopupTwo} setTrigger={setButtonPopupTwo}>
-                <Card.Body>
-                  <h3 className="text-center mb-4 text-white">
-                    Delete a channel!
-                  </h3>
-                  {successTwo && <Alert variant="success">{successTwo}</Alert>}
-                  {errorTwo && <Alert variant="danger">{errorTwo}</Alert>}
-                  <form className="text-white" onSubmit={handleSubmitTwo}>
-                    <Form.Group id="channelID">
-                      <Form.Label>Channel ID</Form.Label>
-                      <Form.Control
-                        required
-                        type="channelID"
-                        ref={channelIDRef}
-                      />
-                    </Form.Group>
-                   
-                    <br></br>
-                    <Button
-                      variant="danger"
-                      disabled={loadingTwo}
-                      className="w-100"
-                      type="submit"
-                    >
-                      Delete channel
-                    </Button>
-                  </form>
-                </Card.Body>
-              </Popup>
-              {/*End of Pop up Two*/}
-
-
+      {/*Start of Pop up Two*/}
+      <Popup trigger={buttonPopupTwo} setTrigger={setButtonPopupTwo}>
+        <Card.Body>
+          <h3 className="text-center mb-4 text-white">Delete a channel!</h3>
+          {successTwo && <Alert variant="success">{successTwo}</Alert>}
+          {errorTwo && <Alert variant="danger">{errorTwo}</Alert>}
+          <form className="text-white" onSubmit={handleSubmitTwo}>
+            <Form.Group id="channelID">
+              <Form.Label>Channel ID</Form.Label>
+              <Form.Control required type="channelID" ref={channelIDRef} />
+            </Form.Group>
+            <small>
+              Only works if the Channel ID exists and you are the host.
+            </small>
+            <br></br>
+            <Button
+              variant="danger"
+              disabled={loadingTwo}
+              className="w-100 mt-3"
+              type="submit"
+            >
+              Delete channel
+            </Button>
+          </form>
+        </Card.Body>
+      </Popup>
+      {/*End of Pop up Two*/}
     </div>
   );
 }

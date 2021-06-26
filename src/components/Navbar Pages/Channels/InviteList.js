@@ -43,6 +43,7 @@ export default class InviteList extends React.Component {
           max="9"
           maxLength="1"
           required
+          placeholder="Input a number from 1 to 9"
           onChange={(value) => this.handleOnChange(value)}
         />
         <div>{this.renderInputs(this.state.inputSize)}</div>
