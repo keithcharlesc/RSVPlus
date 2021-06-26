@@ -23,7 +23,7 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
     1. Takes in the entire collection of events
     2.Start iterating through each event
                                             */
-  console.log(events);
+  //console.log(events);
   //Goes through each events
   for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
     //let currentEvent = events[1];
@@ -75,8 +75,8 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
     */
 
     //Range of dates between start and end for that event
-    console.log(dateRangeForCurrentEvent);
-    var datesRef = db.collection("busyDates").doc(currentUserEmail);
+    //console.log(dateRangeForCurrentEvent);
+    const datesRef = db.collection("busyDates").doc(currentUserEmail);
 
     //Creates documents for dates if the dates havent been initialized
     async function initializeBlocks() {
@@ -136,6 +136,7 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
 
     await updateBlocks();
   }
+  console.log("Done fetching latest data!")
 }
 
 //Function to initialize documents should those dates and their respective blocks not exist.
@@ -161,7 +162,7 @@ async function initializeTimeBlocksForEachDate(datesRef, date) {
             hours: new Array(24).fill(0),
           });
 
-        console.log("created document for that date!");
+        //console.log("created document for that date!");
       }
     })
     .catch((error) => {
@@ -196,17 +197,17 @@ async function incrementDateInBetweenTwoSlotsOnSameDay(
 
         if (rawStartDate.length === 25) {
           let startDateHours = rawStartDate.slice(11, 13);
-          console.log("startDateHours: " + startDateHours);
+          //console.log("startDateHours: " + startDateHours);
           if (startDateHours.charAt(0) === "0") {
             startDateHours = startDateHours.substring(1);
           }
-          console.log("sliced startDateHours: " + startDateHours);
+          //console.log("sliced startDateHours: " + startDateHours);
           let endDateHours = rawEndDate.slice(11, 13);
-          console.log("endDateHours: " + endDateHours);
+          //console.log("endDateHours: " + endDateHours);
           if (endDateHours.charAt(0) === "0") {
             endDateHours = endDateHours.substring(1);
           }
-          console.log("sliced endDateHours: " + endDateHours);
+          //console.log("sliced endDateHours: " + endDateHours);
 
           startDateHours = parseInt(startDateHours); //RMB TO CONVERT TO INT
           endDateHours = parseInt(endDateHours); //RMB TO CONVERT TO INT
@@ -219,7 +220,7 @@ async function incrementDateInBetweenTwoSlotsOnSameDay(
           if (minutesForThatHour !== "00") {
             endDateHours = endDateHours + 1;
           }
-          console.log("Minutes: " + minutesForThatHour);
+          //console.log("Minutes: " + minutesForThatHour);
 
           for (var k = startDateHours; k < endDateHours; k++) {
             //console.log(k);
@@ -231,7 +232,7 @@ async function incrementDateInBetweenTwoSlotsOnSameDay(
         datesRef.collection("busyDatesWithTimeBlocks").doc(date).update({
           hours: updatedHours,
         });
-        console.log("updated same start date and end date!");
+        //console.log("updated same start date and end date!");
       } else {
         // doc.data() will be undefined in this case
         alert("Update failed. Please fetch again!");

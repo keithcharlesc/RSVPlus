@@ -59,7 +59,7 @@ export default function FAQ() {
         >
           <div className="faqs">
             {faqs.map((faq, i) => (
-              <Loop faq={faq} index={i} toggleFAQ={toggleFAQ} />
+              <Loop key={i} faq={faq} index={i} toggleFAQ={toggleFAQ} />
             ))}
           </div>
         </div>
