@@ -134,10 +134,18 @@ export default function Channels() {
       return;
     }
     //console.log("emails validated");
+
+    //console.log("Start Date: ");
+    //console.log(startDate.toLocaleDateString("en-CA"));
+    //console.log("End Date: ");
+    //console.log(endDate.toLocaleDateString("en-CA"));
+
     const dates = dateRange(
       startDate.toLocaleDateString("en-CA"),
       endDate.toLocaleDateString("en-CA")
     );
+
+    //console.log(dates);
 
     //Checks whether input for End Time Slot (Range) is later than Start Time Slot
     let startDateHoursAndMinutes = startOfTime.toLocaleTimeString("it-IT");
@@ -695,7 +703,7 @@ export default function Channels() {
               style={{ width: 250, height: 30 }}
               onClick={() => setButtonPopupTwo(true)}
             >
-              DELETE A CHANNEL [HOST]
+              DELETE A CHANNEL
             </button>
           </Row>
           <Row>
