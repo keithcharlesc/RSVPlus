@@ -277,6 +277,14 @@ export default function Channels() {
     return userList;
   }
 
+  function displayPendingList(arr) {
+    if (arr.length == 0) {
+      return " None!";
+    }
+    const userList = arr.map((email, index) => <li key={index}>{email}</li>);
+    return userList;
+  }
+
   //------------------------------------------*** MAIN:[Agree to Sync Implementation] ***------------------------------------------//
   async function handleAgreeToSync(channel) {
     //Check if user is under responded list already
@@ -455,10 +463,15 @@ export default function Channels() {
         let newCompressedTimeArr = simplifyTimeBlocks(pushedTimeForDisplay);
         //console.log(newCompressedTimeArr);
 
-        latestUpdatedTotalOptimalDates[dateIndex] =
+        if (newCompressedTimeArr.length > 0) {
+          console.log(latestUpdatedTotalOptimalDates[dateIndex]);
+          latestUpdatedTotalOptimalDates[dateIndex] =
           latestUpdatedTotalOptimalDates[dateIndex].concat(
             newCompressedTimeArr.join(", ")
           );
+          } else {
+            latestUpdatedTotalOptimalDates[dateIndex] =  latestUpdatedTotalOptimalDates[dateIndex].concat("No timeslots found!")
+          }
       }
       //Push update after getting all the arrays
       db.collection("channelsCreatedByUser")
@@ -713,18 +726,16 @@ async function handleSubmitTwo(e) {
                                 : "N/A"}
                             </Card.Text>
                             <Card.Text>
-                              Start Date:{" "}
+                              Date Range:{" "}
                               <Badge pill variant="dark">
                                 {" "}
                                 {channel.start_date}
                               </Badge>
-                              {/*console.log(event.start.date)*/}
-                            </Card.Text>
-                            <Card.Text>
-                              End Date:{" "}
+                              {"  "}to{"  "}
                               <Badge pill variant="dark">
                                 {channel.end_date}
                               </Badge>
+                              {/*console.log(event.start.date)*/}
                             </Card.Text>
                             <Card.Text>
                               Timeslots Range:{" "}
@@ -753,7 +764,7 @@ async function handleSubmitTwo(e) {
                               {displayUsersList(channel.respondedEmails)}
                             </Card.Text>
                             <Card.Text>
-                              Pending:{displayUsersList(channel.pendingEmails)}
+                              Pending:{displayPendingList(channel.pendingEmails)}
                             </Card.Text>
                           </Col>
                         </Row>
@@ -767,15 +778,19 @@ async function handleSubmitTwo(e) {
                         <div className="mt-2 float-right">
                         <Row className = "float-right">
                           <Card.Text className="font-italic">
+                           <small>
                            Channel ID: {" "}
                             {channel.documentID}
+                            </small>
                           </Card.Text>
                         </Row>
                         <br></br>
                           <Row className = "float-right">
                           <Card.Text className="font-italic">
+                          <small>
                            Host: {" "}
                             {channel.hostEmail}
+                            </small>
                           </Card.Text>
                         </Row>              
                         </div>    
