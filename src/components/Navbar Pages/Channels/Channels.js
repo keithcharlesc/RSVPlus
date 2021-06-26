@@ -49,12 +49,16 @@ export default function Channels() {
   const nameRef = useRef();
   const descriptionRef = useRef();
   const locationRef = useRef();
+  const channelIDRef = useRef();
 
   const db = firebase.firestore();
   //console.log(db)
   const [loading, setLoader] = useState(false);
+  const [loadingTwo, setLoaderTwo] = useState(false);
   const [error, setError] = useState("");
+  const [errorTwo, setErrorTwo] = useState("");
   const [success, setSuccess] = useState("");
+  const [successTwo, setSuccessTwo] = useState("");
   const hostName = firebase.auth().currentUser?.displayName;
   const currentUserEmail = firebase.auth().currentUser?.email;
 
@@ -171,6 +175,7 @@ export default function Channels() {
       //.collection("channels")
       .add({
         host: hostName, //User who created Channel
+        hostEmail: currentUserEmail,
         name: nameRef.current.value, //Name of Event
         description: descriptionRef.current.value, //Description of Event
         location: locationRef.current.value, //Location of Event
@@ -243,6 +248,7 @@ export default function Channels() {
   //-------------------------------------------//
 
   const [buttonPopup, setButtonPopup] = useState(false);
+  const [buttonPopupTwo, setButtonPopupTwo] = useState(false);
 
   //-------------------------------------------//
   const [channels, setChannels] = useState([]);
@@ -593,11 +599,63 @@ export default function Channels() {
       </div>
     );
   }
+  //*-----------------------Function for Delete Channel Pop up----*/
+
+async function handleSubmitTwo(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    setLoaderTwo(true);
+    setErrorTwo("");
+    setSuccessTwo("");
+       let channelID = channelIDRef.current.value;
+       let hostEmail;
+
+    await db
+        .collection("channelsCreatedByUser")
+        .doc(channelID)
+        .get()
+        .then((doc) => {
+           if (doc.exists) {
+            hostEmail = doc.data().hostEmail;
+           } else {
+            hostEmail = "null";
+          }
+        });
+        //console.log(channelID);
+        //console.log(hostEmail);
+        if (hostEmail === "null") {
+          setErrorTwo("Channel does not exist!");
+          setLoaderTwo(false);
+          return;
+        } else if (currentUserEmail === hostEmail) {
+          await db
+    .collection("channelsCreatedByUser")
+    .doc(channelID)
+    .collection("busyDatesWithTimeBlocks")
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.docs.forEach((snapshot) => {
+        snapshot.ref.delete();
+      });
+    });
+           await db.collection("channelsCreatedByUser").doc(channelID).delete();
+           setSuccessTwo("Channel successfully deleted!");
+           setLoaderTwo(false);
+           return;
+        } else {
+          setErrorTwo("Failed to delete channel, you are not the host!");
+          setLoaderTwo(false);
+          return;
+        }
+   
+}
+  //*-------------------------------------------------------------------------------------------*/
+
 
   return (
     <div>
       <NavigationBar />
-      <div className="p-3 mb-2 bg-dark text-white">
+      <div className="p-3 mb-2 bg-dark text-white" style={{ minHeight: "100vh" }}>
         <h2 className="page-header text-center mb-4">CHANNELS</h2>
         <Container fluid>
           <Row className="d-flex align-items-center justify-content-center mb-4">
@@ -608,18 +666,24 @@ export default function Channels() {
               onClick={handleSecondClick}
               disabled={loading}
             >
-              <span className="button__text">FETCH LATEST</span>
+              <span className="button__text">FETCH LATEST DATA</span>
+            </button>
+            <button
+              className="d-flex align-items-center justify-content-center fetch-events-button mr-4"
+              style={{ width: 250, height: 30 }}
+              onClick={() => setButtonPopup(true)}
+            >
+              CREATE A CHANNEL!
             </button>
             <button
               className="d-flex align-items-center justify-content-center fetch-events-button"
               style={{ width: 250, height: 30 }}
-              onClick={() => setButtonPopup(true)}
+              onClick={() => setButtonPopupTwo(true)}
             >
-              CREATE AN EVENT!
+              DELETE A CHANNEL!
             </button>
           </Row>
           <Row>
-            <Container style={{ minHeight: "100vh" }}>
               {channels.map((channel, index) => (
                 //Rendered Channels
                 <div
@@ -700,24 +764,44 @@ export default function Channels() {
                             {displayUsersList(channel.decidedOutcome)}
                           </Card.Text>
                         </Row>
+                        <div className="mt-2 float-right">
+                        <Row className = "float-right">
+                          <Card.Text className="font-italic">
+                           Channel ID: {" "}
+                            {channel.documentID}
+                          </Card.Text>
+                        </Row>
+                        <br></br>
+                          <Row className = "float-right">
+                          <Card.Text className="font-italic">
+                           Host: {" "}
+                            {channel.hostEmail}
+                          </Card.Text>
+                        </Row>              
+                        </div>    
                       </div>
                     </Card.Body>
                   </Card>
                 </div>
                 //End of Rendered Channels
               ))}
+   
+          </Row>
+        </Container>
+      </div>
+
 
               {/*Pop up */}
               <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
                 <Card.Body>
-                  <h3 className="text-center mb-4">
+                  <h3 className="text-center mb-4 text-white">
                     Create a channel for your event!
                   </h3>
                   {success && <Alert variant="success">{success}</Alert>}
                   {error && <Alert variant="danger">{error}</Alert>}
                   <form className="text-white" onSubmit={handleSubmit}>
                     <Form.Group id="name">
-                      <Form.Label>Name of event</Form.Label>
+                      <Form.Label>Name of Event</Form.Label>
                       <Form.Control
                         required
                         type="name"
@@ -727,7 +811,7 @@ export default function Channels() {
                     </Form.Group>
                     <br></br>
                     <Form.Group id="description">
-                      <Form.Label>Description of event</Form.Label>
+                      <Form.Label>Description of Event</Form.Label>
                       <Form.Control
                         required
                         type="description"
@@ -737,7 +821,7 @@ export default function Channels() {
                     </Form.Group>
                     <br></br>
                     <Form.Group id="location">
-                      <Form.Label>Location of event</Form.Label>
+                      <Form.Label>Location of Event</Form.Label>
                       <Form.Control
                         required
                         type="location"
@@ -816,10 +900,40 @@ export default function Channels() {
                 </Card.Body>
               </Popup>
               {/*End of Pop up */}
-            </Container>
-          </Row>
-        </Container>
-      </div>
+
+              {/*Start of Pop up Two*/}
+              <Popup trigger={buttonPopupTwo} setTrigger={setButtonPopupTwo}>
+                <Card.Body>
+                  <h3 className="text-center mb-4 text-white">
+                    Delete a channel!
+                  </h3>
+                  {successTwo && <Alert variant="success">{successTwo}</Alert>}
+                  {errorTwo && <Alert variant="danger">{errorTwo}</Alert>}
+                  <form className="text-white" onSubmit={handleSubmitTwo}>
+                    <Form.Group id="channelID">
+                      <Form.Label>Channel ID</Form.Label>
+                      <Form.Control
+                        required
+                        type="channelID"
+                        ref={channelIDRef}
+                      />
+                    </Form.Group>
+                   
+                    <br></br>
+                    <Button
+                      variant="danger"
+                      disabled={loadingTwo}
+                      className="w-100"
+                      type="submit"
+                    >
+                      Delete channel
+                    </Button>
+                  </form>
+                </Card.Body>
+              </Popup>
+              {/*End of Pop up Two*/}
+
+
     </div>
   );
 }
