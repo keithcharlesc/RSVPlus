@@ -16,6 +16,8 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
       });
     });
 
+    await db.collection("busyDates").doc(currentUserEmail).delete();
+
   //For User Perspective
   /*  
     1. Takes in the entire collection of events
