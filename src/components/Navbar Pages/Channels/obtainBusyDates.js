@@ -16,7 +16,7 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
       });
     });
 
-    await db.collection("busyDates").doc(currentUserEmail).delete();
+  await db.collection("busyDates").doc(currentUserEmail).delete();
 
   //For User Perspective
   /*  
@@ -136,7 +136,7 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
 
     await updateBlocks();
   }
-  console.log("Done fetching latest data!")
+  console.log("Done fetching latest data!");
 }
 
 //Function to initialize documents should those dates and their respective blocks not exist.
@@ -400,11 +400,12 @@ function dateRange(startDate, endDate, steps = 1) {
 
   //Converts UTC into DD/MM/YYYY then YYYY-MM-DD (To match Google Cal Format)
   for (var i = 0; i < dateArray.length; i++) {
-    dateArray[i] = dateArray[i]
+    /*dateArray[i] = dateArray[i]
       .toLocaleDateString()
       .split("/")
       .reverse()
-      .join("-");
+      .join("-");*/
+    dateArray[i] = dateArray[i].toLocaleDateString("en-CA");
   }
 
   return dateArray;
