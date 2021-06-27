@@ -75,9 +75,8 @@ export default function Channels() {
   //const currentUserEmail = firebase.auth().currentUser?.email;
   //const db = firebase.firestore();
 
-  const handleSecondClick = () => {
+  async function handleSecondClick(channel) {
     setLoader(true);
-
     const btn = document.querySelector(".button");
     btn.classList.add("button--loading");
 
@@ -85,10 +84,11 @@ export default function Channels() {
       gapi.client.calendar.events
         .list({
           calendarId: "primary",
-          timeMin: new Date().toISOString(),
+          timeMin: channel.start_date + "T00:00:00+08:00",
+          timeMax: channel.end_date + "T23:59:00+08:00", //might need to one day here
           showDeleted: false,
           singleEvents: true,
-          maxResults: 30,
+          maxResults: 100,
           orderBy: "startTime",
         })
         .then((response) => {
@@ -99,12 +99,11 @@ export default function Channels() {
           return Promise.resolve(
             obtainBusyDates(events, db, currentUserEmail)
           ).then(() => {
-            setLoader(false);
-            btn.classList.remove("button--loading");
+            handleAgreeToSync(channel, btn);
           });
         });
     });
-  };
+  }
   /*---------------------------------------------------*/
 
   //----------------- Pop up submission -----------------//
@@ -292,7 +291,7 @@ export default function Channels() {
   }
 
   //------------------------------------------*** MAIN:[Agree to Sync Implementation] ***------------------------------------------//
-  async function handleAgreeToSync(channel) {
+  async function handleAgreeToSync(channel, btn) {
     //Check if user is under responded list already
     const respondedEmails = [...channel.respondedEmails]; //Responded Emails Array
     const userHasResponded = respondedEmails.includes(currentUserEmail);
@@ -332,10 +331,10 @@ export default function Channels() {
         .get()
         .then((doc) => {
           //console.log(doc.data().busyHours);
-          //console.log("Channel Hours for " + date);
+          console.log("Channel Hours for " + date);
           channelHoursForThatDate = doc.data().busyHours;
         });
-      //console.log(channelHoursForThatDate);
+      console.log(channelHoursForThatDate);
 
       //Retrieves the busyHours of that Date Document of that USER
       await db
@@ -346,14 +345,16 @@ export default function Channels() {
         .get()
         .then((doc) => {
           if (doc.exists) {
-            //console.log("UserBusyHours for " + date);
+            console.log("UserBusyHours for " + date);
             userBusyHoursForThatDate = doc.data().hours;
           } else {
-            //console.log("User don't have busy hours for that date, giving blank array instead: ");
+            console.log(
+              "User don't have busy hours for that date, giving blank array instead: "
+            );
             userBusyHoursForThatDate = new Array(24).fill(0);
           }
         });
-      //console.log(userBusyHoursForThatDate);
+      console.log(userBusyHoursForThatDate);
 
       //Checks if for every hour, if the user has something on (aka > 0),
       //if yes then +1 to the channel hour as well to indicate how many pax is busy
@@ -367,10 +368,10 @@ export default function Channels() {
         }
       }
 
-      //console.log("------For Date: " + date + "-------");
-      //console.log("New Updated channelHours is:");
-      //console.log(channelHoursForThatDate);
-      //console.log("-----------------------------------");
+      console.log("------For Date: " + date + "-------");
+      console.log("New Updated channelHours is:");
+      console.log(channelHoursForThatDate);
+      console.log("-----------------------------------");
 
       //updateBusyUsersForDates[index] += currentUserEmail + " "; //Append user email to the array element (busy)
       //Have to retrieve the array for it as well another await db if needed to be implemented.
@@ -392,6 +393,12 @@ export default function Channels() {
       pendingEmails: pendingEmails, //List of Pending Users
       //decidedOutcome: "None yet", //Outcome
     });
+
+    if (respondedEmails.length !== invitedEmails.length) {
+      setLoader(false);
+      btn.classList.remove("button--loading");
+      return;
+    }
 
     ///*
     //If everyone has fully responded, give the most optimal date and time below:
@@ -488,10 +495,33 @@ export default function Channels() {
         .update({
           decidedOutcome: latestUpdatedTotalOptimalDates, //Adding documentID to document (Purpose: to update)
         });
+      setLoader(false);
+      btn.classList.remove("button--loading");
     }
     //*/
   }
   // ------------------------------------------*** End of Sync Implementation ***---------------------------------------//
+
+  //------Combining fetch user data and updating channel data ----//
+  /*
+  async function syncCombined(channel) {
+    setLoader(true);
+    const btn = document.querySelector(".button");
+    btn.classList.add("button--loading");
+    /*
+    return Promise.resolve(handleSecondClick(channel)).then(() => {
+      return Promise.resolve(handleAgreeToSync(channel)).then(() => {
+        setLoader(false);
+        btn.classList.remove("button--loading");
+      });
+    });
+    handleSecondClick(channel);
+    handleAgreeToSync(channel);
+
+    setLoader(false);
+    btn.classList.remove("button--loading");
+  }
+  */
 
   //Convert 24H into 9AM
   function timeToConvert(time) {
@@ -682,7 +712,7 @@ export default function Channels() {
         <h2 className="page-header text-center mb-4">CHANNELS</h2>
         <Container fluid>
           <Row className="d-flex align-items-center justify-content-center mb-4">
-            <button
+            {/*<button
               type="button"
               className="d-flex align-items-center justify-content-center button mr-4"
               style={{ width: 250, height: 30 }}
@@ -690,7 +720,7 @@ export default function Channels() {
               disabled={loading}
             >
               <span className="button__text">FETCH LATEST DATA</span>
-            </button>
+            </button>*/}
             <button
               className="d-flex align-items-center justify-content-center fetch-events-button mr-4"
               style={{ width: 250, height: 30 }}
@@ -755,13 +785,17 @@ export default function Channels() {
                             </Badge>
                           </Card.Text>
                           <Card.Text>
-                            <Button
-                              variant="danger"
-                              style={{ width: 260, height: 40 }}
-                              onClick={() => handleAgreeToSync(channel)}
+                            <button
+                              type="button"
+                              className="button"
+                              style={{ width: 250, height: 30 }}
+                              disabled={loading}
+                              onClick={() => handleSecondClick(channel)}
                             >
-                              Agree to Sync Calendar Data
-                            </Button>
+                              <span className="button__text">
+                                Agree to Sync Calendar Data
+                              </span>
+                            </button>
                           </Card.Text>
                         </Col>
                         <Col xs={6} md={4}>
