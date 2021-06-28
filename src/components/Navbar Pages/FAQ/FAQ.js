@@ -10,7 +10,7 @@ export default function FAQ() {
       question: "What is RSVPlus?",
       answer:
         "RSVPlus is designed to bring convenience and accessibility to event planners." +
-        "It displays upcoming events and reminders, but more importantly it provides an optimal timeslot for group events.",
+        " It displays upcoming events and reminders, but more importantly it provides an optimal timeslot for group events.",
       open: false,
     },
     {
@@ -27,7 +27,7 @@ export default function FAQ() {
       answer:
         "A channel is created for every event that you organize. First, enter in details about your event like when it starts and when it ends, and who you want to invite." +
         " Once that's done, RSVPlus will automatically create a channel through which you will be able to monitor who has responded to your event." +
-        " The people whom you have invitied will be able to view the channel via their RSVPlus accounts, and can submit their calendar information to get a date and time that works for everyone.",
+        " The people whom you have invited will be able to view the channel via their RSVPlus accounts, and can submit their calendar information to get a date and time that works for everyone after everyone has responded.",
       open: false,
     },
     {
@@ -46,6 +46,14 @@ export default function FAQ() {
         " However, the link to your calendar cannot be accessed by anyone other than the person to whom it belongs to." +
         " This error message will appear if a person tries to use another person's calendar link: " +
         "'Events from one or more calendars could not be shown here because you do not have the permission to view them.'",
+      open: false,
+    },
+    {
+      question:
+        "Do RSVPlus store any of my Google Calendar events' private information?",
+      answer:
+        "Nope. Every time you sync your data to a channel, it only looks for your Google Calendar events that fall within the date range of that channel. Only the needed dates and busy time slots of those dates are stored." +
+        " No other information such as event name or details are stored on our database. Solely the needed dates and timings! Furthermore, every time you sync to a new channel, your previous data (old dates and timings) will be cleared and gets updated with the new data for the new date range!", 
       open: false,
     },
   ]);
