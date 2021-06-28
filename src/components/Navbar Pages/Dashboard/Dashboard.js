@@ -254,7 +254,7 @@ export default function Dashboard() {
                               Figma
                             </a>
                             <a
-                              href="https://drive.google.com/file/d/1adjMXfSPa8ahQ9fhJG5qqSOus2mWjeP3/view?usp=sharing"
+                              href="https://drive.google.com/file/d/1iSB9UaBqE0AyVJVUmLtc2BbF1cqWHY7f/view?usp=sharing"
                               target="_blank"
                               rel="noreferrer"
                             >
