@@ -331,10 +331,10 @@ export default function Channels() {
         .get()
         .then((doc) => {
           //console.log(doc.data().busyHours);
-          console.log("Channel Hours for " + date);
+          //console.log("Channel Hours for " + date);
           channelHoursForThatDate = doc.data().busyHours;
         });
-      console.log(channelHoursForThatDate);
+      //console.log(channelHoursForThatDate);
 
       //Retrieves the busyHours of that Date Document of that USER
       await db
@@ -345,16 +345,14 @@ export default function Channels() {
         .get()
         .then((doc) => {
           if (doc.exists) {
-            console.log("UserBusyHours for " + date);
+            //console.log("UserBusyHours for " + date);
             userBusyHoursForThatDate = doc.data().hours;
           } else {
-            console.log(
-              "User don't have busy hours for that date, giving blank array instead: "
-            );
+            //console.log("User don't have busy hours for that date, giving blank array instead: ");
             userBusyHoursForThatDate = new Array(24).fill(0);
           }
         });
-      console.log(userBusyHoursForThatDate);
+      //console.log(userBusyHoursForThatDate);
 
       //Checks if for every hour, if the user has something on (aka > 0),
       //if yes then +1 to the channel hour as well to indicate how many pax is busy
@@ -368,10 +366,10 @@ export default function Channels() {
         }
       }
 
-      console.log("------For Date: " + date + "-------");
-      console.log("New Updated channelHours is:");
-      console.log(channelHoursForThatDate);
-      console.log("-----------------------------------");
+      //console.log("------For Date: " + date + "-------");
+      //console.log("New Updated channelHours is:");
+      //console.log(channelHoursForThatDate);
+      //console.log("-----------------------------------");
 
       //updateBusyUsersForDates[index] += currentUserEmail + " "; //Append user email to the array element (busy)
       //Have to retrieve the array for it as well another await db if needed to be implemented.

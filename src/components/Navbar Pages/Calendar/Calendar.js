@@ -112,7 +112,7 @@ export default function Calendar() {
         setSuccess("Event successfully created!");
 
         request.execute((event) => {
-          console.log(event);
+          //console.log(event);
           window.open(event.htmlLink);
         });
       })

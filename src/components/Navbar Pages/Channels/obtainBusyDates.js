@@ -60,11 +60,11 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
 
     if ((rawStartDate.length === 10) & (rawEndDate.length === 10)) {
       dateRangeForCurrentEvent.pop();
-      console.log("Popped : " + rawEndDate);
+      //console.log("Popped : " + rawEndDate);
       rawEndDate =
         dateRangeForCurrentEvent[dateRangeForCurrentEvent.length - 1];
       endDate = dateRangeForCurrentEvent[dateRangeForCurrentEvent.length - 1];
-      console.log("New: " + endDate);
+      //console.log("New: " + endDate);
     }
 
     /*
@@ -128,7 +128,7 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
           await incrementDateInBetweenBlocks(datesRef, date);
         } else if (date === endDate) {
           //updates end date
-          console.log("Updating endDate of : " + endDate);
+          //console.log("Updating endDate of : " + endDate);
           await incrementEndDateBlocks(datesRef, endDate, rawEndDate);
         }
       }
@@ -147,9 +147,7 @@ async function initializeTimeBlocksForEachDate(datesRef, date) {
     .get()
     .then((doc) => {
       if (doc.exists) {
-        console.log(
-          "Document for that date exists already, no need for initializing"
-        );
+        //console.log("Document for that date exists already, no need for initializing");
         //console.log(date);
       } else {
         // doc.data() will be undefined in this case
@@ -281,7 +279,7 @@ async function incrementStartDateBlocks(datesRef, startDate, rawStartDate) {
         datesRef.collection("busyDatesWithTimeBlocks").doc(startDate).update({
           hours: updatedHours,
         });
-        console.log("updated start date!");
+        //console.log("updated start date!");
       } else {
         // doc.data() will be undefined in this case
         alert("Update failed. Please fetch again!");
@@ -311,7 +309,7 @@ async function incrementDateInBetweenBlocks(datesRef, date) {
         datesRef.collection("busyDatesWithTimeBlocks").doc(date).update({
           hours: updatedHours,
         });
-        console.log("updated dates in between start and end of range!");
+        //console.log("updated dates in between start and end of range!");
       } else {
         // doc.data() will be undefined in this case
         alert("Update failed. Please fetch again!");
@@ -365,7 +363,7 @@ async function incrementEndDateBlocks(datesRef, endDate, rawEndDate) {
           if (minutesForThatHour !== "00") {
             endDateHours = endDateHours + 1;
           }
-          console.log("Minutes: " + minutesForThatHour);
+          //console.log("Minutes: " + minutesForThatHour);
 
           for (var k = endDateHours - 1; k >= 0; k--) {
             updatedHours[k]++;
@@ -375,7 +373,7 @@ async function incrementEndDateBlocks(datesRef, endDate, rawEndDate) {
         datesRef.collection("busyDatesWithTimeBlocks").doc(endDate).update({
           hours: updatedHours,
         });
-        console.log("updated end date!");
+        //console.log("updated end date!");
       } else {
         // doc.data() will be undefined in this case
         alert("Update failed. Please fetch again!");
