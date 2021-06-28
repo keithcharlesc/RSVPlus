@@ -246,7 +246,7 @@ export default function Dashboard() {
                         <ul>
                           <li>
                             <a
-                              href="https://www.figma.com/file/GRiEbGtx1zu7emUTC9M2aK/RSVP-Milestone-2?node-id=0%3A1"
+                              href="https://www.figma.com/file/zI65CDPZoYCcvUK7Bw4GuZ/RSVPlus-Milestone-2?node-id=0%3A1"
                               target="_blank"
                               rel="noreferrer"
                               className="mr-2"
@@ -254,7 +254,7 @@ export default function Dashboard() {
                               Figma
                             </a>
                             <a
-                              href="https://drive.google.com/file/d/1WOiNfT6XtidInZEYaUMvzi29iuEna59L/view"
+                              href="https://drive.google.com/file/d/1adjMXfSPa8ahQ9fhJG5qqSOus2mWjeP3/view?usp=sharing"
                               target="_blank"
                               rel="noreferrer"
                             >
