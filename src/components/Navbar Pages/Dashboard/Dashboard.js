@@ -333,7 +333,9 @@ export default function Dashboard() {
                         </p>
                         <p className="mt-4">
                           Get started by clicking the "Display Upcoming Events"
-                          button you see above and explore the other tabs!
+                          button you see above if you have a Google Cal Event
+                          (later than the current time) and explore the other
+                          tabs!
                         </p>
                       </small>
                     </Card.Body>
