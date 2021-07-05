@@ -53,15 +53,28 @@ export default function Channels() {
   const descriptionRef = useRef();
   const locationRef = useRef();
   const channelIDRef = useRef();
+  //const channelIDForModifyRef = useRef();
+  const channelIDForJoinRef = useRef();
 
   const db = firebase.firestore();
   //console.log(db)
   const [loading, setLoader] = useState(false);
   const [loadingTwo, setLoaderTwo] = useState(false);
+  //const [loadingThree, setLoaderThree] = useState(false);
+  const [loadingFour, setLoaderFour] = useState(false); //Joining channel
   const [error, setError] = useState("");
   const [errorTwo, setErrorTwo] = useState("");
+  //const [errorThree, setErrorThree] = useState("");
+  const [errorFour, setErrorFour] = useState(""); // Joining a channel
   const [success, setSuccess] = useState("");
   const [successTwo, setSuccessTwo] = useState("");
+  //const [successThree, setSuccessThree] = useState("");
+  const [successFour, setSuccessFour] = useState(""); // Joining a channel
+  const [buttonPopup, setButtonPopup] = useState(false); //Creating a channel
+  const [buttonPopupTwo, setButtonPopupTwo] = useState(false); //Deleting a channel
+  //const [buttonPopupThree, setButtonPopupThree] = useState(false); //Modifying a channel
+  const [buttonPopupFour, setButtonPopupFour] = useState(false); //Joining a channel
+
   const hostName = firebase.auth().currentUser?.displayName;
   const currentUserEmail = firebase.auth().currentUser?.email;
 
@@ -106,7 +119,7 @@ export default function Channels() {
   }
   /*---------------------------------------------------*/
 
-  //----------------- Pop up submission -----------------//
+  //----------------- Pop up submission (CREATING AN EVENT)-----------------//
   async function handleSubmit(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -254,17 +267,14 @@ export default function Channels() {
         setLoader(false);
       });
   }
-  //End of Pop up submission
+  //End of Pop up submission for creating a channel
   //-------------------------------------------//
-
-  const [buttonPopup, setButtonPopup] = useState(false);
-  const [buttonPopupTwo, setButtonPopupTwo] = useState(false);
 
   //-------------------------------------------//
   const [channels, setChannels] = useState([]);
   const [loadingx, setLoading] = useState(false);
 
-  //---------------------Obtaining emailAddresses by form input fields---------------------//
+  //---------------------Obtaining emailAddresses by form input fields (Getting emails in an array from invite List)---------------------//
   function findAll() {
     const emailAddresses = [];
     var inputs = document.getElementsByName("emailAddress");
@@ -276,7 +286,7 @@ export default function Channels() {
     return emailAddresses;
   }
 
-  //---------------------Display Invited List---------------------//
+  //---------------------Display Invited List (For the emails)---------------------//
   function displayUsersList(arr) {
     const userList = arr.map((email, index) => <li key={index}>{email}</li>);
     return userList;
@@ -500,28 +510,7 @@ export default function Channels() {
   }
   // ------------------------------------------*** End of Sync Implementation ***---------------------------------------//
 
-  //------Combining fetch user data and updating channel data ----//
-  /*
-  async function syncCombined(channel) {
-    setLoader(true);
-    const btn = document.querySelector(".button");
-    btn.classList.add("button--loading");
-    /*
-    return Promise.resolve(handleSecondClick(channel)).then(() => {
-      return Promise.resolve(handleAgreeToSync(channel)).then(() => {
-        setLoader(false);
-        btn.classList.remove("button--loading");
-      });
-    });
-    handleSecondClick(channel);
-    handleAgreeToSync(channel);
-
-    setLoader(false);
-    btn.classList.remove("button--loading");
-  }
-  */
-
-  //Convert 24H into 9AM
+  //------Function to Convert 24H into 9AM-----------------/
   function timeToConvert(time) {
     // Check correct time format and split into components
     time = time.toString().match(/^([01]\d|2[0-3])?$/) || [time];
@@ -546,6 +535,7 @@ export default function Channels() {
   }
   /*---------------------------------------------------*/
 
+  //----------Function to get the Simplified Outputs instead of 1H slots//
   function simplifyTimeBlocks(arr) {
     var index = 0;
     for (var k = 0; k < arr.length; k++) {
@@ -576,6 +566,7 @@ export default function Channels() {
     return arr;
   }
   /*---------------------------------------------------*/
+  //Function to validateEmails against database-----------//
   async function validateEmails(emailArr) {
     var arrayValues = [true, ""];
 
@@ -615,8 +606,9 @@ export default function Channels() {
 
   /*---------------------------------------------------*/
 
+  //*-----------------Display Channels useEffect Hook-----------
   useEffect(() => {
-    //------------------------REF SNAPSHOT----------------------//
+    //Ref snapshot
     const ref = firebase.firestore().collection("channelsCreatedByUser");
     const currentUserEmail = firebase.auth().currentUser?.email;
     //Load channels details REF SNAPSHOT
@@ -699,6 +691,59 @@ export default function Channels() {
     }
   }
   //*-------------------------------------------------------------------------------------------*/
+  //*-----------------------Function to JOIN Channel Pop up----*/
+
+  async function handleSubmitFour(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    setLoaderFour(true);
+    setErrorFour("");
+    setSuccessFour("");
+    let channelID = channelIDForJoinRef.current.value;
+    let invitedEmailsList = [];
+    let pendingEmailsList = [];
+    let respondedEmailsList = [];
+
+    await db
+      .collection("channelsCreatedByUser")
+      .doc(channelID)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          invitedEmailsList = doc.data().invitedEmails;
+          pendingEmailsList = doc.data().pendingEmails;
+          respondedEmailsList = doc.data().respondedEmails;
+          if (invitedEmailsList.indexOf(currentUserEmail) > -1) {
+            setErrorFour(
+              "Failed to join channel, you are already in the channel!"
+            );
+            setLoaderFour(false);
+            return;
+          } else if (respondedEmailsList.length === invitedEmailsList.length) {
+            setErrorFour(
+              "Failed to join channel, optimal time slots have already been determined!"
+            );
+            setLoaderFour(false);
+            return;
+          } else {
+            invitedEmailsList.push(currentUserEmail);
+            pendingEmailsList.push(currentUserEmail);
+            db.collection("channelsCreatedByUser").doc(channelID).update({
+              invitedEmails: invitedEmailsList, //List of Invited Users
+              pendingEmails: pendingEmailsList, //List of Pending Users
+            });
+            setSuccessFour("Successfully joined channel!");
+            setLoaderFour(false);
+            return;
+          }
+        } else {
+          setErrorFour("Channel does not exist!");
+          setLoaderFour(false);
+          return;
+        }
+      });
+  }
+  //*-------------------------------------------------------------------------------------------*/
 
   return (
     <div>
@@ -710,15 +755,6 @@ export default function Channels() {
         <h2 className="page-header text-center mb-4">CHANNELS</h2>
         <Container fluid>
           <Row className="d-flex align-items-center justify-content-center mb-4">
-            {/*<button
-              type="button"
-              className="d-flex align-items-center justify-content-center button mr-4"
-              style={{ width: 250, height: 30 }}
-              onClick={handleSecondClick}
-              disabled={loading}
-            >
-              <span className="button__text">FETCH LATEST DATA</span>
-            </button>*/}
             <button
               className="d-flex align-items-center justify-content-center fetch-events-button mr-4"
               style={{ width: 250, height: 30 }}
@@ -727,11 +763,18 @@ export default function Channels() {
               CREATE A CHANNEL
             </button>
             <button
-              className="d-flex align-items-center justify-content-center fetch-events-button"
+              className="d-flex align-items-center justify-content-center fetch-events-button mr-4"
               style={{ width: 250, height: 30 }}
               onClick={() => setButtonPopupTwo(true)}
             >
               DELETE A CHANNEL
+            </button>
+            <button
+              className="d-flex align-items-center justify-content-center fetch-events-button"
+              style={{ width: 250, height: 30 }}
+              onClick={() => setButtonPopupFour(true)}
+            >
+              JOIN A CHANNEL
             </button>
           </Row>
           <Row>
@@ -840,7 +883,7 @@ export default function Channels() {
         </Container>
       </div>
 
-      {/*Pop up */}
+      {/*Start of Pop up one - Creating a channel  */}
       <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
         <Card.Body>
           <h3 className="text-center mb-4 text-white">
@@ -954,7 +997,7 @@ export default function Channels() {
       </Popup>
       {/*End of Pop up */}
 
-      {/*Start of Pop up Two*/}
+      {/*Start of Pop up Two - Deleting a channel*/}
       <Popup trigger={buttonPopupTwo} setTrigger={setButtonPopupTwo}>
         <Card.Body>
           <h3 className="text-center mb-4 text-white">Delete a channel!</h3>
@@ -981,6 +1024,39 @@ export default function Channels() {
         </Card.Body>
       </Popup>
       {/*End of Pop up Two*/}
+
+      {/*Start of Pop up Four - Joining a channel*/}
+      <Popup trigger={buttonPopupFour} setTrigger={setButtonPopupFour}>
+        <Card.Body>
+          <h3 className="text-center mb-4 text-white">Join a channel!</h3>
+          {successFour && <Alert variant="success">{successFour}</Alert>}
+          {errorFour && <Alert variant="danger">{errorFour}</Alert>}
+          <form className="text-white" onSubmit={handleSubmitFour}>
+            <Form.Group id="channelID">
+              <Form.Label>Channel ID</Form.Label>
+              <Form.Control
+                required
+                type="channelID"
+                ref={channelIDForJoinRef}
+              />
+            </Form.Group>
+            <small>
+              Only works if you're not in that channel yet and if the optimal
+              time slots have not been determined for the channel yet.
+            </small>
+            <br></br>
+            <Button
+              variant="danger"
+              disabled={loadingFour}
+              className="w-100 mt-3"
+              type="submit"
+            >
+              Join channel
+            </Button>
+          </form>
+        </Card.Body>
+      </Popup>
+      {/*End of Pop up Four*/}
     </div>
   );
 }
