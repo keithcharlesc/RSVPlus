@@ -49,30 +49,31 @@ gapi.load("client:auth2", () => {
 /*---------------*/
 
 export default function Channels() {
-  const nameRef = useRef();
-  const descriptionRef = useRef();
-  const locationRef = useRef();
-  const channelIDRef = useRef();
-  //const channelIDForModifyRef = useRef();
-  const channelIDForJoinRef = useRef();
+  const nameRef = useRef(); //Used for CREATE channel
+  const descriptionRef = useRef(); //Used for CREATE channel
+  const locationRef = useRef(); //Used for CREATE channel
+  const channelIDRef = useRef(); //Used for CREATE channel
+  const channelIDForModifyRef = useRef(); //Used for MODIFY invite list
+  const emailForModifyRef = useRef(); //Used for MODIFY invite list
+  const channelIDForJoinRef = useRef(); //Used for JOIN channel
 
   const db = firebase.firestore();
   //console.log(db)
   const [loading, setLoader] = useState(false);
   const [loadingTwo, setLoaderTwo] = useState(false);
-  //const [loadingThree, setLoaderThree] = useState(false);
+  const [loadingThree, setLoaderThree] = useState(false); //Modify
   const [loadingFour, setLoaderFour] = useState(false); //Joining channel
   const [error, setError] = useState("");
   const [errorTwo, setErrorTwo] = useState("");
-  //const [errorThree, setErrorThree] = useState("");
+  const [errorThree, setErrorThree] = useState(""); //Modify
   const [errorFour, setErrorFour] = useState(""); // Joining a channel
   const [success, setSuccess] = useState("");
   const [successTwo, setSuccessTwo] = useState("");
-  //const [successThree, setSuccessThree] = useState("");
+  const [successThree, setSuccessThree] = useState(""); //Modify
   const [successFour, setSuccessFour] = useState(""); // Joining a channel
   const [buttonPopup, setButtonPopup] = useState(false); //Creating a channel
   const [buttonPopupTwo, setButtonPopupTwo] = useState(false); //Deleting a channel
-  //const [buttonPopupThree, setButtonPopupThree] = useState(false); //Modifying a channel
+  const [buttonPopupThree, setButtonPopupThree] = useState(false); //Modifying a channel
   const [buttonPopupFour, setButtonPopupFour] = useState(false); //Joining a channel
 
   const hostName = firebase.auth().currentUser?.displayName;
@@ -744,6 +745,105 @@ export default function Channels() {
       });
   }
   //*-------------------------------------------------------------------------------------------*/
+  //*-----------------------Function to MODIFY (Handle Adding Invites) Channel Pop up----*/
+
+  async function handleAddingOfInvitee(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    setLoaderThree(true);
+    setErrorThree("");
+    setSuccessThree("");
+    let channelID = channelIDForModifyRef.current.value;
+    let userEmail = emailForModifyRef.current.value;
+    let invitedEmailsList = [];
+    let pendingEmailsList = [];
+    let respondedEmailsList = [];
+    let hostEmail;
+
+    //Validation of email
+    let emails = [userEmail];
+    let validation = [true, ""];
+    await validateEmails(emails).then((result) => {
+      //console.log("value from function:" + x);
+      //console.log(result);
+      validation[0] = result[0];
+      validation[1] = result[1];
+    });
+
+    if (validation[0] === false) {
+      setErrorThree(validation[1] + " is not a user of RSVP+!");
+      setLoaderThree(false);
+      return;
+    }
+    //End of validation
+
+    if (userEmail === currentUserEmail) {
+      setErrorThree("You can't add yourself!");
+      setLoaderThree(false);
+      return;
+    }
+
+    await db
+      .collection("channelsCreatedByUser")
+      .doc(channelID)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          hostEmail = doc.data().hostEmail;
+        } else {
+          hostEmail = "null";
+        }
+      });
+
+    if (hostEmail === currentUserEmail) {
+      await db
+        .collection("channelsCreatedByUser")
+        .doc(channelID)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            invitedEmailsList = doc.data().invitedEmails;
+            pendingEmailsList = doc.data().pendingEmails;
+            respondedEmailsList = doc.data().respondedEmails;
+            if (invitedEmailsList.indexOf(userEmail) > -1) {
+              setErrorThree(
+                "Failed to add user, user is already in the channel!"
+              );
+              setLoaderThree(false);
+              return;
+            } else if (
+              respondedEmailsList.length === invitedEmailsList.length
+            ) {
+              setErrorThree(
+                "Failed to add user, optimal time slots have already been determined for the channel!"
+              );
+              setLoaderThree(false);
+              return;
+            } else {
+              invitedEmailsList.push(userEmail);
+              pendingEmailsList.push(userEmail);
+              db.collection("channelsCreatedByUser").doc(channelID).update({
+                invitedEmails: invitedEmailsList, //List of Invited Users
+                pendingEmails: pendingEmailsList, //List of Pending Users
+              });
+              setSuccessThree("Successfully added user to channel!");
+              setLoaderThree(false);
+              return;
+            }
+          } else {
+            setErrorThree("Channel does not exist!");
+            setLoaderThree(false);
+            return;
+          }
+        });
+    } else {
+      setErrorThree("You are not host of the channel!");
+      setLoaderThree(false);
+      return;
+    }
+  }
+  //*-------------------------------------------------------------------------------------------*/
+ 
 
   return (
     <div>
@@ -768,6 +868,13 @@ export default function Channels() {
               onClick={() => setButtonPopupTwo(true)}
             >
               DELETE A CHANNEL
+            </button>
+            <button
+              className="d-flex align-items-center justify-content-center fetch-events-button mr-4"
+              style={{ width: 250, height: 30 }}
+              onClick={() => setButtonPopupThree(true)}
+            >
+              MODIFY INVITES
             </button>
             <button
               className="d-flex align-items-center justify-content-center fetch-events-button"
@@ -1024,6 +1131,42 @@ export default function Channels() {
         </Card.Body>
       </Popup>
       {/*End of Pop up Two*/}
+
+      {/*Start of Pop up Three - Modifying a channel*/}
+      <Popup trigger={buttonPopupThree} setTrigger={setButtonPopupThree}>
+        <Card.Body>
+          <h3 className="text-center mb-4 text-white">
+            Modify Invites (Add)
+          </h3>
+          {successThree && <Alert variant="success">{successThree}</Alert>}
+          {errorThree && <Alert variant="danger">{errorThree}</Alert>}
+          <form className="text-white">
+            <Form.Group id="channelID">
+              <Form.Label>Channel ID</Form.Label>
+              <Form.Control
+                required
+                type="channelID"
+                ref={channelIDForModifyRef}
+              />
+            </Form.Group>
+            <small>Only works if you're host of that channel.</small>
+            <br></br>
+            <Form.Group id="user">
+              <Form.Label className="mt-3">User's Email</Form.Label>
+              <Form.Control required type="email" ref={emailForModifyRef} />
+            </Form.Group>
+                <Button
+                  variant="danger"
+                  disabled={loadingThree}
+                  className="w-100 mt-3"
+                  onClick={handleAddingOfInvitee}
+                >
+                  Add User
+                </Button>
+          </form>
+        </Card.Body>
+      </Popup>
+      {/*End of Pop up Three*/}
 
       {/*Start of Pop up Four - Joining a channel*/}
       <Popup trigger={buttonPopupFour} setTrigger={setButtonPopupFour}>
