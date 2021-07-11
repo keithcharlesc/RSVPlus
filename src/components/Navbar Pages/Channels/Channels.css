@@ -93,3 +93,18 @@
 .create-channel-text {
   color: #ffe600 !important;
 }
+
+.leave-button {
+  font-family: "Roboto", sans-serif !important;
+  background-color: rgba(128, 33, 33, 0.616) !important;
+  border-radius: 12px !important;
+  border: none !important;
+  color: white;
+}
+
+.leave-button:active {
+  transform: scale(0.98);
+  /* Scaling button to 0.98 to its original size */
+  box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+  /* Lowering the shadow */
+}

@@ -18,8 +18,9 @@ import dateRange from "./dateRange";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import obtainBusyDates from "./obtainBusyDates";
+import findOptimalSlots from "./findOptimalSlots";
 
-/*----- GAPI------*/
+/*----------------------- GAPI INITIALIZAITON----------------------*/
 var gapi = window.gapi;
 var CLIENT_ID =
   "1011248109211-umpu5g48dj5p4hqlnhvuvl6f4c9qdhn3.apps.googleusercontent.com";
@@ -46,49 +47,54 @@ gapi.load("client:auth2", () => {
     //console.log("loaded calendar v3, entry!")
   );
 });
-/*---------------*/
-
+/*---------------------------------------------------------------------*/
 export default function Channels() {
+
+  const db = firebase.firestore();
+  const hostName = firebase.auth().currentUser?.displayName;
+  const currentUserEmail = firebase.auth().currentUser?.email;
+
+  //Create Channel [HOST]
   const nameRef = useRef(); //Used for CREATE channel
   const descriptionRef = useRef(); //Used for CREATE channel
   const locationRef = useRef(); //Used for CREATE channel
   const channelIDRef = useRef(); //Used for CREATE channel
-  const channelIDForModifyRef = useRef(); //Used for MODIFY invite list
-  const emailForModifyRef = useRef(); //Used for MODIFY invite list
-  const channelIDForJoinRef = useRef(); //Used for JOIN channel
-
-  const db = firebase.firestore();
-  //console.log(db)
-  const [loading, setLoader] = useState(false);
-  const [loadingTwo, setLoaderTwo] = useState(false);
-  const [loadingThree, setLoaderThree] = useState(false); //Modify
-  const [loadingFour, setLoaderFour] = useState(false); //Joining channel
-  const [error, setError] = useState("");
-  const [errorTwo, setErrorTwo] = useState("");
-  const [errorThree, setErrorThree] = useState(""); //Modify
-  const [errorFour, setErrorFour] = useState(""); // Joining a channel
-  const [success, setSuccess] = useState("");
-  const [successTwo, setSuccessTwo] = useState("");
-  const [successThree, setSuccessThree] = useState(""); //Modify
-  const [successFour, setSuccessFour] = useState(""); // Joining a channel
+  const [loading, setLoader] = useState(false); //Creating
+  const [error, setError] = useState(""); //Creating
+  const [success, setSuccess] = useState(""); //Creating 
   const [buttonPopup, setButtonPopup] = useState(false); //Creating a channel
-  const [buttonPopupTwo, setButtonPopupTwo] = useState(false); //Deleting a channel
-  const [buttonPopupThree, setButtonPopupThree] = useState(false); //Modifying a channel
-  const [buttonPopupFour, setButtonPopupFour] = useState(false); //Joining a channel
 
-  const hostName = firebase.auth().currentUser?.displayName;
-  const currentUserEmail = firebase.auth().currentUser?.email;
-
+  //Date Picker for Create Channel
   const [dateRangeForPicker, setDateRangeForPicker] = useState([null, null]);
   const [startDate, endDate] = dateRangeForPicker;
   const [startOfTime, setStartOfTime] = useState(new Date());
   const [endOfTime, setEndOfTime] = useState(new Date());
 
-  /* -------------- GET EVENTS (BUSY DATES AND TIMINGS) ------------*/
-  //const [loading, setLoader] = useState(false);
-  //const currentUserEmail = firebase.auth().currentUser?.email;
-  //const db = firebase.firestore();
+  //Delete channel [HOST]
+  const [loadingTwo, setLoaderTwo] = useState(false); //Deleting
+  const [errorTwo, setErrorTwo] = useState(""); //Deleting
+  const [successTwo, setSuccessTwo] = useState(""); //Deleting
+  const [buttonPopupTwo, setButtonPopupTwo] = useState(false); //Deleting a channel
 
+  //Add/Remove User to a Channel [HOST]
+  const channelIDForModifyRef = useRef(); //Used for MODIFY invite list
+  const emailForModifyRef = useRef(); //Used for MODIFY invite list
+  const [loadingThree, setLoaderThree] = useState(false); //Modify (Add or Removal)
+  const [errorThree, setErrorThree] = useState(""); //Modify (Add or Removal)
+  const [successThree, setSuccessThree] = useState(""); //Modify
+  const [buttonPopupThree, setButtonPopupThree] = useState(false); //Modifying a channel
+
+  //Join a Channel [USER]
+  const channelIDForJoinRef = useRef(); //Used for JOIN channel
+  const [loadingFour, setLoaderFour] = useState(false); //Joining channel
+  const [errorFour, setErrorFour] = useState(""); // Joining a channel
+  const [successFour, setSuccessFour] = useState(""); // Joining a channel
+  //const [buttonPopupFour, setButtonPopupFour] = useState(false); //Joining a channel
+
+  //Leaving a Channel [USER]
+    const [loadingFive, setLoaderFive] = useState(false); //Leaving channel
+
+  /* -------------- GET EVENTS (BUSY DATES AND TIMINGS) ------------*/
   async function handleSecondClick(channel) {
     setLoader(true);
     const btn = document.querySelector(".button");
@@ -107,9 +113,6 @@ export default function Channels() {
         })
         .then((response) => {
           const events = response.result.items;
-          //console.log("Google Events Fetched: ", events);
-          //let busyDates = [];
-          //Prevents Button Spamming
           return Promise.resolve(
             obtainBusyDates(events, db, currentUserEmail)
           ).then(() => {
@@ -118,49 +121,40 @@ export default function Channels() {
         });
     });
   }
-  /*---------------------------------------------------*/
+  /*----------------------------------------------------------------------*/
 
-  //----------------- Pop up submission (CREATING AN EVENT)-----------------//
+  //-------------------------------------------- (CREATING AN EVENT FUNCTION)-------------------------//
   async function handleSubmit(e) {
     e.preventDefault();
     e.stopPropagation();
     setLoader(true);
     setError("");
     setSuccess("");
+
+    //Array of Emails with Host Email appended to Invite List Array from Form
     const emails = [currentUserEmail, ...findAll()];
     //console.log(emails);
+
+    //Handles the validation of Emails in the Array of Emails
     let validation = [true, ""];
     await validateEmails(emails).then((result) => {
-      //console.log("value from function:" + x);
-      //console.log(result);
       validation[0] = result[0];
       validation[1] = result[1];
     });
-    /* let wrongEmail;
-    await getWrongEmail(emails).then((doesNotExist) => {
-      wrongEmail = doesNotExist;
-    });*/
     //console.log("validation:" + validation);
     if (validation[0] === false) {
       setError(validation[1] + " is not a user of RSVP+!");
       setLoader(false);
       return;
     }
-    //console.log("emails validated");
 
-    //console.log("Start Date: ");
-    //console.log(startDate.toLocaleDateString("en-CA"));
-    //console.log("End Date: ");
-    //console.log(endDate.toLocaleDateString("en-CA"));
-
+    //Get Date Range (In proper format from UTC to YYYY-MM-DD)
     const dates = dateRange(
       startDate.toLocaleDateString("en-CA"),
       endDate.toLocaleDateString("en-CA")
     );
 
-    //console.log(dates);
-
-    //Checks whether input for End Time Slot (Range) is later than Start Time Slot
+    //-----Checks whether input for End Time Slot (Range) is later than Start Time Slot-------//
     let startDateHoursAndMinutes = startOfTime.toLocaleTimeString("it-IT");
     let endDateHoursAndMinutes = endOfTime.toLocaleTimeString("it-IT");
 
@@ -192,11 +186,8 @@ export default function Channels() {
       setLoader(false);
       return;
     }
-    //
-
+    //---------------------------------------//
     db.collection("channelsCreatedByUser")
-      //.doc(currentUserEmail)
-      //.collection("channels")
       .add({
         host: hostName, //User who created Channel
         hostEmail: currentUserEmail,
@@ -234,6 +225,7 @@ export default function Channels() {
 
         for (var i = 0; i < dates.length; i++) {
           let date = dates[i];
+          //Appends date to the front of each date for output later on
           let optimalDateString = date + ": ";
 
           //Creates dates documents with the busy hours blocks for those date range of the channel created
@@ -250,16 +242,17 @@ export default function Channels() {
           totalOptimalDateStrings[i] = optimalDateString;
         }
 
+        //Adding documentID to document (Purpose: to update)
         db.collection("channelsCreatedByUser")
           //.doc(currentUserEmail)
           // .collection("channels")
           .doc(docRef.id)
           .update({
-            decidedOutcome: totalOptimalDateStrings, //Adding documentID to document (Purpose: to update)
+            decidedOutcome: totalOptimalDateStrings, 
           });
 
         setLoader(false);
-        setSuccess("Your channel has been created");
+        setSuccess("Your channel has been created!");
         //console.log("Channel requisite information has been added to firestore");
       })
       .catch((error) => {
@@ -268,8 +261,7 @@ export default function Channels() {
         setLoader(false);
       });
   }
-  //End of Pop up submission for creating a channel
-  //-------------------------------------------//
+  //--------------------  END OF CREATING EVENT    --------------------//
 
   //-------------------------------------------//
   const [channels, setChannels] = useState([]);
@@ -288,11 +280,13 @@ export default function Channels() {
   }
 
   //---------------------Display Invited List (For the emails)---------------------//
+  //For invited and responded list
   function displayUsersList(arr) {
     const userList = arr.map((email, index) => <li key={index}>{email}</li>);
     return userList;
   }
 
+ //For pending list
   function displayPendingList(arr) {
     if (arr.length === 0) {
       return " None!";
@@ -394,7 +388,7 @@ export default function Channels() {
           busyHours: channelHoursForThatDate,
         });
     }
-    //----------------End of For Loop Algo: to update Dates------------
+    //----------------End of For Loop Algo: to update Channel Dates------------
 
     db.collection("channelsCreatedByUser").doc(channel.documentID).update({
       invitedEmails: invitedEmails, //List of Invited Users
@@ -409,101 +403,9 @@ export default function Channels() {
       return;
     }
 
-    ///*
-    //If everyone has fully responded, give the most optimal date and time below:
-    let beginningIndex = parseInt(channel.startTimeToLookForIndex);
-    let endTime = parseInt(channel.endTimeToLookForIndex);
-
-    let timeToBePushed = [
-      "12AM - 1AM",
-      "1AM - 2AM",
-      "2AM - 3AM",
-      "3AM - 4AM",
-      "4AM - 5AM",
-      "5AM - 6AM",
-      "6AM - 7AM",
-      "7AM - 8AM",
-      "8AM - 9AM",
-      "9AM - 10AM",
-      "10AM - 11AM",
-      "11AM - 12PM",
-      "12PM - 1PM",
-      "1PM - 2PM",
-      "2PM - 3PM",
-      "3PM - 4PM",
-      "4PM - 5PM",
-      "5PM - 6PM",
-      "6PM - 7PM",
-      "7PM - 8PM",
-      "8PM - 9PM",
-      "9PM - 10PM",
-      "10PM - 11PM",
-      "11PM - 12AM",
-    ];
-    let latestUpdatedTotalOptimalDates;
-    await db
-      .collection("channelsCreatedByUser")
-      .doc(channel.documentID)
-      .get()
-      .then((doc) => {
-        latestUpdatedTotalOptimalDates = doc.data().decidedOutcome; //can be replaced with channel.decidedOutcome
-      });
-
-    //console.log("Latest optimal dates: " + latestUpdatedTotalOptimalDates);
-
+    //If everyone has respnded, find the optimal slots and output them
     if (respondedEmails.length === invitedEmails.length) {
-      var dateIndex;
-      for (dateIndex = 0; dateIndex < dateRange.length; dateIndex++) {
-        let date = dateRange[dateIndex];
-        let busyHoursForThatDateOfChannel;
-        let pushedTimeForDisplay = [];
-        await db
-          .collection("channelsCreatedByUser")
-          .doc(channel.documentID)
-          .collection("busyDatesWithTimeBlocks")
-          .doc(date)
-          .get()
-          .then((doc) => {
-            //console.log(doc.data().busyHours);
-            //console.log("Channel Hours for " + date);
-            busyHoursForThatDateOfChannel = doc.data().busyHours;
-          });
-
-        for (
-          var loopIndex = beginningIndex;
-          loopIndex <= endTime - 1;
-          loopIndex++
-        ) {
-          if (busyHoursForThatDateOfChannel[loopIndex] === 0) {
-            pushedTimeForDisplay.push(timeToBePushed[loopIndex]);
-          }
-        }
-
-        //console.log(pushedTimeForDisplay);
-        let newCompressedTimeArr = simplifyTimeBlocks(pushedTimeForDisplay);
-        //console.log(newCompressedTimeArr);
-
-        if (newCompressedTimeArr.length > 0) {
-          //console.log(latestUpdatedTotalOptimalDates[dateIndex]);
-          latestUpdatedTotalOptimalDates[dateIndex] =
-            latestUpdatedTotalOptimalDates[dateIndex].concat(
-              newCompressedTimeArr.join(", ")
-            );
-        } else {
-          latestUpdatedTotalOptimalDates[dateIndex] =
-            latestUpdatedTotalOptimalDates[dateIndex].concat(
-              "No timeslots found!"
-            );
-        }
-      }
-      //Push update after getting all the arrays
-      db.collection("channelsCreatedByUser")
-        //.doc(currentUserEmail)
-        // .collection("channels")
-        .doc(channel.documentID)
-        .update({
-          decidedOutcome: latestUpdatedTotalOptimalDates, //Adding documentID to document (Purpose: to update)
-        });
+      findOptimalSlots(channel, db);
       setLoader(false);
       btn.classList.remove("button--loading");
     }
@@ -525,8 +427,7 @@ export default function Channels() {
     return time.join(""); // return adjusted time or original string
   }
 
-  /*---------------------------------------------------*/
-  //Get minutes from HH:MM (hours and minutes 24 hr form)
+  /*-------------Get minutes from HH:MM (hours and minutes 24 hr form)-----------------*/
   function getMinutes(time) {
     let str = time;
     let arr = str.split(":");
@@ -534,43 +435,9 @@ export default function Channels() {
     //console.log(minutes);
     return minutes;
   }
-  /*---------------------------------------------------*/
-
-  //----------Function to get the Simplified Outputs instead of 1H slots//
-  function simplifyTimeBlocks(arr) {
-    var index = 0;
-    for (var k = 0; k < arr.length; k++) {
-      // only if arr length is greater than 1
-      for (var i = index; i < arr.length - 1; i) {
-        //console.log("i position at : " + i);
-        let currentElement = arr[index];
-        //console.log(currentElement);
-        let currentElementSplit = currentElement.split(" - "); //let splitStrings = arr[0].split(" - "); //12AM - 1AM" gives [ '12AM', '1AM' ]
-        let nextElement = arr[index + 1];
-        //console.log(nextElement);
-        let nextElementSplit = nextElement.split(" - ");
-        if (currentElementSplit[1] === nextElementSplit[0]) {
-          //console.log("currentElementSplit[1] : " + currentElementSplit[1]);
-          //console.log("nextElementSplit[0] : " + nextElementSplit[0]);
-          let newElement = currentElementSplit[0] + " - " + nextElementSplit[1];
-          //console.log("new currentElement[0]: " + newElement);
-          arr[index] = newElement;
-          arr.splice(index + 1, 1); //remove next element
-        } else {
-          break;
-        }
-        //console.log("New array length: " + arr.length);
-      }
-      index++;
-    }
-
-    return arr;
-  }
-  /*---------------------------------------------------*/
-  //Function to validateEmails against database-----------//
+  /*-----------Function to validateEmails against RSVP+ Database----------------*/
   async function validateEmails(emailArr) {
     var arrayValues = [true, ""];
-
     for (var i = 0; i < emailArr.length; i++) {
       let currentEmail = emailArr[i];
       await db
@@ -593,21 +460,13 @@ export default function Channels() {
         .catch((error) => {
           console.log("Error getting document:", error);
         });
-
-      //console.log(emailCheck);
-
       if (arrayValues[0] === false) {
         break;
       }
     }
-    //console.log("emailcheck : " + emailCheck);
-
     return arrayValues;
   }
-
-  /*---------------------------------------------------*/
-
-  //*-----------------Display Channels useEffect Hook-----------
+  //*-----------------Display Channels useEffect Hook---------------------//
   useEffect(() => {
     //Ref snapshot
     const ref = firebase.firestore().collection("channelsCreatedByUser");
@@ -642,9 +501,8 @@ export default function Channels() {
       </div>
     );
   }
-  //*-----------------------Function for Delete Channel Pop up----*/
-
-  async function handleSubmitTwo(e) {
+  //*-----------------------(DELETING CHANNEL FUNCTION)[HOST]------------------------*/
+  async function handleDeleteChannel(e) {
     e.preventDefault();
     e.stopPropagation();
     setLoaderTwo(true);
@@ -664,8 +522,6 @@ export default function Channels() {
           hostEmail = "null";
         }
       });
-    //console.log(channelID);
-    //console.log(hostEmail);
     if (hostEmail === "null") {
       setErrorTwo("Channel does not exist!");
       setLoaderTwo(false);
@@ -691,10 +547,8 @@ export default function Channels() {
       return;
     }
   }
-  //*-------------------------------------------------------------------------------------------*/
-  //*-----------------------Function to JOIN Channel Pop up----*/
-
-  async function handleSubmitFour(e) {
+  //*------------------------(JOINING CHANNEL FUNCTION)[USER]---------------------------*/
+  async function handleJoiningChannel(e) {
     e.preventDefault();
     e.stopPropagation();
     setLoaderFour(true);
@@ -744,9 +598,82 @@ export default function Channels() {
         }
       });
   }
-  //*-------------------------------------------------------------------------------------------*/
-  //*-----------------------Function to MODIFY (Handle Adding Invites) Channel Pop up----*/
+  //*----------------------(LEAVING CHANNEL FUNCTION) [USER]-------------------------------*/
+  async function handleLeavingChannel(channelTwo) {
+    setLoaderFive(true);
+    let channelID = channelTwo.documentID;
+    let invitedEmailsList = [];
+    let pendingEmailsList = [];
+    let respondedEmailsList = [];
+    let channel;
+    let hostEmail;
 
+    await db
+      .collection("channelsCreatedByUser")
+      .doc(channelID)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          hostEmail = doc.data().hostEmail;
+        } else {
+          hostEmail = "null";
+        }
+      });
+
+    await db
+      .collection("channelsCreatedByUser")
+      .doc(channelID)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          invitedEmailsList = doc.data().invitedEmails;
+          pendingEmailsList = doc.data().pendingEmails;
+          respondedEmailsList = doc.data().respondedEmails;
+          channel = doc.data();
+
+          if (hostEmail === currentUserEmail) {
+             alert(
+              "Failed to leave channel, you are the host of the channel. Please delete it if it has no use anymore!"
+            );
+            setLoaderFive(false);
+            return;
+          } else if ((respondedEmailsList.indexOf(currentUserEmail) > -1) && (respondedEmailsList.length !== invitedEmailsList.length)) {
+           alert(
+              "Failed to leave channel, you already responded! Please inform the host to create another channel and delete existing if you are unable to make it."
+            );
+            setLoaderFive(false);
+            return;
+          } else {
+            //if user is still pending or
+            if (pendingEmailsList.indexOf(currentUserEmail) > -1 || (respondedEmailsList.length === invitedEmailsList.length)) {
+                invitedEmailsList = invitedEmailsList.filter(
+                  (email) => email !== currentUserEmail
+                );
+                pendingEmailsList = pendingEmailsList.filter(
+                  (email) => email !== currentUserEmail
+                );
+                }
+            db.collection("channelsCreatedByUser").doc(channelID).update({
+              invitedEmails: invitedEmailsList, //List of Invited Users
+              pendingEmails: pendingEmailsList, //List of Pending Users
+            });
+//------------ Find optimal slots
+            if (respondedEmailsList.length === invitedEmailsList.length) {
+              findOptimalSlots(channel, db);
+            }
+//------------
+           alert("Successfully left channel!");
+            setLoaderFive(false);
+            return;
+          }
+        } else {
+          alert("Channel does not exist!");
+          setLoaderFive(false);
+          return;
+        }
+      });
+  }
+  //*--------------------(HANDLING ADDING OF INVITEES FUNCTION) [HOST] MODIFY CHANNEL----*/
   async function handleAddingOfInvitee(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -764,8 +691,6 @@ export default function Channels() {
     let emails = [userEmail];
     let validation = [true, ""];
     await validateEmails(emails).then((result) => {
-      //console.log("value from function:" + x);
-      //console.log(result);
       validation[0] = result[0];
       validation[1] = result[1];
     });
@@ -842,8 +767,111 @@ export default function Channels() {
       return;
     }
   }
+   //*--------------------(HANDLING REMOVAL OF INVITEES FUNCTION) [HOST] MODIFY CHANNEL----*/
+  async function handleRemovalOfInvitee(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    setLoaderThree(true);
+    setErrorThree("");
+    setSuccessThree("");
+    let channelID = channelIDForModifyRef.current.value;
+    let userEmail = emailForModifyRef.current.value;
+    let invitedEmailsList = [];
+    let pendingEmailsList = [];
+    let respondedEmailsList = [];
+    let hostEmail;
+    let channel;
+
+    //Validation of email
+    let emails = [userEmail];
+    let validation = [true, ""];
+    await validateEmails(emails).then((result) => {
+      validation[0] = result[0];
+      validation[1] = result[1];
+    });
+
+    if (validation[0] === false) {
+      setErrorThree(validation[1] + " is not a user of RSVP+!");
+      setLoaderThree(false);
+      return;
+    }
+    //End of validation
+
+    await db
+      .collection("channelsCreatedByUser")
+      .doc(channelID)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          hostEmail = doc.data().hostEmail;
+        } else {
+          hostEmail = "null";
+        }
+      });
+
+    if (hostEmail === currentUserEmail) {
+      await db
+        .collection("channelsCreatedByUser")
+        .doc(channelID)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            if (userEmail === currentUserEmail) {
+              setErrorThree(
+                "You can't remove yourself! Please delete the channel if you are not organizing anymore."
+              );
+              setLoaderThree(false);
+              return;
+            }
+            channel = doc.data();
+            invitedEmailsList = doc.data().invitedEmails;
+            pendingEmailsList = doc.data().pendingEmails;
+            respondedEmailsList = doc.data().respondedEmails;
+            if (respondedEmailsList.length === invitedEmailsList.length) {
+              setErrorThree(
+                "Failed to remove user, optimal time slots have already been determined for the channel! You can delete the channel."
+              );
+              setLoaderThree(false);
+              return;
+            } else if (respondedEmailsList.indexOf(userEmail) > -1) {
+              setErrorThree(
+                "Failed to remove user, user has already responded! Please remake a channel if that user is unable to make it."
+              );
+              setLoaderThree(false);
+              return;
+            } else {
+              if (pendingEmailsList.indexOf(userEmail) > -1) {
+                invitedEmailsList = invitedEmailsList.filter(
+                  (email) => email !== userEmail
+                );
+                pendingEmailsList = pendingEmailsList.filter(
+                  (email) => email !== userEmail
+                );
+                db.collection("channelsCreatedByUser").doc(channelID).update({
+                  invitedEmails: invitedEmailsList, //List of Invited Users
+                  pendingEmails: pendingEmailsList, //List of Pending Users
+                });
+                   if (respondedEmailsList.length === invitedEmailsList.length) {
+              findOptimalSlots(channel, db);
+            }
+                setSuccessThree("Successfully removed user from channel!");
+                setLoaderThree(false);
+                return;
+              }
+            }
+          } else {
+            setErrorThree("Channel does not exist!");
+            setLoaderThree(false);
+            return;
+          }
+        });
+    } else {
+      setErrorThree("You are not host of the channel!");
+      setLoaderThree(false);
+      return;
+    }
+  }
   //*-------------------------------------------------------------------------------------------*/
- 
 
   return (
     <div>
@@ -854,6 +882,26 @@ export default function Channels() {
       >
         <h2 className="page-header text-center mb-4">CHANNELS</h2>
         <Container fluid>
+        <Row className="d-flex align-items-center justify-content-center mb-4">
+        {successFour && <Alert variant="success">{successFour}</Alert>}
+          {errorFour && <Alert variant="danger">{errorFour}</Alert>}
+          <Col className ="d-flex align-items-center justify-content-center"><Form.Control 
+          className = "mr-3"
+            style={{ width: 200, height: 30 }}
+                required
+                type="channelID"
+                ref={channelIDForJoinRef}
+                placeholder="Channel ID"
+              /><Button
+            style={{ width: 60, height: 30 }}
+              variant="danger"
+              className ="d-flex align-items-center justify-content-center"
+              disabled={loadingFour}
+              onClick = {handleJoiningChannel}
+            >
+              Join
+            </Button></Col>
+        </Row>
           <Row className="d-flex align-items-center justify-content-center mb-4">
             <button
               className="d-flex align-items-center justify-content-center fetch-events-button mr-4"
@@ -876,13 +924,6 @@ export default function Channels() {
             >
               MODIFY INVITES
             </button>
-            <button
-              className="d-flex align-items-center justify-content-center fetch-events-button"
-              style={{ width: 250, height: 30 }}
-              onClick={() => setButtonPopupFour(true)}
-            >
-              JOIN A CHANNEL
-            </button>
           </Row>
           <Row>
             {channels.map((channel, index) => (
@@ -891,10 +932,11 @@ export default function Channels() {
                 key={index}
                 className="d-flex align-items-center justify-content-center mb-4"
               >
-                <Card style={{ width: 800 }}>
+                <Card style={{ width: 850 }}>
                   <Card.Header className="d-flex justify-content-center">
                     <Card.Title>
-                      <h2>{channel.name}</h2>
+                      <h2>{channel.name} </h2>
+                     
                     </Card.Title>
                   </Card.Header>
                   <Card.Body>
@@ -935,7 +977,7 @@ export default function Channels() {
                           <Card.Text>
                             <button
                               type="button"
-                              className="button"
+                              className="button mt-1"
                               style={{ width: 250, height: 30 }}
                               disabled={loading}
                               onClick={() => handleSecondClick(channel)}
@@ -974,10 +1016,17 @@ export default function Channels() {
                           </Card.Text>
                         </Row>
                         <br></br>
-                        <Row className="float-right">
+                        <Row className="mt- 2float-right">
                           <Card.Text className="font-italic">
                             <small>Host: {channel.hostEmail}</small>
                           </Card.Text>
+                        </Row>
+                          <Row className="float-right">
+                             <button className="leave-button" style={{ width: 63, height: 30 }} disabled={loadingFive} onClick={() => handleLeavingChannel(channel)}>
+                             <small>
+                              Leave
+                             </small>
+                             </button>
                         </Row>
                       </div>
                     </div>
@@ -1110,7 +1159,7 @@ export default function Channels() {
           <h3 className="text-center mb-4 text-white">Delete a channel!</h3>
           {successTwo && <Alert variant="success">{successTwo}</Alert>}
           {errorTwo && <Alert variant="danger">{errorTwo}</Alert>}
-          <form className="text-white" onSubmit={handleSubmitTwo}>
+          <form className="text-white" onSubmit={handleDeleteChannel}>
             <Form.Group id="channelID">
               <Form.Label>Channel ID</Form.Label>
               <Form.Control required type="channelID" ref={channelIDRef} />
@@ -1136,7 +1185,7 @@ export default function Channels() {
       <Popup trigger={buttonPopupThree} setTrigger={setButtonPopupThree}>
         <Card.Body>
           <h3 className="text-center mb-4 text-white">
-            Modify Invites (Add)
+            Modify Invites (Add or Remove)
           </h3>
           {successThree && <Alert variant="success">{successThree}</Alert>}
           {errorThree && <Alert variant="danger">{errorThree}</Alert>}
@@ -1155,6 +1204,9 @@ export default function Channels() {
               <Form.Label className="mt-3">User's Email</Form.Label>
               <Form.Control required type="email" ref={emailForModifyRef} />
             </Form.Group>
+            <Row>
+              <Col>
+                {" "}
                 <Button
                   variant="danger"
                   disabled={loadingThree}
@@ -1163,43 +1215,24 @@ export default function Channels() {
                 >
                   Add User
                 </Button>
+              </Col>
+              <Col>
+                {" "}
+                <Button
+                  variant="danger"
+                  disabled={loadingThree}
+                  className="w-100 mt-3"
+                  onClick={handleRemovalOfInvitee}
+                >
+                  Remove User
+                </Button>
+              </Col>
+            </Row>
           </form>
         </Card.Body>
       </Popup>
       {/*End of Pop up Three*/}
 
-      {/*Start of Pop up Four - Joining a channel*/}
-      <Popup trigger={buttonPopupFour} setTrigger={setButtonPopupFour}>
-        <Card.Body>
-          <h3 className="text-center mb-4 text-white">Join a channel!</h3>
-          {successFour && <Alert variant="success">{successFour}</Alert>}
-          {errorFour && <Alert variant="danger">{errorFour}</Alert>}
-          <form className="text-white" onSubmit={handleSubmitFour}>
-            <Form.Group id="channelID">
-              <Form.Label>Channel ID</Form.Label>
-              <Form.Control
-                required
-                type="channelID"
-                ref={channelIDForJoinRef}
-              />
-            </Form.Group>
-            <small>
-              Only works if you're not in that channel yet and if the optimal
-              time slots have not been determined for the channel yet.
-            </small>
-            <br></br>
-            <Button
-              variant="danger"
-              disabled={loadingFour}
-              className="w-100 mt-3"
-              type="submit"
-            >
-              Join channel
-            </Button>
-          </form>
-        </Card.Body>
-      </Popup>
-      {/*End of Pop up Four*/}
     </div>
   );
 }
