@@ -49,12 +49,12 @@ export default function NavigationBar() {
           <Nav>
             <Navbar.Text className="nav-bar-name">
               Signed in as: {currentUser.displayName}
+              <Image
+                className="photo ml-2"
+                src={currentUser.photoURL}
+                roundedCircle
+              />
             </Navbar.Text>
-            <Image
-              className="photo ml-2 mt-2"
-              src={currentUser.photoURL}
-              roundedCircle
-            />
           </Nav>
         </Navbar.Collapse>
         <Button

@@ -110,6 +110,7 @@ export default function GoogleCal() {
                 placeholder="Paste a public URL of your calendar"
                 onChange={onUrlChange}
                 value={url}
+                className="mb-1"
                 style={{ width: "105%" }}
               ></input>
             </Col>
@@ -140,7 +141,7 @@ export default function GoogleCal() {
             <Col>
               <Button
                 variant="danger"
-                className="d-flex align-items-center justify-content-center"
+                className="d-flex align-items-center justify-content-center mb-1"
                 style={{ height: 30 }}
                 onClick={handleLoadUrl}
                 disabled={loadingThree}

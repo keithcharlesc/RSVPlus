@@ -154,7 +154,7 @@ export default function Calendar() {
 
         <Container className="" style={{ minHeight: "75vh" }}>
           <Row>
-            <Col md={7}>
+            <Col md={7} className="mb-3">
               <GoogleCal />
             </Col>
             <Col md={{ span: 4, offset: 1 }}>

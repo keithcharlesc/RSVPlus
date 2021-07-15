@@ -49,7 +49,6 @@ gapi.load("client:auth2", () => {
 });
 /*---------------------------------------------------------------------*/
 export default function Channels() {
-
   const db = firebase.firestore();
   const hostName = firebase.auth().currentUser?.displayName;
   const currentUserEmail = firebase.auth().currentUser?.email;
@@ -61,7 +60,7 @@ export default function Channels() {
   const channelIDRef = useRef(); //Used for CREATE channel
   const [loading, setLoader] = useState(false); //Creating
   const [error, setError] = useState(""); //Creating
-  const [success, setSuccess] = useState(""); //Creating 
+  const [success, setSuccess] = useState(""); //Creating
   const [buttonPopup, setButtonPopup] = useState(false); //Creating a channel
 
   //Date Picker for Create Channel
@@ -92,7 +91,7 @@ export default function Channels() {
   //const [buttonPopupFour, setButtonPopupFour] = useState(false); //Joining a channel
 
   //Leaving a Channel [USER]
-    const [loadingFive, setLoaderFive] = useState(false); //Leaving channel
+  const [loadingFive, setLoaderFive] = useState(false); //Leaving channel
 
   /* -------------- GET EVENTS (BUSY DATES AND TIMINGS) ------------*/
   async function handleSecondClick(channel) {
@@ -248,7 +247,7 @@ export default function Channels() {
           // .collection("channels")
           .doc(docRef.id)
           .update({
-            decidedOutcome: totalOptimalDateStrings, 
+            decidedOutcome: totalOptimalDateStrings,
           });
 
         setLoader(false);
@@ -286,7 +285,7 @@ export default function Channels() {
     return userList;
   }
 
- //For pending list
+  //For pending list
   function displayPendingList(arr) {
     if (arr.length === 0) {
       return " None!";
@@ -559,44 +558,52 @@ export default function Channels() {
     let pendingEmailsList = [];
     let respondedEmailsList = [];
 
-    await db
-      .collection("channelsCreatedByUser")
-      .doc(channelID)
-      .get()
-      .then((doc) => {
-        if (doc.exists) {
-          invitedEmailsList = doc.data().invitedEmails;
-          pendingEmailsList = doc.data().pendingEmails;
-          respondedEmailsList = doc.data().respondedEmails;
-          if (invitedEmailsList.indexOf(currentUserEmail) > -1) {
-            setErrorFour(
-              "Failed to join channel, you are already in the channel!"
-            );
-            setLoaderFour(false);
-            return;
-          } else if (respondedEmailsList.length === invitedEmailsList.length) {
-            setErrorFour(
-              "Failed to join channel, optimal time slots have already been determined!"
-            );
-            setLoaderFour(false);
-            return;
+    try {
+      await db
+        .collection("channelsCreatedByUser")
+        .doc(channelID)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            invitedEmailsList = doc.data().invitedEmails;
+            pendingEmailsList = doc.data().pendingEmails;
+            respondedEmailsList = doc.data().respondedEmails;
+            if (invitedEmailsList.indexOf(currentUserEmail) > -1) {
+              setErrorFour(
+                "Failed to join channel, you are already in the channel!"
+              );
+              setLoaderFour(false);
+              return;
+            } else if (
+              respondedEmailsList.length === invitedEmailsList.length
+            ) {
+              setErrorFour(
+                "Failed to join channel, optimal time slots have already been determined!"
+              );
+              setLoaderFour(false);
+              return;
+            } else {
+              invitedEmailsList.push(currentUserEmail);
+              pendingEmailsList.push(currentUserEmail);
+              db.collection("channelsCreatedByUser").doc(channelID).update({
+                invitedEmails: invitedEmailsList, //List of Invited Users
+                pendingEmails: pendingEmailsList, //List of Pending Users
+              });
+              setSuccessFour("Successfully joined channel!");
+              setLoaderFour(false);
+              return;
+            }
           } else {
-            invitedEmailsList.push(currentUserEmail);
-            pendingEmailsList.push(currentUserEmail);
-            db.collection("channelsCreatedByUser").doc(channelID).update({
-              invitedEmails: invitedEmailsList, //List of Invited Users
-              pendingEmails: pendingEmailsList, //List of Pending Users
-            });
-            setSuccessFour("Successfully joined channel!");
+            setErrorFour("Channel does not exist!");
             setLoaderFour(false);
             return;
           }
-        } else {
-          setErrorFour("Channel does not exist!");
-          setLoaderFour(false);
-          return;
-        }
-      });
+        });
+    } catch (err) {
+      setErrorFour("Channel field cannot be blank.");
+      setLoaderFour(false);
+      return;
+    }
   }
   //*----------------------(LEAVING CHANNEL FUNCTION) [USER]-------------------------------*/
   async function handleLeavingChannel(channelTwo) {
@@ -632,37 +639,43 @@ export default function Channels() {
           channel = doc.data();
 
           if (hostEmail === currentUserEmail) {
-             alert(
+            alert(
               "Failed to leave channel, you are the host of the channel. Please delete it if it has no use anymore!"
             );
             setLoaderFive(false);
             return;
-          } else if ((respondedEmailsList.indexOf(currentUserEmail) > -1) && (respondedEmailsList.length !== invitedEmailsList.length)) {
-           alert(
+          } else if (
+            respondedEmailsList.indexOf(currentUserEmail) > -1 &&
+            respondedEmailsList.length !== invitedEmailsList.length
+          ) {
+            alert(
               "Failed to leave channel, you already responded! Please inform the host to create another channel and delete existing if you are unable to make it."
             );
             setLoaderFive(false);
             return;
           } else {
             //if user is still pending or
-            if (pendingEmailsList.indexOf(currentUserEmail) > -1 || (respondedEmailsList.length === invitedEmailsList.length)) {
-                invitedEmailsList = invitedEmailsList.filter(
-                  (email) => email !== currentUserEmail
-                );
-                pendingEmailsList = pendingEmailsList.filter(
-                  (email) => email !== currentUserEmail
-                );
-                }
+            if (
+              pendingEmailsList.indexOf(currentUserEmail) > -1 ||
+              respondedEmailsList.length === invitedEmailsList.length
+            ) {
+              invitedEmailsList = invitedEmailsList.filter(
+                (email) => email !== currentUserEmail
+              );
+              pendingEmailsList = pendingEmailsList.filter(
+                (email) => email !== currentUserEmail
+              );
+            }
             db.collection("channelsCreatedByUser").doc(channelID).update({
               invitedEmails: invitedEmailsList, //List of Invited Users
               pendingEmails: pendingEmailsList, //List of Pending Users
             });
-//------------ Find optimal slots
+            //------------ Find optimal slots
             if (respondedEmailsList.length === invitedEmailsList.length) {
               findOptimalSlots(channel, db);
             }
-//------------
-           alert("Successfully left channel!");
+            //------------
+            alert("Successfully left channel!");
             setLoaderFive(false);
             return;
           }
@@ -690,13 +703,19 @@ export default function Channels() {
     //Validation of email
     let emails = [userEmail];
     let validation = [true, ""];
-    await validateEmails(emails).then((result) => {
-      validation[0] = result[0];
-      validation[1] = result[1];
-    });
+    try {
+      await validateEmails(emails).then((result) => {
+        validation[0] = result[0];
+        validation[1] = result[1];
+      });
 
-    if (validation[0] === false) {
-      setErrorThree(validation[1] + " is not a user of RSVP+!");
+      if (validation[0] === false) {
+        setErrorThree(validation[1] + " is not a user of RSVP+!");
+        setLoaderThree(false);
+        return;
+      }
+    } catch (err) {
+      setErrorThree("Field cannot be blank!");
       setLoaderThree(false);
       return;
     }
@@ -708,66 +727,78 @@ export default function Channels() {
       return;
     }
 
-    await db
-      .collection("channelsCreatedByUser")
-      .doc(channelID)
-      .get()
-      .then((doc) => {
-        if (doc.exists) {
-          hostEmail = doc.data().hostEmail;
-        } else {
-          hostEmail = "null";
-        }
-      });
-
-    if (hostEmail === currentUserEmail) {
+    try {
       await db
         .collection("channelsCreatedByUser")
         .doc(channelID)
         .get()
         .then((doc) => {
           if (doc.exists) {
-            invitedEmailsList = doc.data().invitedEmails;
-            pendingEmailsList = doc.data().pendingEmails;
-            respondedEmailsList = doc.data().respondedEmails;
-            if (invitedEmailsList.indexOf(userEmail) > -1) {
-              setErrorThree(
-                "Failed to add user, user is already in the channel!"
-              );
-              setLoaderThree(false);
-              return;
-            } else if (
-              respondedEmailsList.length === invitedEmailsList.length
-            ) {
-              setErrorThree(
-                "Failed to add user, optimal time slots have already been determined for the channel!"
-              );
-              setLoaderThree(false);
-              return;
+            hostEmail = doc.data().hostEmail;
+          } else {
+            hostEmail = "null";
+          }
+        });
+    } catch (err) {
+      setErrorThree("Field cannot be blank!");
+      setLoaderThree(false);
+      return;
+    }
+
+    if (hostEmail === currentUserEmail) {
+      try {
+        await db
+          .collection("channelsCreatedByUser")
+          .doc(channelID)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              invitedEmailsList = doc.data().invitedEmails;
+              pendingEmailsList = doc.data().pendingEmails;
+              respondedEmailsList = doc.data().respondedEmails;
+              if (invitedEmailsList.indexOf(userEmail) > -1) {
+                setErrorThree(
+                  "Failed to add user, user is already in the channel!"
+                );
+                setLoaderThree(false);
+                return;
+              } else if (
+                respondedEmailsList.length === invitedEmailsList.length
+              ) {
+                setErrorThree(
+                  "Failed to add user, optimal time slots have already been determined for the channel!"
+                );
+                setLoaderThree(false);
+                return;
+              } else {
+                invitedEmailsList.push(userEmail);
+                pendingEmailsList.push(userEmail);
+                db.collection("channelsCreatedByUser").doc(channelID).update({
+                  invitedEmails: invitedEmailsList, //List of Invited Users
+                  pendingEmails: pendingEmailsList, //List of Pending Users
+                });
+                setSuccessThree("Successfully added user to channel!");
+                setLoaderThree(false);
+                return;
+              }
             } else {
-              invitedEmailsList.push(userEmail);
-              pendingEmailsList.push(userEmail);
-              db.collection("channelsCreatedByUser").doc(channelID).update({
-                invitedEmails: invitedEmailsList, //List of Invited Users
-                pendingEmails: pendingEmailsList, //List of Pending Users
-              });
-              setSuccessThree("Successfully added user to channel!");
+              setErrorThree("Channel does not exist!");
               setLoaderThree(false);
               return;
             }
-          } else {
-            setErrorThree("Channel does not exist!");
-            setLoaderThree(false);
-            return;
-          }
-        });
+          });
+      } catch (err) {
+        setErrorThree("Field cannot be blank!");
+        setLoaderThree(false);
+        return;
+      }
     } else {
       setErrorThree("You are not host of the channel!");
       setLoaderThree(false);
       return;
     }
   }
-   //*--------------------(HANDLING REMOVAL OF INVITEES FUNCTION) [HOST] MODIFY CHANNEL----*/
+  //*--------------------(HANDLING REMOVAL OF INVITEES FUNCTION) [HOST] MODIFY CHANNEL----*/
   async function handleRemovalOfInvitee(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -785,86 +816,104 @@ export default function Channels() {
     //Validation of email
     let emails = [userEmail];
     let validation = [true, ""];
-    await validateEmails(emails).then((result) => {
-      validation[0] = result[0];
-      validation[1] = result[1];
-    });
 
-    if (validation[0] === false) {
-      setErrorThree(validation[1] + " is not a user of RSVP+!");
+    try {
+      await validateEmails(emails).then((result) => {
+        validation[0] = result[0];
+        validation[1] = result[1];
+      });
+
+      if (validation[0] === false) {
+        setErrorThree(validation[1] + " is not a user of RSVP+!");
+        setLoaderThree(false);
+        return;
+      }
+    } catch (err) {
+      setErrorThree("Field cannot be blank!");
       setLoaderThree(false);
       return;
     }
     //End of validation
-
-    await db
-      .collection("channelsCreatedByUser")
-      .doc(channelID)
-      .get()
-      .then((doc) => {
-        if (doc.exists) {
-          hostEmail = doc.data().hostEmail;
-        } else {
-          hostEmail = "null";
-        }
-      });
-
-    if (hostEmail === currentUserEmail) {
+    try {
       await db
         .collection("channelsCreatedByUser")
         .doc(channelID)
         .get()
         .then((doc) => {
           if (doc.exists) {
-            if (userEmail === currentUserEmail) {
-              setErrorThree(
-                "You can't remove yourself! Please delete the channel if you are not organizing anymore."
-              );
-              setLoaderThree(false);
-              return;
-            }
-            channel = doc.data();
-            invitedEmailsList = doc.data().invitedEmails;
-            pendingEmailsList = doc.data().pendingEmails;
-            respondedEmailsList = doc.data().respondedEmails;
-            if (respondedEmailsList.length === invitedEmailsList.length) {
-              setErrorThree(
-                "Failed to remove user, optimal time slots have already been determined for the channel! You can delete the channel."
-              );
-              setLoaderThree(false);
-              return;
-            } else if (respondedEmailsList.indexOf(userEmail) > -1) {
-              setErrorThree(
-                "Failed to remove user, user has already responded! Please remake a channel if that user is unable to make it."
-              );
-              setLoaderThree(false);
-              return;
-            } else {
-              if (pendingEmailsList.indexOf(userEmail) > -1) {
-                invitedEmailsList = invitedEmailsList.filter(
-                  (email) => email !== userEmail
+            hostEmail = doc.data().hostEmail;
+          } else {
+            hostEmail = "null";
+          }
+        });
+    } catch (err) {
+      setErrorThree("Field cannot be blank!");
+      setLoaderThree(false);
+      return;
+    }
+
+    if (hostEmail === currentUserEmail) {
+      try {
+        await db
+          .collection("channelsCreatedByUser")
+          .doc(channelID)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              if (userEmail === currentUserEmail) {
+                setErrorThree(
+                  "You can't remove yourself! Please delete the channel if you are not organizing anymore."
                 );
-                pendingEmailsList = pendingEmailsList.filter(
-                  (email) => email !== userEmail
-                );
-                db.collection("channelsCreatedByUser").doc(channelID).update({
-                  invitedEmails: invitedEmailsList, //List of Invited Users
-                  pendingEmails: pendingEmailsList, //List of Pending Users
-                });
-                   if (respondedEmailsList.length === invitedEmailsList.length) {
-              findOptimalSlots(channel, db);
-            }
-                setSuccessThree("Successfully removed user from channel!");
                 setLoaderThree(false);
                 return;
               }
+              channel = doc.data();
+              invitedEmailsList = doc.data().invitedEmails;
+              pendingEmailsList = doc.data().pendingEmails;
+              respondedEmailsList = doc.data().respondedEmails;
+              if (respondedEmailsList.length === invitedEmailsList.length) {
+                setErrorThree(
+                  "Failed to remove user, optimal time slots have already been determined for the channel! You can delete the channel."
+                );
+                setLoaderThree(false);
+                return;
+              } else if (respondedEmailsList.indexOf(userEmail) > -1) {
+                setErrorThree(
+                  "Failed to remove user, user has already responded! Please remake a channel if that user is unable to make it."
+                );
+                setLoaderThree(false);
+                return;
+              } else {
+                if (pendingEmailsList.indexOf(userEmail) > -1) {
+                  invitedEmailsList = invitedEmailsList.filter(
+                    (email) => email !== userEmail
+                  );
+                  pendingEmailsList = pendingEmailsList.filter(
+                    (email) => email !== userEmail
+                  );
+                  db.collection("channelsCreatedByUser").doc(channelID).update({
+                    invitedEmails: invitedEmailsList, //List of Invited Users
+                    pendingEmails: pendingEmailsList, //List of Pending Users
+                  });
+                  if (respondedEmailsList.length === invitedEmailsList.length) {
+                    findOptimalSlots(channel, db);
+                  }
+                  setSuccessThree("Successfully removed user from channel!");
+                  setLoaderThree(false);
+                  return;
+                }
+              }
+            } else {
+              setErrorThree("Channel does not exist!");
+              setLoaderThree(false);
+              return;
             }
-          } else {
-            setErrorThree("Channel does not exist!");
-            setLoaderThree(false);
-            return;
-          }
-        });
+          });
+      } catch (err) {
+        setErrorThree("Field cannot be blank!");
+        setLoaderThree(false);
+        return;
+      }
     } else {
       setErrorThree("You are not host of the channel!");
       setLoaderThree(false);
@@ -882,43 +931,60 @@ export default function Channels() {
       >
         <h2 className="page-header text-center mb-4">CHANNELS</h2>
         <Container fluid>
-        <Row className="d-flex align-items-center justify-content-center mb-4">
-        {successFour && <Alert variant="success">{successFour}</Alert>}
-          {errorFour && <Alert variant="danger">{errorFour}</Alert>}
-          <Col className ="d-flex align-items-center justify-content-center"><Form.Control 
-          className = "mr-3"
-            style={{ width: 200, height: 30 }}
-                required
-                type="channelID"
-                ref={channelIDForJoinRef}
-                placeholder="Channel ID"
-              /><Button
-            style={{ width: 60, height: 30 }}
-              variant="danger"
-              className ="d-flex align-items-center justify-content-center"
-              disabled={loadingFour}
-              onClick = {handleJoiningChannel}
-            >
-              Join
-            </Button></Col>
-        </Row>
+          <Row className="d-flex align-items-center justify-content-center mb-4">
+            {successFour && (
+              <div className="d-flex align-items-center justify-content-center w-50">
+                <Alert variant="success" className="text-center">
+                  {successFour}
+                </Alert>
+              </div>
+            )}
+            {errorFour && (
+              <div className="d-flex align-items-center justify-content-center w-50">
+                <Alert variant="danger" className="text-center">
+                  {errorFour}
+                </Alert>
+              </div>
+            )}
+            <div>
+              <Col className="d-flex align-items-center justify-content-center">
+                <Form.Control
+                  className="mr-3"
+                  style={{ width: 200, height: 30 }}
+                  required
+                  type="channelID"
+                  ref={channelIDForJoinRef}
+                  placeholder="Channel ID"
+                />
+                <Button
+                  style={{ width: 60, height: 30 }}
+                  variant="danger"
+                  className="d-flex align-items-center justify-content-center"
+                  disabled={loadingFour}
+                  onClick={handleJoiningChannel}
+                >
+                  Join
+                </Button>
+              </Col>
+            </div>
+          </Row>
           <Row className="d-flex align-items-center justify-content-center mb-4">
             <button
-              className="d-flex align-items-center justify-content-center fetch-events-button mr-4"
+              className="d-flex align-items-center justify-content-center fetch-events-button mr-4 mb-2"
               style={{ width: 250, height: 30 }}
               onClick={() => setButtonPopup(true)}
             >
               CREATE A CHANNEL
             </button>
             <button
-              className="d-flex align-items-center justify-content-center fetch-events-button mr-4"
+              className="d-flex align-items-center justify-content-center fetch-events-button mr-4 mb-2"
               style={{ width: 250, height: 30 }}
               onClick={() => setButtonPopupTwo(true)}
             >
               DELETE A CHANNEL
             </button>
             <button
-              className="d-flex align-items-center justify-content-center fetch-events-button mr-4"
+              className="d-flex align-items-center justify-content-center fetch-events-button mr-4 mb-2"
               style={{ width: 250, height: 30 }}
               onClick={() => setButtonPopupThree(true)}
             >
@@ -932,11 +998,10 @@ export default function Channels() {
                 key={index}
                 className="d-flex align-items-center justify-content-center mb-4"
               >
-                <Card style={{ width: 850 }}>
+                <Card className="w-50">
                   <Card.Header className="d-flex justify-content-center">
                     <Card.Title>
                       <h2>{channel.name} </h2>
-                     
                     </Card.Title>
                   </Card.Header>
                   <Card.Body>
@@ -1016,17 +1081,20 @@ export default function Channels() {
                           </Card.Text>
                         </Row>
                         <br></br>
-                        <Row className="mt- 2float-right">
+                        <Row className="mt-2">
                           <Card.Text className="font-italic">
                             <small>Host: {channel.hostEmail}</small>
                           </Card.Text>
                         </Row>
-                          <Row className="float-right">
-                             <button className="leave-button" style={{ width: 63, height: 30 }} disabled={loadingFive} onClick={() => handleLeavingChannel(channel)}>
-                             <small>
-                              Leave
-                             </small>
-                             </button>
+                        <Row className="float-right">
+                          <button
+                            className="leave-button"
+                            style={{ width: 63, height: 30 }}
+                            disabled={loadingFive}
+                            onClick={() => handleLeavingChannel(channel)}
+                          >
+                            <small>Leave</small>
+                          </button>
                         </Row>
                       </div>
                     </div>
@@ -1232,7 +1300,6 @@ export default function Channels() {
         </Card.Body>
       </Popup>
       {/*End of Pop up Three*/}
-
     </div>
   );
 }
