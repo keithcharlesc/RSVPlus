@@ -342,7 +342,7 @@ export default function Channels() {
 
       //Retrieves the busyHours of that Date Document of that USER
       await db
-        .collection("busyDates")
+        .collection("userAccounts")
         .doc(currentUserEmail)
         .collection("busyDatesWithTimeBlocks")
         .doc(date)
@@ -998,7 +998,7 @@ export default function Channels() {
                 key={index}
                 className="d-flex align-items-center justify-content-center mb-4"
               >
-                <Card className="w-50">
+                <Card style={{ width: 850 }}>
                   <Card.Header className="d-flex justify-content-center">
                     <Card.Title>
                       <h2>{channel.name} </h2>
@@ -1088,7 +1088,7 @@ export default function Channels() {
                         </Row>
                         <Row className="float-right">
                           <button
-                            className="leave-button"
+                            className="leave-button mt-2"
                             style={{ width: 63, height: 30 }}
                             disabled={loadingFive}
                             onClick={() => handleLeavingChannel(channel)}

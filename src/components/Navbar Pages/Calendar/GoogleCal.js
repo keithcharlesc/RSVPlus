@@ -51,9 +51,9 @@ export default function GoogleCal() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoaderTwo(true);
-    db.collection("displayCalendarURL")
+    db.collection("userAccounts")
       .doc(currentUserEmail)
-      .set({
+      .update({
         url: url,
       })
       .then(() => {
@@ -70,17 +70,20 @@ export default function GoogleCal() {
   const handleLoadUrl = (e) => {
     e.preventDefault();
     setLoaderThree(true);
-    var docRef = db.collection("displayCalendarURL").doc(currentUserEmail);
+    var docRef = db.collection("userAccounts").doc(currentUserEmail);
     onClear();
 
     docRef
       .get()
       .then((doc) => {
-        if (doc.exists) {
+        if (
+          doc.exists &&
+          typeof doc.data().url !== "undefined" &&
+          doc.data().url !== ""
+        ) {
           setUrl(doc.data().url);
           setLoaderThree(false);
           //console.log(doc.data().url);
-          //console.log("Document read!");
         } else {
           // doc.data() will be undefined in this case
           setUrl(MoonPhasesCalendar);

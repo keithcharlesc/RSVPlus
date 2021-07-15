@@ -6,7 +6,7 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
   await sleep(500);
 
   await db
-    .collection("busyDates")
+    .collection("userAccounts")
     .doc(currentUserEmail)
     .collection("busyDatesWithTimeBlocks")
     .get()
@@ -16,7 +16,7 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
       });
     });
 
-  await db.collection("busyDates").doc(currentUserEmail).delete();
+  //await db.collection("busyDates").doc(currentUserEmail).delete();
 
   //For User Perspective
   /*  
@@ -76,7 +76,7 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
 
     //Range of dates between start and end for that event
     //console.log(dateRangeForCurrentEvent);
-    const datesRef = db.collection("busyDates").doc(currentUserEmail);
+    const datesRef = db.collection("userAccounts").doc(currentUserEmail);
 
     //Creates documents for dates if the dates havent been initialized
     async function initializeBlocks() {
