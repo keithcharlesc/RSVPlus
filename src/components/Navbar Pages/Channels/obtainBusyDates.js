@@ -1,4 +1,9 @@
-export default async function obtainBusyDates(events, db, currentUserEmail) {
+export default async function obtainBusyDates(
+  events,
+  db,
+  currentUserEmail,
+  channel
+) {
   //1. Delete any documents if they exist to fetch the new latest data.
   const sleep = (milliseconds) => {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -6,6 +11,8 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
   await sleep(500);
 
   await db
+    .collection("channelsCreatedByUser")
+    .doc(channel.documentID)
     .collection("userAccounts")
     .doc(currentUserEmail)
     .collection("busyDatesWithTimeBlocks")
@@ -76,7 +83,11 @@ export default async function obtainBusyDates(events, db, currentUserEmail) {
 
     //Range of dates between start and end for that event
     //console.log(dateRangeForCurrentEvent);
-    const datesRef = db.collection("userAccounts").doc(currentUserEmail);
+    const datesRef = db
+      .collection("channelsCreatedByUser")
+      .doc(channel.documentID)
+      .collection("userAccounts")
+      .doc(currentUserEmail);
 
     //Creates documents for dates if the dates havent been initialized
     async function initializeBlocks() {
