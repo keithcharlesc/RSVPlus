@@ -113,7 +113,7 @@ export default function Channels() {
         .then((response) => {
           const events = response.result.items;
           return Promise.resolve(
-            obtainBusyDates(events, db, currentUserEmail)
+            obtainBusyDates(events, db, currentUserEmail, channel)
           ).then(() => {
             handleAgreeToSync(channel, btn);
           });
@@ -342,6 +342,8 @@ export default function Channels() {
 
       //Retrieves the busyHours of that Date Document of that USER
       await db
+        .collection("channelsCreatedByUser")
+        .doc(channel.documentID)
         .collection("userAccounts")
         .doc(currentUserEmail)
         .collection("busyDatesWithTimeBlocks")
@@ -526,6 +528,19 @@ export default function Channels() {
       setLoaderTwo(false);
       return;
     } else if (currentUserEmail === hostEmail) {
+      await db
+        .collection("channelsCreatedByUser")
+        .doc(channelID)
+        .collection("userAccounts")
+        .doc(currentUserEmail)
+        .collection("busyDatesWithTimeBlocks")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.docs.forEach((snapshot) => {
+            snapshot.ref.delete();
+          });
+        });
+
       await db
         .collection("channelsCreatedByUser")
         .doc(channelID)
@@ -998,7 +1013,7 @@ export default function Channels() {
                 key={index}
                 className="d-flex align-items-center justify-content-center mb-4"
               >
-                <Card style={{ width: 850 }}>
+                <Card style={{ width: 860 }}>
                   <Card.Header className="d-flex justify-content-center">
                     <Card.Title>
                       <h2>{channel.name} </h2>
