@@ -19,6 +19,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import obtainBusyDates from "./obtainBusyDates";
 import findOptimalSlots from "./findOptimalSlots";
+import decrementDates from "./decrementDates";
 
 /*----------------------- GAPI INITIALIZAITON----------------------*/
 var gapi = window.gapi;
@@ -528,11 +529,12 @@ export default function Channels() {
       setLoaderTwo(false);
       return;
     } else if (currentUserEmail === hostEmail) {
+      /*
       await db
         .collection("channelsCreatedByUser")
         .doc(channelID)
         .collection("userAccounts")
-        .doc(currentUserEmail)
+        .doc(currentUserEmail) 
         .collection("busyDatesWithTimeBlocks")
         .get()
         .then((querySnapshot) => {
@@ -540,6 +542,7 @@ export default function Channels() {
             snapshot.ref.delete();
           });
         });
+        */
 
       await db
         .collection("channelsCreatedByUser")
@@ -659,13 +662,23 @@ export default function Channels() {
             );
             setLoaderFive(false);
             return;
-          } else if (
-            respondedEmailsList.indexOf(currentUserEmail) > -1 &&
-            respondedEmailsList.length !== invitedEmailsList.length
-          ) {
-            alert(
-              "Failed to leave channel, you already responded! Please inform the host to create another channel and delete existing if you are unable to make it."
+          } else if (respondedEmailsList.indexOf(currentUserEmail) > -1) {
+            decrementDates(channel, db, currentUserEmail);
+
+            invitedEmailsList = invitedEmailsList.filter(
+              (email) => email !== currentUserEmail
             );
+
+            respondedEmailsList = respondedEmailsList.filter(
+              (email) => email !== currentUserEmail
+            );
+
+            db.collection("channelsCreatedByUser").doc(channelID).update({
+              invitedEmails: invitedEmailsList, //List of Invited Users
+              respondedEmails: respondedEmailsList,
+            });
+
+            alert("Successfully left channel!");
             setLoaderFive(false);
             return;
           } else {
@@ -886,16 +899,23 @@ export default function Channels() {
               invitedEmailsList = doc.data().invitedEmails;
               pendingEmailsList = doc.data().pendingEmails;
               respondedEmailsList = doc.data().respondedEmails;
-              if (respondedEmailsList.length === invitedEmailsList.length) {
-                setErrorThree(
-                  "Failed to remove user, optimal time slots have already been determined for the channel! You can delete the channel."
+              if (respondedEmailsList.indexOf(userEmail) > -1) {
+                decrementDates(channel, db, userEmail);
+
+                invitedEmailsList = invitedEmailsList.filter(
+                  (email) => email !== userEmail
                 );
-                setLoaderThree(false);
-                return;
-              } else if (respondedEmailsList.indexOf(userEmail) > -1) {
-                setErrorThree(
-                  "Failed to remove user, user has already responded! Please remake a channel if that user is unable to make it."
+
+                respondedEmailsList = respondedEmailsList.filter(
+                  (email) => email !== userEmail
                 );
+
+                db.collection("channelsCreatedByUser").doc(channelID).update({
+                  invitedEmails: invitedEmailsList, //List of Invited Users
+                  respondedEmails: respondedEmailsList,
+                });
+
+                setSuccessThree("Successfully removed user!");
                 setLoaderThree(false);
                 return;
               } else {

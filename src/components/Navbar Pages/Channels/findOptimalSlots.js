@@ -63,7 +63,10 @@ export default async function findOptimalSlots(channel, db) {
       loopIndex <= endTime - 1;
       loopIndex++
     ) {
-      if (busyHoursForThatDateOfChannel[loopIndex] === 0) {
+      if (
+        busyHoursForThatDateOfChannel[loopIndex] === 0 ||
+        busyHoursForThatDateOfChannel[loopIndex] < 0
+      ) {
         pushedTimeForDisplay.push(timeToBePushed[loopIndex]);
       }
     }
