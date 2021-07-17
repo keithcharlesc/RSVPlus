@@ -230,7 +230,7 @@ export default function Calendar() {
                     className="mt-2"
                     disabled={loading}
                     variant="danger"
-                    style={{ width: 100, height: 50 }}
+                    style={{ width: 110, height: 50 }}
                     onClick={(e) => handleClick(e)}
                   >
                     Add Event
