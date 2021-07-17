@@ -94,6 +94,9 @@ export default function Channels() {
   //Leaving a Channel [USER]
   const [loadingFive, setLoaderFive] = useState(false); //Leaving channel
 
+  //Refreshing a Channnel
+  const [loadingSix, setLoaderSix] = useState(false); //Leaving channel
+
   /* -------------- GET EVENTS (BUSY DATES AND TIMINGS) ------------*/
   async function handleSecondClick(channel) {
     setLoader(true);
@@ -714,6 +717,202 @@ export default function Channels() {
         }
       });
   }
+  //*--------------------(HANDLE REFRESHING A CHANNEL) -------------------*//
+  async function handleRefreshChannel(channel, db, currentUserEmail) {
+    setLoaderSix(true);
+    const btnTwo = document.querySelector(".buttonTwo");
+    btnTwo.classList.add("buttonTwo--loading");
+    const respondedEmailsList = channel.respondedEmails;
+    const hasResponded = respondedEmailsList.indexOf(currentUserEmail) > -1;
+
+    if (hasResponded === false) {
+      alert(
+        "You have yet to respond, refresh is to be used only if you have synced to the channel before but have new changes made to your Google Calendar!"
+      );
+      btnTwo.classList.remove("buttonTwo--loading");
+      setLoaderSix(false);
+      return;
+    }
+    //1.1 Decrement and delete documents
+    const dateRange = [...channel.dateRange]; //dateRange Array
+    var index = 0;
+    for (index = 0; index < dateRange.length; index++) {
+      let date = dateRange[index];
+      let channelHoursForThatDate = [];
+      let userBusyHoursForThatDate = [];
+
+      //Retrieves the busyHours of that Date Document of that CHANNEL
+      await db
+        .collection("channelsCreatedByUser")
+        .doc(channel.documentID)
+        .collection("busyDatesWithTimeBlocks")
+        .doc(date)
+        .get()
+        .then((doc) => {
+          //console.log(doc.data().busyHours);
+          //console.log("Channel Hours for " + date);
+          channelHoursForThatDate = doc.data().busyHours;
+        });
+      //console.log(channelHoursForThatDate);
+
+      //Retrieves the busyHours of that Date Document of that USER
+      await db
+        .collection("channelsCreatedByUser")
+        .doc(channel.documentID)
+        .collection("userAccounts")
+        .doc(currentUserEmail)
+        .collection("busyDatesWithTimeBlocks")
+        .doc(date)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            //console.log("UserBusyHours for " + date);
+            userBusyHoursForThatDate = doc.data().hours;
+          } else {
+            //console.log("User don't have busy hours for that date, giving blank array instead: ");
+            userBusyHoursForThatDate = new Array(24).fill(0);
+          }
+        });
+
+      for (
+        var hourIndex = 0;
+        hourIndex < channelHoursForThatDate.length;
+        hourIndex++
+      ) {
+        if (userBusyHoursForThatDate[hourIndex] > 0) {
+          channelHoursForThatDate[hourIndex]--;
+        }
+      }
+
+      await db
+        .collection("channelsCreatedByUser")
+        .doc(channel.documentID)
+        .collection("busyDatesWithTimeBlocks")
+        .doc(date)
+        .update({
+          busyHours: channelHoursForThatDate,
+        });
+
+      let totalOptimalDateStrings = new Array(dateRange.length).fill("");
+      for (var i = 0; i < dateRange.length; i++) {
+        let date = dateRange[i];
+        //Appends date to the front of each date for output later on
+        let optimalDateString = date + ": ";
+        totalOptimalDateStrings[i] = optimalDateString;
+      }
+
+      //Adding documentID to document (Purpose: to update)
+      await db
+        .collection("channelsCreatedByUser")
+        .doc(channel.documentID)
+        .update({
+          decidedOutcome: totalOptimalDateStrings,
+        });
+    }
+
+    await db
+      .collection("channelsCreatedByUser")
+      .doc(channel.documentID)
+      .collection("userAccounts")
+      .doc(currentUserEmail)
+      .collection("busyDatesWithTimeBlocks")
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.docs.forEach((snapshot) => {
+          snapshot.ref.delete();
+        });
+      });
+
+    await db
+      .collection("channelsCreatedByUser")
+      .doc(channel.documentID)
+      .collection("userAccounts")
+      .doc(currentUserEmail)
+      .delete();
+    //1.2 Obtain the latest events from Google and Obtain the Latest Busy Dates
+    gapi.auth2.getAuthInstance().then(() => {
+      gapi.client.calendar.events
+        .list({
+          calendarId: "primary",
+          timeMin: channel.start_date + "T00:00:00+08:00",
+          timeMax: channel.end_date + "T23:59:00+08:00", //might need to one day here
+          showDeleted: false,
+          singleEvents: true,
+          maxResults: 100,
+          orderBy: "startTime",
+        })
+        .then((response) => {
+          const events = response.result.items;
+          return Promise.resolve(
+            obtainBusyDates(events, db, currentUserEmail, channel)
+          )
+            .then(async () => {
+              //1.3 Update channel with increment
+              var indexTwo = 0;
+              for (indexTwo = 0; indexTwo < dateRange.length; indexTwo++) {
+                let date = dateRange[indexTwo];
+                let channelHoursForThatDateTwo = [];
+                let userBusyHoursForThatDateTwo = [];
+
+                //Retrieves the busyHours of that Date Document of that CHANNEL
+                await db
+                  .collection("channelsCreatedByUser")
+                  .doc(channel.documentID)
+                  .collection("busyDatesWithTimeBlocks")
+                  .doc(date)
+                  .get()
+                  .then((doc) => {
+                    channelHoursForThatDateTwo = doc.data().busyHours;
+                  });
+
+                //Retrieves the busyHours of that Date Document of that USER
+                await db
+                  .collection("channelsCreatedByUser")
+                  .doc(channel.documentID)
+                  .collection("userAccounts")
+                  .doc(currentUserEmail)
+                  .collection("busyDatesWithTimeBlocks")
+                  .doc(date)
+                  .get()
+                  .then((doc) => {
+                    if (doc.exists) {
+                      //console.log("UserBusyHours for " + date);
+                      userBusyHoursForThatDateTwo = doc.data().hours;
+                    } else {
+                      //console.log("User don't have busy hours for that date, giving blank array instead: ");
+                      userBusyHoursForThatDateTwo = new Array(24).fill(0);
+                    }
+                  });
+
+                for (
+                  var hourIndexTwo = 0;
+                  hourIndexTwo < channelHoursForThatDateTwo.length;
+                  hourIndexTwo++
+                ) {
+                  if (userBusyHoursForThatDateTwo[hourIndexTwo] > 0) {
+                    channelHoursForThatDateTwo[hourIndexTwo]++;
+                  }
+                }
+
+                await db
+                  .collection("channelsCreatedByUser")
+                  .doc(channel.documentID)
+                  .collection("busyDatesWithTimeBlocks")
+                  .doc(date)
+                  .update({
+                    busyHours: channelHoursForThatDateTwo,
+                  });
+              }
+              //
+            })
+            .then(async () => {
+              await findOptimalSlots(channel, db);
+              btnTwo.classList.remove("buttonTwo--loading");
+              setLoaderSix(false);
+            });
+        });
+    });
+  }
   //*--------------------(HANDLING ADDING OF INVITEES FUNCTION) [HOST] MODIFY CHANNEL----*/
   async function handleAddingOfInvitee(e) {
     e.preventDefault();
@@ -1086,6 +1285,23 @@ export default function Channels() {
                                 Agree to Sync Calendar Data
                               </span>
                             </button>
+
+                            <button
+                              className="buttonTwo mt-2"
+                              style={{ width: 70, height: 30 }}
+                              disabled={loadingSix}
+                              onClick={() =>
+                                handleRefreshChannel(
+                                  channel,
+                                  db,
+                                  currentUserEmail
+                                )
+                              }
+                            >
+                              <span className="buttonTwo__text">
+                                <small>Refresh</small>
+                              </span>
+                            </button>
                           </Card.Text>
                         </Col>
                         <Col xs={6} md={4}>
@@ -1116,12 +1332,12 @@ export default function Channels() {
                           </Card.Text>
                         </Row>
                         <br></br>
-                        <Row className="mt-2">
+                        <Row>
                           <Card.Text className="font-italic">
                             <small>Host: {channel.hostEmail}</small>
                           </Card.Text>
                         </Row>
-                        <Row className="float-right">
+                        <Row className="float-right mt-2">
                           <button
                             className="leave-button mt-2"
                             style={{ width: 63, height: 30 }}
