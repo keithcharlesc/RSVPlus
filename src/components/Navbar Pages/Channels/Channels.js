@@ -71,31 +71,30 @@ export default function Channels() {
   const [endOfTime, setEndOfTime] = useState(new Date());
 
   //Delete channel [HOST]
-  const [loadingTwo, setLoaderTwo] = useState(false); //Deleting
-  const [errorTwo, setErrorTwo] = useState(""); //Deleting
-  const [successTwo, setSuccessTwo] = useState(""); //Deleting
-  const [buttonPopupTwo, setButtonPopupTwo] = useState(false); //Deleting a channel
+  const [loadingTwo, setLoaderTwo] = useState(false);
+  const [errorTwo, setErrorTwo] = useState("");
+  const [successTwo, setSuccessTwo] = useState("");
+  const [buttonPopupTwo, setButtonPopupTwo] = useState(false);
 
-  //Add/Remove User to a Channel [HOST]
-  const channelIDForModifyRef = useRef(); //Used for MODIFY invite list
-  const emailForModifyRef = useRef(); //Used for MODIFY invite list
-  const [loadingThree, setLoaderThree] = useState(false); //Modify (Add or Removal)
-  const [errorThree, setErrorThree] = useState(""); //Modify (Add or Removal)
-  const [successThree, setSuccessThree] = useState(""); //Modify
-  const [buttonPopupThree, setButtonPopupThree] = useState(false); //Modifying a channel
+  //Add or Remove User to a Channel [HOST]
+  const channelIDForModifyRef = useRef();
+  const emailForModifyRef = useRef();
+  const [loadingThree, setLoaderThree] = useState(false);
+  const [errorThree, setErrorThree] = useState("");
+  const [successThree, setSuccessThree] = useState("");
+  const [buttonPopupThree, setButtonPopupThree] = useState(false);
 
   //Join a Channel [USER]
-  const channelIDForJoinRef = useRef(); //Used for JOIN channel
-  const [loadingFour, setLoaderFour] = useState(false); //Joining channel
-  const [errorFour, setErrorFour] = useState(""); // Joining a channel
-  const [successFour, setSuccessFour] = useState(""); // Joining a channel
-  //const [buttonPopupFour, setButtonPopupFour] = useState(false); //Joining a channel
+  const channelIDForJoinRef = useRef();
+  const [loadingFour, setLoaderFour] = useState(false);
+  const [errorFour, setErrorFour] = useState("");
+  const [successFour, setSuccessFour] = useState("");
 
   //Leaving a Channel [USER]
-  const [loadingFive, setLoaderFive] = useState(false); //Leaving channel
+  const [loadingFive, setLoaderFive] = useState(false);
 
-  //Refreshing a Channnel
-  const [loadingSix, setLoaderSix] = useState(false); //Leaving channel
+  //Refreshing a Channel
+  const [loadingSix, setLoaderSix] = useState(false);
 
   /* -------------- GET EVENTS (BUSY DATES AND TIMINGS) ------------*/
   async function handleSecondClick(channel) {
@@ -108,7 +107,7 @@ export default function Channels() {
         .list({
           calendarId: "primary",
           timeMin: channel.start_date + "T00:00:00+08:00",
-          timeMax: channel.end_date + "T23:59:00+08:00", //might need to one day here
+          timeMax: channel.end_date + "T23:59:00+08:00",
           showDeleted: false,
           singleEvents: true,
           maxResults: 100,
@@ -523,29 +522,65 @@ export default function Channels() {
       .then((doc) => {
         if (doc.exists) {
           hostEmail = doc.data().hostEmail;
+          //console.log(hostEmail);
         } else {
           hostEmail = "null";
         }
       });
+
     if (hostEmail === "null") {
       setErrorTwo("Channel does not exist!");
       setLoaderTwo(false);
       return;
     } else if (currentUserEmail === hostEmail) {
-      /*
+      let responded = [];
+
       await db
         .collection("channelsCreatedByUser")
-        .doc(channelID)
-        .collection("userAccounts")
-        .doc(currentUserEmail) 
-        .collection("busyDatesWithTimeBlocks")
         .get()
         .then((querySnapshot) => {
-          querySnapshot.docs.forEach((snapshot) => {
-            snapshot.ref.delete();
+          querySnapshot.forEach((doc) => {
+            // doc.data() is never undefined for query doc snapshots
+            //console.log(doc.id, " => ", doc.data());
+            //console.log(doc.data().respondedEmails);
+            responded = doc.data().respondedEmails;
+            //console.log(responded);
           });
+        })
+        .catch((error) => {
+          console.log("Error getting documents: ", error);
         });
-        */
+
+      for (let i = 0; i < responded.length; i++) {
+        let email = responded[i];
+        //console.log(email);
+        await db
+          .collection("channelsCreatedByUser")
+          .doc(channelID)
+          .collection("userAccounts")
+          .doc(email)
+          .collection("busyDatesWithTimeBlocks")
+          .get()
+          .then((querySnapshot) => {
+            querySnapshot.docs.forEach((snapshot) => {
+              //console.log(email);
+              snapshot.ref.delete();
+            });
+          })
+          .catch((error) => {
+            console.log("Error getting documents: ", error);
+          });
+
+        await db
+          .collection("channelsCreatedByUser")
+          .doc(channelID)
+          .collection("userAccounts")
+          .doc(email)
+          .delete()
+          .catch((error) => {
+            console.log("Error getting documents: ", error);
+          });
+      }
 
       await db
         .collection("channelsCreatedByUser")
