@@ -150,6 +150,15 @@ export default function Channels() {
       return;
     }
 
+    let duplicate = hasDuplicates(emails);
+    if (duplicate) {
+      setError(
+        "Duplicate email address found, please remove the duplicate (remove your own email/the duplicate email from the invite list!)"
+      );
+      setLoader(false);
+      return;
+    }
+
     //Get Date Range (In proper format from UTC to YYYY-MM-DD)
     const dates = dateRange(
       startDate.toLocaleDateString("en-CA"),
@@ -268,6 +277,11 @@ export default function Channels() {
   //-------------------------------------------//
   const [channels, setChannels] = useState([]);
   const [loadingx, setLoading] = useState(false);
+
+  //---Checks for duplicates--//
+  function hasDuplicates(array) {
+    return new Set(array).size !== array.length;
+  }
 
   //---------------------Obtaining emailAddresses by form input fields (Getting emails in an array from invite List)---------------------//
   function findAll() {
