@@ -271,7 +271,7 @@ export default function Dashboard() {
                               </a>
                             </li>
                           </ul>
-                          <strong>New features for each tab! 🔥</strong>
+                          <strong>Features for each tab! 🔥</strong>
                           <ol>
                             <li className="mt-4 mb-1">
                               Home (Dashboard)
@@ -288,20 +288,48 @@ export default function Dashboard() {
                               <ul>
                                 <li className="mt-2">
                                   Create your own channel for a meet-up or event
-                                  and invite your friends of RSVP+.
+                                  and invite your friends of RSVP+. [Host]
                                 </li>
                                 <li className="mt-2">
                                   View channels you have been invited to or have
-                                  created.
+                                  created. [Host & User]
                                 </li>
                                 <li className="mt-2">
                                   Delete a channel that you are the host of
-                                  should you wish to remove it.
+                                  should you wish to remove it. [Host]
                                 </li>
                                 <li className="mt-2">
                                   Derive optimal time slots for an event
                                   (channel) for specified dates and time range
-                                  after everyone has "Agreed to Sync"! ✨
+                                  after everyone has "Agreed to Sync"! ✨ [Host
+                                  & User]
+                                </li>
+                                <li className="mt-2">
+                                  Join a channel by simply entering the channel
+                                  ID if it has yet to determine slots. [User]
+                                </li>
+                                <li className="mt-2">
+                                  Invite more people (that you might have
+                                  forgotten) to the channel if it has yet to
+                                  determine slots. [Host]
+                                </li>
+                                <li className="mt-2">
+                                  Remove a user from a channel if the user takes
+                                  too long to respond or is unable to make it in
+                                  the end, slots will be updated without his/
+                                  her data! [Host]
+                                </li>
+                                <li className="mt-2">
+                                  Leave a channel after everyone has decided on
+                                  a date and time, or if you are unable to make
+                                  it or should you wish to turn down the
+                                  invitation. [User]
+                                </li>
+                                <li className="mt-2">
+                                  Refresh the channel with your latest Google
+                                  Calendar data should there be any new changes
+                                  made to your calendar to get newly determined
+                                  slots! [Host & User]
                                 </li>
                               </ul>
                             </li>{" "}
@@ -336,10 +364,6 @@ export default function Dashboard() {
                               </ul>
                             </li>
                           </ol>
-                          <p className="mt-4">
-                            Other new updates includes: Google Login, input
-                            handling and a nicer design!
-                          </p>
                           <p className="mt-4">
                             Get started by clicking the "Display Upcoming
                             Events" button you see above if you have a Google
