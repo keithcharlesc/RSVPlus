@@ -1,5 +1,7 @@
 import findOptimalSlots from "./findOptimalSlots";
 
+//Checks the previous slots added to channel and remove them
+
 export default async function decrementDates(channel, db, currentUserEmail) {
   //-------------- SUB OF MAIN <For Loop Algo: To update Dates>-----------
   const dateRange = [...channel.dateRange]; //dateRange Array
