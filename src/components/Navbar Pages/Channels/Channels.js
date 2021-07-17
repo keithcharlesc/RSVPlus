@@ -304,6 +304,8 @@ export default function Channels() {
     const userHasResponded = respondedEmails.includes(currentUserEmail);
 
     if (userHasResponded === true) {
+      setLoader(false);
+      btn.classList.remove("button--loading");
       alert("You already responded!");
       return;
     }
