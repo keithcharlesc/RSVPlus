@@ -533,19 +533,19 @@ export default function Channels() {
 
       await db
         .collection("channelsCreatedByUser")
+        .doc(channelID)
         .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            // doc.data() is never undefined for query doc snapshots
-            //console.log(doc.id, " => ", doc.data());
-            //console.log(doc.data().respondedEmails);
+        .then((doc) => {
+          if (doc.exists) {
             responded = doc.data().respondedEmails;
             //console.log(responded);
-          });
+          }
         })
         .catch((error) => {
           console.log("Error getting documents: ", error);
         });
+
+      //console.log(responded);
 
       for (let i = 0; i < responded.length; i++) {
         let email = responded[i];
