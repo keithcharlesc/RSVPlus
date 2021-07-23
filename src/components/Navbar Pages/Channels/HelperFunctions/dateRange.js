@@ -1,4 +1,6 @@
-//Function to obtain Date In-between
+// Function to obtain Date In-between
+// Used in Channels.js and obtainBusyDates.js
+
 export default function dateRange(startDate, endDate, steps = 1) {
   const dateArray = [];
   let currentDate = new Date(startDate);

@@ -4,7 +4,7 @@ import { Carousel } from "react-bootstrap";
 import StepOne from "./img/StepOne.png";
 import StepTwo from "./img/StepTwo.png";
 import StepThree from "./img/StepThree.png";
-import { Link } from "react-router-dom";
+import { BrowserRouter, Link } from "react-router-dom";
 import "./CalGuide.css";
 
 export default function CalGuide() {
@@ -22,7 +22,9 @@ export default function CalGuide() {
         style={{ minHeight: "100vh" }}
       >
         <h2 className="text-center mb-5">Calendar How-To</h2>
-        <Link to="/calendar">Back to Calendar</Link>
+        <BrowserRouter>
+          <Link to="/calendar">Back to Calendar</Link>
+        </BrowserRouter>
 
         <Carousel activeIndex={index} onSelect={handleSelect}>
           <Carousel.Item>

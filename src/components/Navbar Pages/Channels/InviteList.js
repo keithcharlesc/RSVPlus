@@ -1,6 +1,6 @@
 import React from "react";
 import { Form } from "react-bootstrap";
-//Component used in Channels
+//Component used in Channels.js
 export default class InviteList extends React.Component {
   constructor() {
     super();

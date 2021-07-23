@@ -1,3 +1,6 @@
+//Derives optimal time slots of Channel
+//Used in decrementDates.js and Channel.js
+
 export default async function findOptimalSlots(channel, db) {
   ///*
   //If everyone has fully responded, give the most optimal date and time below:
@@ -97,7 +100,7 @@ export default async function findOptimalSlots(channel, db) {
 }
 
 //----------Function to get the Simplified Outputs instead of 1H slots//
-function simplifyTimeBlocks(arr) {
+export function simplifyTimeBlocks(arr) {
   var index = 0;
   for (var k = 0; k < arr.length; k++) {
     // only if arr length is greater than 1
