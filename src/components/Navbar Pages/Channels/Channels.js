@@ -14,18 +14,15 @@ import { firebase } from "@firebase/app";
 import Popup from "./Popup";
 import InviteList from "./InviteList";
 import "./Channels.css";
-import dateRange from "./HelperFunctions/dateRange";
+import dateRange from "./dateRange";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import obtainBusyDates from "./obtainBusyDates";
 import findOptimalSlots from "./findOptimalSlots";
 import decrementDates from "./decrementDates";
-import timeToConvert from "./HelperFunctions/timeToConvert";
-import getMinutes from "./HelperFunctions/getMinutes";
 
 /*----------------------- GAPI INITIALIZAITON----------------------*/
 var gapi = window.gapi;
-//console.log(gapi);
 var CLIENT_ID =
   "1011248109211-umpu5g48dj5p4hqlnhvuvl6f4c9qdhn3.apps.googleusercontent.com";
 var API_KEY = "AIzaSyD3-pnAPnBMzBqL_dAZYYyVGretc42zUnA";
@@ -52,7 +49,6 @@ gapi.load("client:auth2", () => {
   );
 });
 /*---------------------------------------------------------------------*/
-
 export default function Channels() {
   const db = firebase.firestore();
   const hostName = firebase.auth().currentUser?.displayName;
@@ -163,15 +159,11 @@ export default function Channels() {
       return;
     }
 
-    //console.log(startDate.toLocaleDateString("en-CA"));
-    //console.log(endDate.toLocaleDateString("en-CA"));
     //Get Date Range (In proper format from UTC to YYYY-MM-DD)
     const dates = dateRange(
       startDate.toLocaleDateString("en-CA"),
       endDate.toLocaleDateString("en-CA")
     );
-
-    //console.log(dates);
 
     //-----Checks whether input for End Time Slot (Range) is later than Start Time Slot-------//
     let startDateHoursAndMinutes = startOfTime.toLocaleTimeString("it-IT");
@@ -441,6 +433,28 @@ export default function Channels() {
   }
   // ------------------------------------------*** End of Sync Implementation ***---------------------------------------//
 
+  //------Function to Convert 24H into 9AM-----------------/
+  function timeToConvert(time) {
+    // Check correct time format and split into components
+    time = time.toString().match(/^([01]\d|2[0-3])?$/) || [time];
+
+    if (time.length > 1) {
+      // If time format correct
+      time = time.slice(1); // Remove full string match value
+      time[5] = +time[0] < 12 ? "AM" : "PM"; // Set AM/PM
+      time[0] = +time[0] % 12 || 12; // Adjust hours
+    }
+    return time.join(""); // return adjusted time or original string
+  }
+
+  /*-------------Get minutes from HH:MM (hours and minutes 24 hr form)-----------------*/
+  function getMinutes(time) {
+    let str = time;
+    let arr = str.split(":");
+    let minutes = +arr[0] * 60 + +arr[1];
+    //console.log(minutes);
+    return minutes;
+  }
   /*-----------Function to validateEmails against RSVP+ Database----------------*/
   async function validateEmails(emailArr) {
     var arrayValues = [true, ""];
