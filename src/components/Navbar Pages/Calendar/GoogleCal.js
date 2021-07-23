@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import { ReactEmbeddedGoogleCalendar } from "react-embedded-google-calendar";
 import { Row, Col, Button } from "react-bootstrap";
-import firebase from "../../../firebase";
-import { BrowserRouter, Link } from "react-router-dom";
+import { firebase } from "@firebase/app";
+import { Link } from "react-router-dom";
 
 const MoonPhasesCalendar =
   "https://calendar.google.com/calendar/embed?src=ht3jlfaac5lfd6263ulfh4tql8%40group.calendar.google.com&ctz=Europe%2FRome";
 
 export default function GoogleCal() {
-  const db = firebase.firestore();
-  const currentUserEmail = firebase.auth().currentUser?.email;
   const [loading, setLoader] = useState(false);
   const [loadingTwo, setLoaderTwo] = useState(false);
   const [loadingThree, setLoaderThree] = useState(false);
@@ -45,7 +43,9 @@ export default function GoogleCal() {
       });
   };
 
+  const db = firebase.firestore();
   //const uid = firebase.auth().currentUser?.uid;
+  const currentUserEmail = firebase.auth().currentUser?.email;
 
   //Storing Google Calendar URL
   const handleSubmit = (e) => {
@@ -103,11 +103,9 @@ export default function GoogleCal() {
       <form>
         <label>
           <strong>Input Google Calendar Link Below:</strong>
-          <BrowserRouter>
-            <Link className="ml-2" to="/calendar-guide">
-              Guide
-            </Link>
-          </BrowserRouter>
+          <Link className="ml-2" to="/calendar-guide">
+            Guide
+          </Link>
           <Row className="mt-2">
             <Col sm={9}>
               <input

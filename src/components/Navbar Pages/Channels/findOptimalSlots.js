@@ -97,7 +97,7 @@ export default async function findOptimalSlots(channel, db) {
 }
 
 //----------Function to get the Simplified Outputs instead of 1H slots//
-export function simplifyTimeBlocks(arr) {
+function simplifyTimeBlocks(arr) {
   var index = 0;
   for (var k = 0; k < arr.length; k++) {
     // only if arr length is greater than 1

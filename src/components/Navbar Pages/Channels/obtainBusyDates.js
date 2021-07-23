@@ -1,5 +1,3 @@
-import dateRange from "./HelperFunctions/dateRange";
-
 export default async function obtainBusyDates(
   events,
   db,
@@ -396,4 +394,23 @@ async function incrementEndDateBlocks(datesRef, endDate, rawEndDate) {
     .catch((error) => {
       console.log("Error getting document:", error);
     });
+}
+
+//Function to obtain Date In-between
+function dateRange(startDate, endDate, steps = 1) {
+  const dateArray = [];
+  let currentDate = new Date(startDate);
+
+  while (currentDate <= new Date(endDate)) {
+    dateArray.push(new Date(currentDate));
+    // Using UTC date to prevent problems with time zones and DST
+    currentDate.setUTCDate(currentDate.getUTCDate() + steps);
+  }
+
+  //Converts UTC into DD/MM/YYYY then YYYY-MM-DD (To match Google Cal Format)
+  for (var i = 0; i < dateArray.length; i++) {
+    dateArray[i] = dateArray[i].toLocaleDateString("en-CA");
+  }
+
+  return dateArray;
 }
