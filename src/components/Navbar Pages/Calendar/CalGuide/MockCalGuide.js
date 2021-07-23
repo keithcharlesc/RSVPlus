@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import NavigationBar from "../../NavigationBar/NavigationBar";
+import MockNavigationBar from "../../NavigationBar/MockNavigationBar";
 import { Carousel } from "react-bootstrap";
 import StepOne from "./img/StepOne.png";
 import StepTwo from "./img/StepTwo.png";
@@ -16,7 +16,7 @@ export default function CalGuide() {
 
   return (
     <>
-      <NavigationBar />
+      <MockNavigationBar />
       <div
         className="p-3 mb-2 bg-dark text-white"
         style={{ minHeight: "100vh" }}

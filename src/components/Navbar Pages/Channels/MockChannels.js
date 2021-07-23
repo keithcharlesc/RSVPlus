@@ -9,7 +9,7 @@ import {
   Badge,
   Col,
 } from "react-bootstrap";
-import NavigationBar from "../NavigationBar/NavigationBar";
+import MockNavigationBar from "../NavigationBar/MockNavigationBar";
 import { firebase } from "@firebase/app";
 import Popup from "./Popup";
 import InviteList from "./InviteList";
@@ -20,12 +20,9 @@ import "react-datepicker/dist/react-datepicker.css";
 import obtainBusyDates from "./obtainBusyDates";
 import findOptimalSlots from "./findOptimalSlots";
 import decrementDates from "./decrementDates";
-import timeToConvert from "./HelperFunctions/timeToConvert";
-import getMinutes from "./HelperFunctions/getMinutes";
 
-/*----------------------- GAPI INITIALIZAITON----------------------*/
-var gapi = window.gapi;
-//console.log(gapi);
+/*----- GAPI------*/
+var gapi = { auth2: {}, client: {} };
 var CLIENT_ID =
   "1011248109211-umpu5g48dj5p4hqlnhvuvl6f4c9qdhn3.apps.googleusercontent.com";
 var API_KEY = "AIzaSyD3-pnAPnBMzBqL_dAZYYyVGretc42zUnA";
@@ -34,26 +31,10 @@ var DISCOVERY_DOCS = [
 ];
 var SCOPES = "https://www.googleapis.com/auth/calendar.events";
 
-gapi.load("client:auth2", () => {
-  //console.log("loaded auth2 client!");
+gapi.load = (a, f) => f();
+/*---------------*/
 
-  gapi.client.init({
-    apiKey: API_KEY,
-    clientId: CLIENT_ID,
-    discoveryDocs: DISCOVERY_DOCS,
-    scope: SCOPES,
-  });
-
-  gapi.client.load(
-    "calendar",
-    "v3",
-    () => console.log()
-    //console.log("loaded calendar v3, entry!")
-  );
-});
-/*---------------------------------------------------------------------*/
-
-export default function Channels() {
+export default function MockChannels() {
   const db = firebase.firestore();
   const hostName = firebase.auth().currentUser?.displayName;
   const currentUserEmail = firebase.auth().currentUser?.email;
@@ -441,6 +422,28 @@ export default function Channels() {
   }
   // ------------------------------------------*** End of Sync Implementation ***---------------------------------------//
 
+  //------Function to Convert 24H into 9AM-----------------/
+  function timeToConvert(time) {
+    // Check correct time format and split into components
+    time = time.toString().match(/^([01]\d|2[0-3])?$/) || [time];
+
+    if (time.length > 1) {
+      // If time format correct
+      time = time.slice(1); // Remove full string match value
+      time[5] = +time[0] < 12 ? "AM" : "PM"; // Set AM/PM
+      time[0] = +time[0] % 12 || 12; // Adjust hours
+    }
+    return time.join(""); // return adjusted time or original string
+  }
+
+  /*-------------Get minutes from HH:MM (hours and minutes 24 hr form)-----------------*/
+  function getMinutes(time) {
+    let str = time;
+    let arr = str.split(":");
+    let minutes = +arr[0] * 60 + +arr[1];
+    //console.log(minutes);
+    return minutes;
+  }
   /*-----------Function to validateEmails against RSVP+ Database----------------*/
   async function validateEmails(emailArr) {
     var arrayValues = [true, ""];
@@ -1195,7 +1198,7 @@ export default function Channels() {
 
   return (
     <div>
-      <NavigationBar />
+      <MockNavigationBar />
       <div
         className="p-3 mb-2 bg-dark text-white"
         style={{ minHeight: "100vh" }}
