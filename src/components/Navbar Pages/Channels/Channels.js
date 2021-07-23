@@ -14,12 +14,14 @@ import { firebase } from "@firebase/app";
 import Popup from "./Popup";
 import InviteList from "./InviteList";
 import "./Channels.css";
-import dateRange from "./dateRange";
+import dateRange from "./HelperFunctions/dateRange";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import obtainBusyDates from "./obtainBusyDates";
 import findOptimalSlots from "./findOptimalSlots";
 import decrementDates from "./decrementDates";
+import timeToConvert from "./HelperFunctions/timeToConvert";
+import getMinutes from "./HelperFunctions/getMinutes";
 
 /*----------------------- GAPI INITIALIZAITON----------------------*/
 var gapi = window.gapi;
@@ -433,28 +435,6 @@ export default function Channels() {
   }
   // ------------------------------------------*** End of Sync Implementation ***---------------------------------------//
 
-  //------Function to Convert 24H into 9AM-----------------/
-  function timeToConvert(time) {
-    // Check correct time format and split into components
-    time = time.toString().match(/^([01]\d|2[0-3])?$/) || [time];
-
-    if (time.length > 1) {
-      // If time format correct
-      time = time.slice(1); // Remove full string match value
-      time[5] = +time[0] < 12 ? "AM" : "PM"; // Set AM/PM
-      time[0] = +time[0] % 12 || 12; // Adjust hours
-    }
-    return time.join(""); // return adjusted time or original string
-  }
-
-  /*-------------Get minutes from HH:MM (hours and minutes 24 hr form)-----------------*/
-  function getMinutes(time) {
-    let str = time;
-    let arr = str.split(":");
-    let minutes = +arr[0] * 60 + +arr[1];
-    //console.log(minutes);
-    return minutes;
-  }
   /*-----------Function to validateEmails against RSVP+ Database----------------*/
   async function validateEmails(emailArr) {
     var arrayValues = [true, ""];
