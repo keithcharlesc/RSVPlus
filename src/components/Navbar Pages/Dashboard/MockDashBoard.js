@@ -146,6 +146,7 @@ export default function Dashboard() {
             <Row className="d-flex align-items-center justify-content-center mb-4">
               {" "}
               <button
+                data-testid="buttonOne"
                 className="d-flex align-items-center justify-content-center button"
                 style={{ width: 250, height: 30 }}
                 onClick={handleSecondClick}

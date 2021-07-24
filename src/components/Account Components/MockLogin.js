@@ -115,6 +115,7 @@ export default function MockLogin() {
                 <div className="vl">
                   <div className="ml-4">
                     <Button
+                      data-testid="button"
                       variant="danger"
                       disabled={loading}
                       className="login-button mt-4 w-100"
