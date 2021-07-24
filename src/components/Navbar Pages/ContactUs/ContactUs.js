@@ -69,6 +69,7 @@ export default function ContactUs() {
                 </Form.Group>
                 <br></br>
                 <Button
+                  data-testid="submit-button"
                   variant="danger"
                   disabled={loading}
                   className="w-100"

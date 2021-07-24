@@ -25,10 +25,12 @@ export default function Login() {
       scope: "https://www.googleapis.com/auth/calendar",
     });
 
-    gapi.client.load("calendar", "v3", () =>
-     console.log()
-    //console.log("loaded calendar v3, entry!")
-  );
+    gapi.client.load(
+      "calendar",
+      "v3",
+      () => console.log()
+      //console.log("loaded calendar v3, entry!")
+    );
   });
   /* ------------ Login with gapi Auth and firebase -------------*/
   async function login() {
@@ -124,6 +126,7 @@ export default function Login() {
                 <div className="vl">
                   <div className="ml-4">
                     <Button
+                      data-testid="button"
                       variant="danger"
                       disabled={loading}
                       className="login-button mt-4 w-100"
