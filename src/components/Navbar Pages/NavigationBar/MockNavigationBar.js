@@ -66,6 +66,7 @@ export default function MockNavigationBar() {
           </Nav>
         </Navbar.Collapse>
         <Button
+          data-testid="button"
           variant="outline-primary"
           className="ml-3"
           onClick={handleLogout}

@@ -121,6 +121,7 @@ export default function GoogleCal() {
             </Col>
             <Col sm={3}>
               <Button
+                data-testid="buttonOne"
                 variant="danger"
                 className="d-flex align-items-center justify-content-center ml-2"
                 style={{ width: 74, height: 30 }}
@@ -134,6 +135,7 @@ export default function GoogleCal() {
           <Row className="mt-3">
             <Col>
               <Button
+                data-testid="buttonTwo"
                 variant="danger"
                 className="d-flex align-items-center justify-content-center"
                 style={{ height: 30 }}
@@ -145,6 +147,7 @@ export default function GoogleCal() {
             </Col>
             <Col>
               <Button
+                data-testid="buttonThree"
                 variant="danger"
                 className="d-flex align-items-center justify-content-center mb-1"
                 style={{ height: 30 }}
@@ -156,6 +159,7 @@ export default function GoogleCal() {
             </Col>
             <Col>
               <Button
+                data-testid="buttonFour"
                 variant="danger"
                 className="d-flex align-items-center justify-content-center"
                 style={{ width: 200, height: 30 }}

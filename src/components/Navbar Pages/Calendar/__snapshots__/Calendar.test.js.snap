@@ -1,0 +1,392 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`matches snapshot 1`] = `
+Array [
+  <div>
+    <nav
+      className="navbar navbar-expand-sm navbar-dark bg-dark"
+    >
+      <a
+        className="nav-bar-appName text-danger navbar-brand"
+        href="/"
+      >
+        RSVP+
+      </a>
+      <button
+        aria-controls="responsive-navbar-nav"
+        aria-label="Toggle navigation"
+        className="navbar-toggler collapsed"
+        onClick={[Function]}
+        type="button"
+      >
+        <span
+          className="navbar-toggler-icon"
+        />
+      </button>
+      <div
+        aria-expanded={null}
+        className="navbar-collapse collapse"
+        id="responsive-navbar-nav"
+      >
+        <div
+          className="mr-auto navbar-nav"
+          onKeyDown={[Function]}
+        >
+          <a
+            className="nav-bar-text px-3 nav-link"
+            data-rb-event-key="/"
+            href="/"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+          >
+            Home
+          </a>
+          <a
+            className="nav-bar-text px-3 nav-link"
+            data-rb-event-key="/channels"
+            href="/channels"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+          >
+            Channels
+          </a>
+          <a
+            className="nav-bar-text px-3 nav-link"
+            data-rb-event-key="/calendar"
+            href="/calendar"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+          >
+            Calendar
+          </a>
+          <a
+            className="nav-bar-text px-3 nav-link"
+            data-rb-event-key="/faq"
+            href="/faq"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+          >
+            FAQ
+          </a>
+          <a
+            className="nav-bar-text px-3 nav-link"
+            data-rb-event-key="/contact-us"
+            href="/contact-us"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+          >
+            Contact Us
+          </a>
+        </div>
+        <div
+          className="navbar-nav"
+          onKeyDown={[Function]}
+        >
+          <span
+            className="nav-bar-name navbar-text"
+          >
+            Signed in as: 
+            Bob
+            <img
+              className="photo ml-2 rounded-circle"
+              src="thttp://email.com/image"
+            />
+          </span>
+        </div>
+      </div>
+      <button
+        className="ml-3 btn btn-outline-primary"
+        data-testid="button"
+        disabled={false}
+        onClick={[Function]}
+        type="button"
+      >
+        Log Out
+      </button>
+    </nav>
+    <div>
+      
+    </div>
+  </div>,
+  <div
+    className="p-3 mb-2 bg-dark text-white"
+    style={
+      Object {
+        "minHeight": "100vh",
+      }
+    }
+  >
+    <h2
+      className="text-center mb-5"
+    >
+      Calendar How-To
+    </h2>
+    <a
+      href="/calendar"
+      onClick={[Function]}
+    >
+      Back to Calendar
+    </a>
+    <div
+      className="carousel slide"
+      onKeyDown={[Function]}
+      onMouseOut={[Function]}
+      onMouseOver={[Function]}
+      onTouchEnd={[Function]}
+      onTouchMove={[Function]}
+      onTouchStart={[Function]}
+    >
+      <ol
+        className="carousel-indicators"
+      >
+        <li
+          className="active"
+          onClick={[Function]}
+        />
+        <li
+          onClick={[Function]}
+        />
+        <li
+          onClick={[Function]}
+        />
+      </ol>
+      <div
+        className="carousel-inner"
+      >
+        <div
+          className="active carousel-item"
+        >
+          <img
+            alt="First slide"
+            className="d-block w-100"
+            src="StepOne.png"
+          />
+          <div
+            className="carousel-caption"
+          >
+            <h3
+              className="mt-5"
+            >
+              Step 1
+            </h3>
+            <p
+              className="mt-5"
+            >
+              Going to Google Calendar.
+            </p>
+          </div>
+        </div>
+        <div
+          className="carousel-item"
+        >
+          <img
+            alt="Second slide"
+            className="d-block w-100"
+            src="StepTwo.png"
+          />
+          <div
+            className="carousel-caption"
+          >
+            <h3
+              className="mt-5"
+            >
+              Step 2
+            </h3>
+            <p
+              className="mt-5"
+            >
+              Getting public URL.
+            </p>
+          </div>
+        </div>
+        <div
+          className="carousel-item"
+        >
+          <img
+            alt="Third slide"
+            className="d-block w-100"
+            src="StepThree.png"
+          />
+          <div
+            className="carousel-caption"
+          >
+            <h3
+              className="mt-5"
+            >
+              Step 3
+            </h3>
+            <p
+              className="mt-5"
+            >
+              Saving URL in RSVP+ for future logins to fetch from.
+            </p>
+          </div>
+        </div>
+      </div>
+      <a
+        className="carousel-control-prev"
+        href="#"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="button"
+      >
+        <span
+          aria-hidden="true"
+          className="carousel-control-prev-icon"
+        />
+        <span
+          className="sr-only"
+        >
+          Previous
+        </span>
+      </a>
+      <a
+        className="carousel-control-next"
+        href="#"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="button"
+      >
+        <span
+          aria-hidden="true"
+          className="carousel-control-next-icon"
+        />
+        <span
+          className="sr-only"
+        >
+          Next
+        </span>
+      </a>
+    </div>
+  </div>,
+]
+`;
+
+exports[`matches snapshot 2`] = `
+Array [
+  <form>
+    <label>
+      <strong>
+        Input Google Calendar Link Below:
+      </strong>
+      <a
+        className="ml-2"
+        href="/calendar-guide"
+        onClick={[Function]}
+      >
+        Guide
+      </a>
+      <div
+        className="mt-2 row"
+      >
+        <div
+          className="col-sm-9"
+        >
+          <input
+            className="mb-1"
+            onChange={[Function]}
+            placeholder="Paste a public URL of your calendar"
+            style={
+              Object {
+                "width": "105%",
+              }
+            }
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          className="col-sm-3"
+        >
+          <button
+            className="d-flex align-items-center justify-content-center ml-2 btn btn-danger"
+            data-testid="buttonOne"
+            disabled={false}
+            onClick={[Function]}
+            style={
+              Object {
+                "height": 30,
+                "width": 74,
+              }
+            }
+            type="button"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+      <div
+        className="mt-3 row"
+      >
+        <div
+          className="col"
+        >
+          <button
+            className="d-flex align-items-center justify-content-center btn btn-danger"
+            data-testid="buttonTwo"
+            disabled={false}
+            onClick={[Function]}
+            style={
+              Object {
+                "height": 30,
+              }
+            }
+            type="button"
+          >
+            SaveURL
+          </button>
+        </div>
+        <div
+          className="col"
+        >
+          <button
+            className="d-flex align-items-center justify-content-center mb-1 btn btn-danger"
+            data-testid="buttonThree"
+            disabled={false}
+            onClick={[Function]}
+            style={
+              Object {
+                "height": 30,
+              }
+            }
+            type="button"
+          >
+            Fetch
+          </button>
+        </div>
+        <div
+          className="col"
+        >
+          <button
+            className="d-flex align-items-center justify-content-center btn btn-danger"
+            data-testid="buttonFour"
+            disabled={false}
+            onClick={[Function]}
+            style={
+              Object {
+                "height": 30,
+                "width": 200,
+              }
+            }
+            type="button"
+          >
+            Use Sample Calendar
+          </button>
+        </div>
+      </div>
+    </label>
+  </form>,
+  <hr />,
+  <div
+    style={
+      Object {
+        "height": "500px",
+      }
+    }
+  >
+    <p>
+      Please, provide public URL of your Google calendar
+    </p>
+  </div>,
+]
+`;
