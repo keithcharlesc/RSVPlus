@@ -227,6 +227,7 @@ export default function Calendar() {
                     />
                   </div>
                   <Button
+                    data-testid="buttonToTest"
                     className="mt-2"
                     disabled={loading}
                     variant="danger"

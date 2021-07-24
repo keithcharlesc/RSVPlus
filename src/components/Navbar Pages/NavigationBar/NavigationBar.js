@@ -58,6 +58,7 @@ export default function NavigationBar() {
           </Nav>
         </Navbar.Collapse>
         <Button
+          data-testid="button"
           variant="outline-primary"
           className="ml-3"
           onClick={handleLogout}
