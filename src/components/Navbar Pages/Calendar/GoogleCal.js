@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ReactEmbeddedGoogleCalendar } from "react-embedded-google-calendar";
 import { Row, Col, Button } from "react-bootstrap";
-import { firebase } from "@firebase/app";
+import firebase from "../../../firebase";
 import { BrowserRouter, Link } from "react-router-dom";
 
 const MoonPhasesCalendar =
