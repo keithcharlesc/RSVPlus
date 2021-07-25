@@ -1186,6 +1186,28 @@ export default function Channels() {
     }
   }
   //*-------------------------------------------------------------------------------------------*/
+  function displayRefreshButton(channel) {
+    const refreshButton = (
+      <button
+        className="buttonTwo mt-2"
+        style={{ width: 70, height: 30 }}
+        disabled={loadingSix}
+        onClick={() => handleRefreshChannel(channel, db, currentUserEmail)}
+      >
+        <span className="buttonTwo__text">
+          <small>Refresh</small>
+        </span>
+      </button>
+    );
+
+    const emails = channel.respondedEmails;
+    const boolean = emails.indexOf(currentUserEmail) > -1; //Check if logged in user email belongs to Responded Emails
+    if (boolean === true) {
+      return refreshButton;
+    }
+  }
+
+  //*------*/
 
   return (
     <div>
@@ -1317,22 +1339,7 @@ export default function Channels() {
                               </span>
                             </button>
 
-                            <button
-                              className="buttonTwo mt-2"
-                              style={{ width: 70, height: 30 }}
-                              disabled={loadingSix}
-                              onClick={() =>
-                                handleRefreshChannel(
-                                  channel,
-                                  db,
-                                  currentUserEmail
-                                )
-                              }
-                            >
-                              <span className="buttonTwo__text">
-                                <small>Refresh</small>
-                              </span>
-                            </button>
+                            {displayRefreshButton(channel)}
                           </Card.Text>
                         </Col>
                         <Col xs={6} md={4}>
