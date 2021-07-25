@@ -11,7 +11,7 @@ test("obtains proper date range in between two dates", () => {
   ]);
 });
 
-test("converts time index to AM/PM", () => {
+test("converts hours and minutes to minutes", () => {
   expect(getMinutes("10:25")).toBe(625);
 });
 
