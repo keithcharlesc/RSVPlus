@@ -27,7 +27,7 @@ export default function ContactUs() {
       })
       .then(() => {
         setLoader(false);
-        setSuccess("Your message has been submitted");
+        setSuccess("Your message has been submitted!");
       })
       .catch((error) => {
         setError(error.message);
