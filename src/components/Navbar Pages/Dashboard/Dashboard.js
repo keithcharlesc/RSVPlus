@@ -58,6 +58,7 @@ export default function Dashboard() {
           //console.log("Google Events Fetched: ", events);
           if (events.length === 0) {
             alert("No events found.");
+            setEvents(events);
             btn.classList.remove("button--loading");
             setLoader(false);
             return;
