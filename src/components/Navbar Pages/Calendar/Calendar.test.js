@@ -1,7 +1,7 @@
 import React from "react";
 import MockCalendar from "./MockCalendar";
 import MockCalGuide from "./CalGuide/MockCalGuide";
-import GoogleCal from "./GoogleCal";
+import MockGoogleCal from "./MockGoogleCal";
 import { render, getByTestId } from "@testing-library/react";
 import TestRenderer from "react-test-renderer";
 import { toHaveTextContent } from "@testing-library/jest-dom";
@@ -25,7 +25,7 @@ it("matches snapshot", () => {
 });
 
 it("renders GoogleCal without crashing and has correct text", () => {
-  const { getByText } = render(<GoogleCal />);
+  const { getByText } = render(<MockGoogleCal />);
   getByText("Input Google Calendar Link Below:");
   getByText("Guide");
   expect(getByText("Guide").href).toBe("http://localhost/calendar-guide");
@@ -44,7 +44,7 @@ it("renders GoogleCal without crashing and has correct text", () => {
 });
 
 it("matches snapshot", () => {
-  const tree = TestRenderer.create(<GoogleCal />).toJSON();
+  const tree = TestRenderer.create(<MockGoogleCal />).toJSON();
   expect(tree).toMatchSnapshot();
 });
 

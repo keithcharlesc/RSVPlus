@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import MockNavigationBar from "../NavigationBar/MockNavigationBar";
 import "./Calendar.css";
-import GoogleCal from "./GoogleCal";
+import MockGoogleCal from "./MockGoogleCal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -139,7 +139,7 @@ export default function Calendar() {
         <Container className="" style={{ minHeight: "75vh" }}>
           <Row>
             <Col md={7} className="mb-3">
-              <GoogleCal />
+              <MockGoogleCal />
             </Col>
             <Col md={{ span: 4, offset: 1 }}>
               <section className="create-event-section">
