@@ -4,7 +4,7 @@
 
 <https://rsvplus.vercel.app/>
 
-## Video Introduction
+## Video Introduction (Quick Walkthrough of Features)
 
 <https://www.youtube.com/watch?v=Hb3KAmThD3o&ab_channel=NUSOrbital>
 
