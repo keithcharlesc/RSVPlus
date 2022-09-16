@@ -28,6 +28,9 @@ Through this project, we **aim to bring convenience and accessibility to everyon
 
 <img src="src/imgs/mainIdea.png" width="800" height="400" alt="main idea of application"/>
 
+## Breakdown of Features
+<https://www.figma.com/file/zI65CDPZoYCcvUK7Bw4GuZ/RSVPlus-Milestone-2?node-id=0%3A1>
+
 ## User Stories
 
 | As a …​ | I want to …​                                                                                  | So that I can…​                                                                                 |
