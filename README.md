@@ -8,6 +8,10 @@
 
 <https://www.youtube.com/watch?v=Hb3KAmThD3o&ab_channel=NUSOrbital>
 
+## Detailed Walkthrough of Primary Features
+
+<https://www.youtube.com/watch?v=9X-SUjXz4Zk>
+
 ## Purpose
 
 RSVPlus is a calendar web application that suggests optimal time slots based on everyone's Google Calendar availability.
